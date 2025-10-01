@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ property.title }} - Traca Management Services Ltd{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Property Images -->
+        <div class="col-lg-8">
+            <div class="card card-brand mb-4">
+                <div class="card-body p-0">
+                    {% if property.media.all %}
+                        <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% for media in property.media.all %}
+                                    {% if media.media_type == 'image' %}
+                                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                        <img src="{{ media.file.url }}" class="d-block w-100" alt="{{ media.caption }}" style="height: 500px; object-fit: cover;">
+                                        {% if media.caption %}
+                                        <div class="carousel-caption d-none d-md-block">
+                                            <p>{{ media.caption }}</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% if property.media.count > 1 %}
+                            <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <img src="{% static 'images/default_property.jpg' %}" class="card-img-top" alt="No Image" style="height: 500px; object-fit: cover;">
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Property Details -->
+            <div class="card card-brand mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h3 class="mb-0">
+                        {{ property.title }}
+                        {% if property.is_verified %}
+                        <span class="badge-verified badge-verified-lg ms-2">
+                            <i class="fas fa-check"></i>Verified Property
+                        </span>
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-brand-secondary">KSh {{ property.price|intcomma }}</h5>
+                            <p class="text-muted mb-0">{{ property.get_property_type_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ property.county.name }}</p>
+                            <p class="text-muted mb-0"><i class="fas fa-calendar me-2"></i>Listed {{ property.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+
+                    <h5>Property Details</h5>
+                    <div class="row">
+                        {% if property.bedrooms %}
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-bed fa-2x text-brand-primary mb-2"></i>
+                                <h6>{{ property.bedrooms }}</h6>
+                                <small class="text-muted">Bedrooms</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if property.bathrooms %}
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-bath fa-2x text-brand-primary mb-2"></i>
+                                <h6>{{ property.bathrooms }}</h6>
+                                <small class="text-muted">Bathrooms</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if property.parking_slots %}
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-car fa-2x text-brand-primary mb-2"></i>
+                                <h6>{{ property.parking_slots }}</h6>
+                                <small class="text-muted">Parking</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if property.area %}
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-ruler-combined fa-2x text-brand-primary mb-2"></i>
+                                <h6>{{ property.area|intcomma }}</h6>
+                                <small class="text-muted">Sq Ft</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <h5 class="mt-4">Description</h5>
+                    <p class="text-muted">{{ property.description|linebreaks }}</p>
+                </div>
+            </div>
+
+            <!-- Virtual Tour & Video -->
+            {% if property.virtual_tour_url or property.video_tour %}
+            <div class="card card-brand mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0"><i class="fas fa-video me-2"></i>Virtual Tours</h5>
+                </div>
+                <div class="card-body">
+                    {% if property.virtual_tour_url %}
+                    <div class="mb-3">
+                        <h6>Virtual Tour</h6>
+                        <a href="{{ property.virtual_tour_url }}" target="_blank" class="btn btn-primary-brand">
+                            <i class="fas fa-external-link-alt me-2"></i>View Virtual Tour
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if property.video_tour %}
+                    <div>
+                        <h6>Video Tour</h6>
+                        <video controls class="w-100" style="max-height: 400px;">
+                            <source src="{{ property.video_tour.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Inquiry Form -->
+            <div class="card card-brand mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>Make an Inquiry</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Full Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.inquiry_type.id_for_label }}" class="form-label">Inquiry Type</label>
+                            {{ form.inquiry_type }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">Message</label>
+                            {{ form.message }}
+                        </div>
+                        <button type="submit" class="btn btn-primary-brand w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Send Inquiry
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Property Management CTA -->
+            <div class="card card-brand">
+                <div class="card-body text-center">
+                    <h5 class="text-brand-primary">Need Property Management?</h5>
+                    <p class="text-muted">Let Traca Management Services handle your property for you.</p>
+                    <a href="{% url 'listings:management_request' %}" class="btn btn-primary-brand">
+                        <i class="fas fa-cogs me-2"></i>Request Management
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Properties -->
+    {% if related_properties %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="text-brand-primary mb-4">Related Properties</h3>
+            <div class="row">
+                {% for related_property in related_properties %}
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card card-brand h-100">
+                        {% if related_property.main_image %}
+                            <img src="{{ related_property.main_image.file.url }}" class="card-img-top" alt="{{ related_property.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/default_property.jpg' %}" class="card-img-top" alt="No Image" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title text-brand-primary">
+                                {{ related_property.title }}
+                                {% if related_property.is_verified %}
+                                <span class="badge-verified badge-verified-sm ms-1">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                {% endif %}
+                            </h6>
+                            <p class="card-text text-muted small mb-2">
+                                <i class="fas fa-map-marker-alt me-1"></i> {{ related_property.county.name }}
+                            </p>
+                            <h6 class="text-brand-secondary">KSh {{ related_property.price|intcomma }}</h6>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'listings:property_detail' related_property.pk %}" class="btn btn-primary-brand btn-sm w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

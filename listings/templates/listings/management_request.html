@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Property Management Request - Traca Management Services Ltd{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-light py-5">
+    <div class="container">
+        <h1 class="display-4 text-center text-brand-primary mb-4">Property Management Request</h1>
+        <p class="lead text-center text-muted">Let us manage your property and collect rent for you.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-brand shadow">
+                <div class="card-header bg-primary-brand text-white">
+                    <h4 class="mb-0"><i class="fas fa-cogs me-2"></i>Submit Your Property for Management</h4>
+                </div>
+                <div class="card-body bg-background-pale-grey">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Landlord Information -->
+                        <h5 class="text-brand-primary mb-3">Landlord Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.landlord_name.id_for_label }}" class="form-label">Full Name *</label>
+                                {{ form.landlord_name }}
+                                {% if form.landlord_name.errors %}
+                                    <div class="text-danger small">{{ form.landlord_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.landlord_contact.id_for_label }}" class="form-label">Phone Number *</label>
+                                {{ form.landlord_contact }}
+                                {% if form.landlord_contact.errors %}
+                                    <div class="text-danger small">{{ form.landlord_contact.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Property Information -->
+                        <h5 class="text-brand-primary mb-3 mt-4">Property Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.property_type.id_for_label }}" class="form-label">Property Type *</label>
+                                {{ form.property_type }}
+                                {% if form.property_type.errors %}
+                                    <div class="text-danger small">{{ form.property_type.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.county.id_for_label }}" class="form-label">County *</label>
+                                {{ form.county }}
+                                {% if form.county.errors %}
+                                    <div class="text-danger small">{{ form.county.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.rent_amount.id_for_label }}" class="form-label">Monthly Rent Amount (KSh) *</label>
+                            {{ form.rent_amount }}
+                            {% if form.rent_amount.errors %}
+                                <div class="text-danger small">{{ form.rent_amount.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.service_terms.id_for_label }}" class="form-label">Property Description & Service Terms *</label>
+                            {{ form.service_terms }}
+                            {% if form.service_terms.errors %}
+                                <div class="text-danger small">{{ form.service_terms.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Please describe your property, location, and what management services you need.</div>
+                        </div>
+
+                        <!-- Property Media -->
+                        <h5 class="text-brand-primary mb-3 mt-4">Property Media</h5>
+                        <div class="mb-3">
+                            <label for="{{ form.property_images.id_for_label }}" class="form-label">Property Images</label>
+                            {{ form.property_images }}
+                            {% if form.property_images.errors %}
+                                <div class="text-danger small">{{ form.property_images.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Upload multiple images of your property (JPG, PNG, max 5MB each)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.property_videos.id_for_label }}" class="form-label">Property Videos</label>
+                            {{ form.property_videos }}
+                            {% if form.property_videos.errors %}
+                                <div class="text-danger small">{{ form.property_videos.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Upload videos of your property (MP4, AVI, max 50MB each)</div>
+                        </div>
+
+                        <!-- Services Information -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Our Management Services Include:</h6>
+                            <ul class="mb-0">
+                                <li>Tenant screening and selection</li>
+                                <li>Rent collection and financial reporting</li>
+                                <li>Property maintenance coordination</li>
+                                <li>Legal compliance and documentation</li>
+                                <li>Regular property inspections</li>
+                                <li>Marketing and advertising</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary-brand btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Management Request
+                            </button>
+                            <a href="{% url 'listings:home' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <div class="card card-brand">
+                        <div class="card-body text-center">
+                            <i class="fas fa-clock fa-3x text-brand-primary mb-3"></i>
+                            <h5>Quick Response</h5>
+                            <p class="text-muted">We respond to all management requests within 24 hours.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-brand">
+                        <div class="card-body text-center">
+                            <i class="fas fa-shield-alt fa-3x text-brand-primary mb-3"></i>
+                            <h5>Trusted Service</h5>
+                            <p class="text-muted">Over 10 years of experience in Kenyan real estate management.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

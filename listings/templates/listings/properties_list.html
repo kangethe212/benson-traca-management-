@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Properties List - Traca Management Services Ltd{% endblock %}
+
+{% block extra_css %}
+<style>
+.property-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.property-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.property-card .card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.property-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.property-card .badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.property-card .btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+}
+
+.filter-card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.sort-dropdown .dropdown-toggle {
+    border-radius: 8px;
+    font-weight: 500;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-light py-5">
+    <div class="container">
+        <h1 class="display-4 text-center text-brand-primary mb-4">Our Properties</h1>
+        <p class="lead text-center text-muted">Find your next home, office, or investment opportunity.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Property Statistics -->
+    {% if stats %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card stats-card text-white">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h4 class="mb-1">{{ stats.total_properties }}</h4>
+                            <small>Total Properties</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="mb-1">{{ stats.sale_properties }}</h4>
+                            <small>For Sale</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="mb-1">{{ stats.rent_properties }}</h4>
+                            <small>For Rent</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="mb-1">{{ stats.verified_properties }}</h4>
+                            <small>Verified</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Search & Filter Sidebar -->
+        <div class="col-lg-4 mb-4">
+            <div class="card filter-card">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Advanced Search</h5>
+                </div>
+                <div class="card-body bg-background-pale-grey">
+                    <form method="GET" action="{% url 'listings:properties_list' %}" id="search-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ search_form.keyword.id_for_label }}" class="form-label">Keyword</label>
+                            {{ search_form.keyword }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ search_form.county.id_for_label }}" class="form-label">County</label>
+                            {{ search_form.county }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ search_form.property_type.id_for_label }}" class="form-label">Property Type</label>
+                            {{ search_form.property_type }}
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ search_form.min_price.id_for_label }}" class="form-label">Min Price</label>
+                                {{ search_form.min_price }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ search_form.max_price.id_for_label }}" class="form-label">Max Price</label>
+                                {{ search_form.max_price }}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ search_form.bedrooms.id_for_label }}" class="form-label">Min Bedrooms</label>
+                                {{ search_form.bedrooms }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ search_form.bathrooms.id_for_label }}" class="form-label">Min Bathrooms</label>
+                                {{ search_form.bathrooms }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ search_form.parking_slots.id_for_label }}" class="form-label">Min Parking Slots</label>
+                            {{ search_form.parking_slots }}
+                        </div>
+
+                        <h6 class="mt-4 mb-2">Additional Features</h6>
+                        <div class="form-check mb-2">
+                            {{ search_form.is_furnished }}
+                            <label class="form-check-label" for="{{ search_form.is_furnished.id_for_label }}">
+                                Furnished
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            {{ search_form.pet_friendly }}
+                            <label class="form-check-label" for="{{ search_form.pet_friendly.id_for_label }}">
+                                Pet Friendly
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary-brand w-100 mt-3">
+                            <i class="fas fa-search me-2"></i>Search Properties
+                        </button>
+                        <a href="{% url 'listings:properties_list' %}" class="btn btn-outline-secondary w-100 mt-2">Reset Filters</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Listings -->
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_results }} results</h4>
+                <div class="dropdown sort-dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-sort me-2"></i>Sort by
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item {% if current_sort == 'newest' %}active{% endif %}" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}sort=newest">Newest First</a></li>
+                        <li><a class="dropdown-item {% if current_sort == 'price_low' %}active{% endif %}" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}sort=price_low">Price: Low to High</a></li>
+                        <li><a class="dropdown-item {% if current_sort == 'price_high' %}active{% endif %}" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}sort=price_high">Price: High to Low</a></li>
+                        <li><a class="dropdown-item {% if current_sort == 'verified' %}active{% endif %}" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}sort=verified">Verified First</a></li>
+                        <li><a class="dropdown-item {% if current_sort == 'bedrooms' %}active{% endif %}" href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}sort=bedrooms">Most Bedrooms</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row">
+                {% if page_obj %}
+                    {% for property in page_obj %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card card-brand h-100 shadow-sm property-card">
+                            <div class="position-relative">
+                                {% if property.main_image %}
+                                    <img src="{{ property.main_image.file.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 220px; object-fit: cover;">
+                                {% else %}
+                                    <img src="{% static 'images/default_property.jpg' %}" class="card-img-top" alt="No Image" style="height: 220px; object-fit: cover;">
+                                {% endif %}
+                                <div class="position-absolute top-0 start-0 m-2">
+                                    <span class="badge bg-{% if property.property_type == 'sale' %}success{% else %}primary{% endif %}">
+                                        {{ property.get_property_type_display }}
+                                    </span>
+                                </div>
+                                {% if property.is_verified %}
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Verified
+                                    </span>
+                                </div>
+                                {% endif %}
+                                <div class="position-absolute bottom-0 end-0 m-2">
+                                    <span class="badge bg-dark bg-opacity-75">
+                                        <i class="fas fa-images me-1"></i>{{ property.media.count }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-brand-primary mb-2">
+                                    {{ property.title|truncatechars:50 }}
+                                </h5>
+                                <p class="card-text text-muted mb-2">
+                                    <i class="fas fa-map-marker-alt me-1"></i> {{ property.county.name }}
+                                </p>
+                                <h6 class="text-brand-secondary mb-3 fw-bold">KSh {{ property.price|intcomma }}</h6>
+                                
+                                <div class="row g-2 mb-3">
+                                    {% if property.bedrooms %}
+                                    <div class="col-4 text-center">
+                                        <div class="border rounded p-2">
+                                            <i class="fas fa-bed text-primary"></i>
+                                            <div class="small text-muted">{{ property.bedrooms }}</div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if property.bathrooms %}
+                                    <div class="col-4 text-center">
+                                        <div class="border rounded p-2">
+                                            <i class="fas fa-bath text-primary"></i>
+                                            <div class="small text-muted">{{ property.bathrooms }}</div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if property.parking_slots %}
+                                    <div class="col-4 text-center">
+                                        <div class="border rounded p-2">
+                                            <i class="fas fa-car text-primary"></i>
+                                            <div class="small text-muted">{{ property.parking_slots }}</div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if property.area %}
+                                <p class="text-muted small mb-3">
+                                    <i class="fas fa-ruler-combined me-1"></i> {{ property.area|intcomma }} sq ft
+                                </p>
+                                {% endif %}
+                                
+                                <div class="mt-auto">
+                                    <a href="{% url 'listings:property_detail' property.pk %}" class="btn btn-primary-brand w-100">
+                                        <i class="fas fa-eye me-2"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No properties found</h4>
+                            <p class="text-muted">Try adjusting your search criteria or browse all properties.</p>
+                            <a href="{% url 'listings:properties_list' %}" class="btn btn-primary-brand">View All Properties</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Properties pagination" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.county %}&county={{ request.GET.county }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.bedrooms %}&bedrooms={{ request.GET.bedrooms }}{% endif %}{% if request.GET.bathrooms %}&bathrooms={{ request.GET.bathrooms }}{% endif %}{% if request.GET.parking_slots %}&parking_slots={{ request.GET.parking_slots }}{% endif %}{% if request.GET.is_furnished %}&is_furnished={{ request.GET.is_furnished }}{% endif %}{% if request.GET.pet_friendly %}&pet_friendly={{ request.GET.pet_friendly }}{% endif %}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.county %}&county={{ request.GET.county }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.bedrooms %}&bedrooms={{ request.GET.bedrooms }}{% endif %}{% if request.GET.bathrooms %}&bathrooms={{ request.GET.bathrooms }}{% endif %}{% if request.GET.parking_slots %}&parking_slots={{ request.GET.parking_slots }}{% endif %}{% if request.GET.is_furnished %}&is_furnished={{ request.GET.is_furnished }}{% endif %}{% if request.GET.pet_friendly %}&pet_friendly={{ request.GET.pet_friendly }}{% endif %}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.county %}&county={{ request.GET.county }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.bedrooms %}&bedrooms={{ request.GET.bedrooms }}{% endif %}{% if request.GET.bathrooms %}&bathrooms={{ request.GET.bathrooms }}{% endif %}{% if request.GET.parking_slots %}&parking_slots={{ request.GET.parking_slots }}{% endif %}{% if request.GET.is_furnished %}&is_furnished={{ request.GET.is_furnished }}{% endif %}{% if request.GET.pet_friendly %}&pet_friendly={{ request.GET.pet_friendly }}{% endif %}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.county %}&county={{ request.GET.county }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.bedrooms %}&bedrooms={{ request.GET.bedrooms }}{% endif %}{% if request.GET.bathrooms %}&bathrooms={{ request.GET.bathrooms }}{% endif %}{% if request.GET.parking_slots %}&parking_slots={{ request.GET.parking_slots }}{% endif %}{% if request.GET.is_furnished %}&is_furnished={{ request.GET.is_furnished }}{% endif %}{% if request.GET.pet_friendly %}&pet_friendly={{ request.GET.pet_friendly }}{% endif %}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">Last</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

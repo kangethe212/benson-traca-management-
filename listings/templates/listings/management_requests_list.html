@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Management Requests - Traca Management Services Ltd{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-light py-5">
+    <div class="container">
+        <h1 class="display-4 text-center text-brand-primary mb-4">Property Management Requests</h1>
+        <p class="lead text-center text-muted">Review and manage landlord requests for property management services.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Filter Options -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-brand">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="mb-0">Filter by Status:</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'listings:management_requests_list' %}" 
+                                   class="btn {% if not status_filter %}btn-primary-brand{% else %}btn-outline-secondary{% endif %}">
+                                    All
+                                </a>
+                                <a href="{% url 'listings:management_requests_list' %}?status=pending" 
+                                   class="btn {% if status_filter == 'pending' %}btn-primary-brand{% else %}btn-outline-secondary{% endif %}">
+                                    Pending
+                                </a>
+                                <a href="{% url 'listings:management_requests_list' %}?status=approved" 
+                                   class="btn {% if status_filter == 'approved' %}btn-primary-brand{% else %}btn-outline-secondary{% endif %}">
+                                    Approved
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Requests List -->
+    <div class="row">
+        {% if page_obj %}
+            {% for request in page_obj %}
+            <div class="col-lg-6 mb-4">
+                <div class="card card-brand h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ request.landlord_name }}</h5>
+                        <span class="badge {% if request.status == 'pending' %}bg-warning{% else %}bg-success{% endif %}">
+                            {{ request.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <strong>Contact:</strong><br>
+                                <i class="fas fa-phone me-1"></i>{{ request.landlord_contact }}
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Rent Amount:</strong><br>
+                                <span class="text-brand-secondary">KSh {{ request.rent_amount|intcomma }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <strong>Property Type:</strong><br>
+                                {{ request.property.get_property_type_display }}
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>County:</strong><br>
+                                {{ request.property.county.name }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Service Terms:</strong>
+                            <p class="text-muted mt-1">{{ request.service_terms|truncatewords:20 }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Property Images:</strong>
+                            <div class="row mt-2">
+                                {% for media in request.property.media.all %}
+                                    {% if media.media_type == 'image' %}
+                                    <div class="col-3">
+                                        <img src="{{ media.file.url }}" class="img-thumbnail" alt="Property Image" style="height: 80px; object-fit: cover;">
+                                    </div>
+                                    {% endif %}
+                                {% empty %}
+                                    <div class="col-12">
+                                        <span class="text-muted">No images uploaded</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>{{ request.created_at|date:"M d, Y" }}
+                            </small>
+                            <div>
+                                <a href="{% url 'listings:property_detail' request.property.pk %}" class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="fas fa-eye me-1"></i>View Property
+                                </a>
+                                <a href="{% url 'admin:listings_managementrequest_change' request.pk %}" class="btn btn-primary-brand btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Manage
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No management requests found</h4>
+                    <p class="text-muted">
+                        {% if status_filter %}
+                            No {{ status_filter }} requests at the moment.
+                        {% else %}
+                            No management requests have been submitted yet.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Management requests pagination" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Last</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card card-brand">
+                <div class="card-body text-center">
+                    <h5 class="text-brand-primary mb-3">Quick Actions</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="{% url 'admin:listings_managementrequest_add' %}" class="btn btn-primary-brand w-100 mb-2">
+                                <i class="fas fa-plus me-2"></i>Add New Request
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'admin:listings_managementrequest_changelist' %}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-cog me-2"></i>Admin Panel
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'listings:home' %}" class="btn btn-outline-secondary w-100 mb-2">
+                                <i class="fas fa-home me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

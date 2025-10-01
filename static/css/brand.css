@@ -1,0 +1,327 @@
+/* Traca Management Services Ltd - Brand Colors and Styles */
+
+/* Brand Color Variables */
+:root {
+    --brand-magenta: #FF00FF;
+    --brand-bright-pink: #FF69B4;
+    --brand-pale-grey: #F5F5F5;
+    --brand-white: #FFFFFF;
+    --brand-dark-grey: #333333;
+    --brand-black: #000000;
+}
+
+/* Brand Color Classes */
+.text-brand-primary {
+    color: var(--brand-magenta) !important;
+}
+
+.text-brand-secondary {
+    color: var(--brand-bright-pink) !important;
+}
+
+.bg-brand-primary {
+    background-color: var(--brand-magenta) !important;
+}
+
+.bg-brand-secondary {
+    background-color: var(--brand-bright-pink) !important;
+}
+
+.bg-background-pale-grey {
+    background-color: var(--brand-pale-grey) !important;
+}
+
+/* Button Styles */
+.btn-primary-brand {
+    background-color: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+    color: var(--brand-white);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-brand:hover {
+    background-color: var(--brand-bright-pink);
+    border-color: var(--brand-bright-pink);
+    color: var(--brand-white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 0, 255, 0.3);
+}
+
+.btn-primary-brand:focus {
+    background-color: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+    color: var(--brand-white);
+    box-shadow: 0 0 0 0.2rem rgba(255, 0, 255, 0.25);
+}
+
+.btn-outline-primary-brand {
+    color: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+    background-color: transparent;
+}
+
+.btn-outline-primary-brand:hover {
+    background-color: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+    color: var(--brand-white);
+}
+
+/* Card Styles */
+.card-brand {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card-brand:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-brand .card-header {
+    border-radius: 15px 15px 0 0 !important;
+    border: none;
+}
+
+.card-brand .card-footer {
+    border-radius: 0 0 15px 15px !important;
+    border: none;
+    background-color: transparent;
+}
+
+/* Verified Badge Styles */
+.badge-verified {
+    background: linear-gradient(45deg, var(--brand-magenta), var(--brand-bright-pink));
+    color: var(--brand-white);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.badge-verified-sm {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+}
+
+.badge-verified-lg {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.badge-verified i {
+    font-size: 0.8em;
+}
+
+/* Form Styles */
+.form-control:focus {
+    border-color: var(--brand-magenta);
+    box-shadow: 0 0 0 0.2rem rgba(255, 0, 255, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--brand-magenta);
+    box-shadow: 0 0 0 0.2rem rgba(255, 0, 255, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+}
+
+/* Navigation Styles */
+.navbar-brand {
+    font-weight: 700;
+    color: var(--brand-magenta) !important;
+}
+
+.nav-link:hover {
+    color: var(--brand-bright-pink) !important;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--brand-magenta), var(--brand-bright-pink));
+    color: var(--brand-white);
+    padding: 100px 0;
+}
+
+.hero-section h1 {
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Property Cards */
+.property-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.property-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(255, 0, 255, 0.2);
+}
+
+.property-card .card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.property-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Pagination Styles */
+.pagination .page-link {
+    color: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+}
+
+.pagination .page-link:hover {
+    background-color: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+    color: var(--brand-white);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+}
+
+/* Alert Styles */
+.alert-info {
+    background-color: rgba(255, 0, 255, 0.1);
+    border-color: var(--brand-magenta);
+    color: var(--brand-dark-grey);
+}
+
+/* Footer Styles */
+.footer-brand {
+    background-color: var(--brand-dark-grey);
+    color: var(--brand-white);
+}
+
+.footer-brand a {
+    color: var(--brand-bright-pink);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-brand a:hover {
+    color: var(--brand-magenta);
+}
+
+/* Loading Animation */
+.loading-spinner {
+    border: 3px solid var(--brand-pale-grey);
+    border-top: 3px solid var(--brand-magenta);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .card-brand {
+        margin-bottom: 1rem;
+    }
+    
+    .badge-verified {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--brand-pale-grey);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--brand-magenta);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-bright-pink);
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Utility Classes */
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.box-shadow-brand {
+    box-shadow: 0 4px 6px rgba(255, 0, 255, 0.1);
+}
+
+.border-brand {
+    border: 2px solid var(--brand-magenta) !important;
+}
+
+.border-brand-secondary {
+    border: 2px solid var(--brand-bright-pink) !important;
+}
+
+/* Print Styles */
+@media print {
+    .btn, .navbar, .footer-brand {
+        display: none !important;
+    }
+    
+    .card-brand {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}

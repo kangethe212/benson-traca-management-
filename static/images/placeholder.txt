@@ -1,0 +1,4 @@
+# Placeholder for images directory
+# Add your images here:
+# - hero.jpg (for homepage hero section)
+# - default_property.jpg (for properties without images)

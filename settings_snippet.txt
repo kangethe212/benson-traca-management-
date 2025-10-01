@@ -1,0 +1,86 @@
+# Django Settings Snippet for Traca Management Services Ltd
+# Add these configurations to your settings.py file
+
+# INSTALLED_APPS - Add these apps
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',  # Django REST Framework
+    'django_filters',  # For API filtering
+    'listings',  # Main listings app
+    # ... other apps
+]
+
+# STATIC FILES CONFIGURATION
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# MEDIA FILES CONFIGURATION
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# DJANGO REST FRAMEWORK CONFIGURATION
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
+
+# EMAIL CONFIGURATION - DEVELOPMENT
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# EMAIL CONFIGURATION - PRODUCTION (uncomment and configure)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'your-smtp-host'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@domain.com'
+# EMAIL_HOST_PASSWORD = 'your-email-password'
+
+# ADMIN EMAIL SETTINGS
+ADMINS = [
+    ('Admin', 'admin@tracamanagement.co.ke'),
+]
+
+# TIMEZONE FOR KENYA
+TIME_ZONE = 'Africa/Nairobi'
+
+# PRODUCTION SETTINGS (for deployment)
+# DEBUG = False
+# ALLOWED_HOSTS = ['your-domain.com', 'www.your-domain.com']
+
+# POSTGRESQL DATABASE (for production)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'traca_estates',
+#         'USER': 'your_db_user',
+#         'PASSWORD': 'your_db_password',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
+# STATIC FILES WITH WHITENOISE (for production)
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# MEDIA FILES WITH DJANGO-STORAGES (for production)
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# AWS_ACCESS_KEY_ID = 'your-access-key'
+# AWS_SECRET_ACCESS_KEY = 'your-secret-key'
+# AWS_STORAGE_BUCKET_NAME = 'your-bucket-name'
+# AWS_S3_REGION_NAME = 'your-region'
