@@ -1,0 +1,140 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:listings_property_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; <a href="{% url 'admin:listings_property_change' property.id %}">{{ property.title|truncatechars:30 }}</a>
+&rsaquo; {% trans 'Bulk Media Upload' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="module aligned">
+    <h1>{% trans 'Bulk Media Upload' %}</h1>
+    <h2>{{ property.title }}</h2>
+    
+    <div class="form-row">
+        <div class="help">
+            <p><strong>Instructions:</strong></p>
+            <ul>
+                <li>Select multiple files to upload at once</li>
+                <li>Choose the media type (image or video)</li>
+                <li>Files will be automatically named and ordered</li>
+                <li>You can edit captions and settings after upload</li>
+            </ul>
+        </div>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <fieldset class="module aligned">
+            <h2>Upload Settings</h2>
+            
+            <div class="form-row">
+                <div>
+                    <label for="id_media_type">Media Type:</label>
+                    <select name="media_type" id="id_media_type" required>
+                        <option value="image">Images (Photos)</option>
+                        <option value="video">Videos</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div>
+                    <label for="id_media_files">Select Files:</label>
+                    <input type="file" name="media_files" id="id_media_files" multiple required>
+                    <p class="help">Hold Ctrl/Cmd to select multiple files</p>
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class="submit-row">
+            <input type="submit" value="{% trans 'Upload Files' %}" class="default">
+            <a href="{% url 'admin:listings_property_change' property.id %}" class="button">{% trans 'Cancel' %}</a>
+        </div>
+    </form>
+    
+    <div class="module">
+        <h2>Current Media Files</h2>
+        {% if property.media.all %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Preview</th>
+                        <th>Caption</th>
+                        <th>Primary</th>
+                        <th>Order</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for media in property.media.all %}
+                    <tr>
+                        <td>{{ media.get_media_type_display }}</td>
+                        <td>
+                            {% if media.media_type == 'image' %}
+                                <img src="{{ media.file.url }}" style="max-width: 50px; max-height: 30px; object-fit: cover;">
+                            {% else %}
+                                📹 Video
+                            {% endif %}
+                        </td>
+                        <td>{{ media.caption }}</td>
+                        <td>{% if media.is_primary %}✓{% endif %}</td>
+                        <td>{{ media.order }}</td>
+                        <td>
+                            <a href="{% url 'admin:listings_propertymedia_change' media.id %}">Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No media files uploaded yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.help {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.help ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.help li {
+    margin: 5px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

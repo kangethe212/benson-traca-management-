@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('admin/listings/', include('listings.admin_urls')),  # Custom admin views
     path('api/', include('listings.api_urls')),  # API endpoints
     path('', include('listings.urls')),  # New listings app
     path('old/', include('properties.urls')),  # Keep old properties app for reference
