@@ -4,30 +4,95 @@
 
 {% block title %}{{ property.title }} - Traca Management Services Ltd{% endblock %}
 
+{% block extra_css %}
+<style>
+.property-detail-card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.property-detail-card:hover {
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+.feature-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin: 0.25rem;
+    display: inline-block;
+}
+
+.price-highlight {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.inquiry-form {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.carousel-item img {
+    border-radius: 12px 12px 0 0;
+}
+
+.property-stats {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     <div class="row">
         <!-- Property Images -->
         <div class="col-lg-8">
-            <div class="card card-brand mb-4">
+            <div class="card property-detail-card mb-4">
                 <div class="card-body p-0">
-                    {% if property.media.all %}
+                    {% if property_images %}
                         <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-inner">
-                                {% for media in property.media.all %}
-                                    {% if media.media_type == 'image' %}
-                                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                        <img src="{{ media.file.url }}" class="d-block w-100" alt="{{ media.caption }}" style="height: 500px; object-fit: cover;">
-                                        {% if media.caption %}
-                                        <div class="carousel-caption d-none d-md-block">
-                                            <p>{{ media.caption }}</p>
-                                        </div>
-                                        {% endif %}
+                                {% for media in property_images %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <img src="{{ media.file.url }}" class="d-block w-100" alt="{{ media.caption }}" style="height: 500px; object-fit: cover;">
+                                    {% if media.caption %}
+                                    <div class="carousel-caption d-none d-md-block">
+                                        <p>{{ media.caption }}</p>
                                     </div>
                                     {% endif %}
+                                </div>
                                 {% endfor %}
                             </div>
-                            {% if property.media.count > 1 %}
+                            {% if property_images.count > 1 %}
                             <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Previous</span>
@@ -110,6 +175,18 @@
 
                     <h5 class="mt-4">Description</h5>
                     <p class="text-muted">{{ property.description|linebreaks }}</p>
+                    
+                    <!-- Property Features -->
+                    {% if property_features %}
+                    <h5 class="mt-4">Property Features</h5>
+                    <div class="mb-3">
+                        {% for feature in property_features %}
+                        <span class="feature-badge">
+                            <i class="fas fa-check me-1"></i>{{ feature }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -144,12 +221,63 @@
 
         <!-- Sidebar -->
         <div class="col-lg-4">
+            <!-- Property Price & Stats -->
+            <div class="price-highlight mb-4">
+                <h2 class="mb-2">KSh {{ property.price|intcomma }}</h2>
+                <p class="mb-0">{{ property.get_property_type_display }}</p>
+                {% if property.is_verified %}
+                <span class="badge bg-light text-dark mt-2">
+                    <i class="fas fa-check-circle me-1"></i>Verified Property
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Property Statistics -->
+            <div class="property-stats mb-4">
+                <div class="row">
+                    {% if property.bedrooms %}
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <span class="stat-number">{{ property.bedrooms }}</span>
+                            <span class="stat-label">Bedrooms</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if property.bathrooms %}
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <span class="stat-number">{{ property.bathrooms }}</span>
+                            <span class="stat-label">Bathrooms</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if property.parking_slots %}
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <span class="stat-number">{{ property.parking_slots }}</span>
+                            <span class="stat-label">Parking</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if property.area %}
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="stat-item">
+                            <span class="stat-number">{{ property.area|intcomma }}</span>
+                            <span class="stat-label">Square Feet</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
             <!-- Inquiry Form -->
-            <div class="card card-brand mb-4">
+            <div class="card property-detail-card mb-4">
                 <div class="card-header bg-primary-brand text-white">
                     <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>Make an Inquiry</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body inquiry-form">
                     <form method="POST">
                         {% csrf_token %}
                         <div class="mb-3">
@@ -180,8 +308,11 @@
             </div>
 
             <!-- Property Management CTA -->
-            <div class="card card-brand">
+            <div class="card property-detail-card">
                 <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-cogs fa-3x text-brand-primary"></i>
+                    </div>
                     <h5 class="text-brand-primary">Need Property Management?</h5>
                     <p class="text-muted">Let Traca Management Services handle your property for you.</p>
                     <a href="{% url 'listings:management_request' %}" class="btn btn-primary-brand">
@@ -196,32 +327,59 @@
     {% if related_properties %}
     <div class="row mt-5">
         <div class="col-12">
-            <h3 class="text-brand-primary mb-4">Related Properties</h3>
+            <div class="text-center mb-5">
+                <h3 class="text-brand-primary mb-2">Similar Properties</h3>
+                <p class="text-muted">You might also be interested in these properties</p>
+            </div>
             <div class="row">
                 {% for related_property in related_properties %}
                 <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="card card-brand h-100">
-                        {% if related_property.main_image %}
-                            <img src="{{ related_property.main_image.file.url }}" class="card-img-top" alt="{{ related_property.title }}" style="height: 200px; object-fit: cover;">
-                        {% else %}
-                            <img src="{% static 'images/default_property.jpg' %}" class="card-img-top" alt="No Image" style="height: 200px; object-fit: cover;">
-                        {% endif %}
+                    <div class="card property-detail-card h-100">
+                        <div class="position-relative">
+                            {% if related_property.main_image %}
+                                <img src="{{ related_property.main_image.file.url }}" class="card-img-top" alt="{{ related_property.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'images/default_property.jpg' %}" class="card-img-top" alt="No Image" style="height: 200px; object-fit: cover;">
+                            {% endif %}
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge bg-primary-brand">{{ related_property.get_property_type_display }}</span>
+                            </div>
+                            {% if related_property.is_verified %}
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Verified
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
                         <div class="card-body">
                             <h6 class="card-title text-brand-primary">
-                                {{ related_property.title }}
-                                {% if related_property.is_verified %}
-                                <span class="badge-verified badge-verified-sm ms-1">
-                                    <i class="fas fa-check"></i>
-                                </span>
-                                {% endif %}
+                                {{ related_property.title|truncatechars:50 }}
                             </h6>
                             <p class="card-text text-muted small mb-2">
                                 <i class="fas fa-map-marker-alt me-1"></i> {{ related_property.county.name }}
                             </p>
-                            <h6 class="text-brand-secondary">KSh {{ related_property.price|intcomma }}</h6>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="text-brand-secondary mb-0">KSh {{ related_property.price|intcomma }}</h6>
+                                {% if related_property.area %}
+                                <small class="text-muted">{{ related_property.area|intcomma }} sq ft</small>
+                                {% endif %}
+                            </div>
+                            {% if related_property.bedrooms or related_property.bathrooms %}
+                            <div class="d-flex justify-content-between text-muted small">
+                                {% if related_property.bedrooms %}
+                                <span><i class="fas fa-bed me-1"></i>{{ related_property.bedrooms }} bed</span>
+                                {% endif %}
+                                {% if related_property.bathrooms %}
+                                <span><i class="fas fa-bath me-1"></i>{{ related_property.bathrooms }} bath</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
                         </div>
                         <div class="card-footer bg-transparent">
-                            <a href="{% url 'listings:property_detail' related_property.pk %}" class="btn btn-primary-brand btn-sm w-100">View Details</a>
+                            <a href="{% url 'listings:property_detail' related_property.pk %}" class="btn btn-primary-brand btn-sm w-100">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
                         </div>
                     </div>
                 </div>
