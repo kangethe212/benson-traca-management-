@@ -5,6 +5,71 @@
 
 {% block extra_css %}
 <style>
+/* Animated Background for About Page */
+.hero-background {
+    position: relative;
+    min-height: 60vh;
+    background: linear-gradient(135deg, rgba(0, 51, 102, 0.8) 0%, rgba(26, 77, 115, 0.8) 100%);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.hero-slideshow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1.1);
+    animation: aboutSlideShow 20s infinite;
+}
+
+.hero-slide:nth-child(1) { animation-delay: 0s; }
+.hero-slide:nth-child(2) { animation-delay: 4s; }
+.hero-slide:nth-child(3) { animation-delay: 8s; }
+.hero-slide:nth-child(4) { animation-delay: 12s; }
+.hero-slide:nth-child(5) { animation-delay: 16s; }
+
+@keyframes aboutSlideShow {
+    0%, 15% { opacity: 1; transform: scale(1); }
+    20%, 95% { opacity: 0; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
 .about-hero {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
     padding: 100px 0 80px;
@@ -88,26 +153,198 @@
 .timeline-item:last-child::after {
     display: none;
 }
+
+/* Mobile Responsive for About Page */
+@media (max-width: 768px) {
+    .hero-background {
+        min-height: 50vh;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-content .btn {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .team-card .card-body {
+        padding: 1rem;
+    }
+    
+    .team-card .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .stats-card {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card h5 {
+        font-size: 1.1rem;
+    }
+    
+    .stats-card .display-6 {
+        font-size: 1.5rem;
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .mission-card .card-body {
+        padding: 1rem;
+    }
+    
+    .timeline-item {
+        padding-left: 2rem;
+    }
+    
+    .timeline-item::before {
+        left: 0.5rem;
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    .timeline-item::after {
+        left: 0.75rem;
+        width: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-content .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .team-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .team-card .card-title {
+        font-size: 1rem;
+    }
+    
+    .stats-card {
+        padding: 1rem;
+    }
+    
+    .stats-card h5 {
+        font-size: 1rem;
+    }
+    
+    .stats-card .display-6 {
+        font-size: 1.25rem;
+    }
+    
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .mission-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .timeline-item {
+        padding-left: 1.5rem;
+    }
+    
+    .timeline-item::before {
+        left: 0.25rem;
+        width: 0.75rem;
+        height: 0.75rem;
+    }
+    
+    .timeline-item::after {
+        left: 0.5rem;
+        width: 0.2rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .team-card .card-body {
+        padding: 0.5rem;
+    }
+    
+    .stats-card {
+        padding: 0.75rem;
+    }
+    
+    .mission-card .card-body {
+        padding: 0.5rem;
+    }
+    
+    .timeline-item {
+        padding-left: 1.25rem;
+    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
-    <!-- Hero Section -->
-    <section class="about-hero">
+    <!-- Animated Background Hero Section -->
+    <div class="hero-background">
+        <!-- Background Slideshow -->
+        <div class="hero-slideshow">
+            <div class="hero-slide" style="background-image: url('{% static 'images/traca 1.jpg' %}');"></div>
+            <div class="hero-slide" style="background-image: url('{% static 'images/traca 2.jpg' %}');"></div>
+            <div class="hero-slide" style="background-image: url('{% static 'images/traca 3.jpg' %}');"></div>
+            <div class="hero-slide" style="background-image: url('{% static 'images/traca 5.jpeg' %}');"></div>
+            <div class="hero-slide" style="background-image: url('{% static 'images/traca 6.jpeg' %}');"></div>
+        </div>
+        
+        <!-- Hero Content -->
         <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="display-4 fw-bold text-brand-primary mb-4">About Traca Management Services</h1>
-                    <p class="lead text-muted mb-4">Redefining Real Estate Excellence Across Kenya</p>
-                    <p class="text-muted">We are Kenya's premier property management company, dedicated to delivering exceptional real estate services with integrity, innovation, and unwavering commitment to our clients' success.</p>
+            <div class="hero-content">
+                <h1 class="hero-title">About Traca Management Services</h1>
+                <p class="hero-subtitle">Redefining Real Estate Excellence Across Kenya</p>
+                <p class="lead mb-4" style="opacity: 0.9; max-width: 800px; margin: 0 auto;">We are Kenya's premier property management company, dedicated to delivering exceptional real estate services with integrity, innovation, and unwavering commitment to our clients' success.</p>
+                <div class="mt-4">
+                    <a href="#about-content" class="btn btn-lg smooth-scroll" style="background: #FF1493; color: white; border: none; padding: 12px 30px; font-weight: 600; border-radius: 25px;">
+                        <i class="fas fa-arrow-down me-2"></i>Learn More About Us
+                    </a>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Company Story -->
-    <section class="py-5">
+    <section id="about-content" class="py-5">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
@@ -117,7 +354,20 @@
                     <p>Our mission is to bridge the gap between property owners, buyers, and tenants by providing transparent, efficient, and reliable real estate services that exceed expectations.</p>
                 </div>
                 <div class="col-lg-6">
-                    <img src="{% static 'images/hero.jpg' %}" class="img-fluid rounded shadow" alt="Traca Management Services" style="height: 400px; object-fit: cover;">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <img src="{% static 'images/traca 1.jpg' %}" class="img-fluid rounded shadow" alt="Traca Office" style="height: 180px; width: 100%; object-fit: cover;">
+                        </div>
+                        <div class="col-6">
+                            <img src="{% static 'images/traca 2.jpg' %}" class="img-fluid rounded shadow" alt="Traca Team" style="height: 180px; width: 100%; object-fit: cover;">
+                        </div>
+                        <div class="col-6">
+                            <img src="{% static 'images/traca 3.jpg' %}" class="img-fluid rounded shadow" alt="Traca Properties" style="height: 180px; width: 100%; object-fit: cover;">
+                        </div>
+                        <div class="col-6">
+                            <img src="{% static 'images/traca 5.jpeg' %}" class="img-fluid rounded shadow" alt="Traca Services" style="height: 180px; width: 100%; object-fit: cover;">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,7 +496,7 @@
                             <div class="card team-card text-center">
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <i class="fas fa-user-circle fa-5x text-brand-primary"></i>
+                                        <img src="{% static 'images/traca 6.jpeg' %}" alt="Benson Mwangi" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
                                     </div>
                                     <h5 class="card-title text-brand-primary">Benson Mwangi</h5>
                                     <p class="text-muted">CEO & Founder</p>
@@ -258,7 +508,7 @@
                             <div class="card team-card text-center">
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <i class="fas fa-user-circle fa-5x text-brand-primary"></i>
+                                        <img src="{% static 'images/traca 7.jpeg' %}" alt="Sarah Kimani" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
                                     </div>
                                     <h5 class="card-title text-brand-primary">Sarah Kimani</h5>
                                     <p class="text-muted">Head of Operations</p>
@@ -270,7 +520,7 @@
                             <div class="card team-card text-center">
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <i class="fas fa-user-circle fa-5x text-brand-primary"></i>
+                                        <img src="{% static 'images/traca 8.jpeg' %}" alt="David Ochieng" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
                                     </div>
                                     <h5 class="card-title text-brand-primary">David Ochieng</h5>
                                     <p class="text-muted">Head of Sales</p>
@@ -359,6 +609,54 @@
         </div>
     </section>
 
+    <!-- Awards & Certifications -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="text-brand-primary mb-3">Awards & Recognition</h2>
+                <p class="text-muted">Our commitment to excellence has been recognized by industry leaders</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-3 col-6">
+                    <div class="text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h6 class="text-brand-primary">Best Property Management 2023</h6>
+                        <small class="text-muted">Kenya Real Estate Awards</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h6 class="text-brand-primary">Customer Excellence Award</h6>
+                        <small class="text-muted">Property Management Association</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <h6 class="text-brand-primary">ISO 9001 Certified</h6>
+                        <small class="text-muted">Quality Management System</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h6 class="text-brand-primary">5-Star Rating</h6>
+                        <small class="text-muted">Google Reviews (4.9/5)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Call to Action -->
     <section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <div class="container text-center">
@@ -374,7 +672,30 @@
                 <a href="{% url 'listings:management_request' %}" class="btn btn-outline-light btn-lg">
                     <i class="fas fa-cogs me-2"></i>List Your Property
                 </a>
+                <button class="btn btn-success btn-lg" onclick="openWhatsApp()">
+                    <i class="fab fa-whatsapp me-2"></i>WhatsApp Chat
+                </button>
             </div>
         </div>
     </section>
+
+<script>
+// Smooth scrolling for hero button
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.smooth-scroll').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}

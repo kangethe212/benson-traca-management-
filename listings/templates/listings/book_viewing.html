@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Schedule Viewing - {{ property.title }} - Traca Management Services{% endblock %}
+
+{% block extra_css %}
+<style>
+.booking-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+}
+
+.property-summary {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.property-summary-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.booking-form-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 2rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 0.5rem;
+}
+
+.time-slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.time-slot-btn {
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-weight: 500;
+}
+
+.time-slot-btn:hover:not(.booked):not(.selected) {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: translateY(-2px);
+}
+
+.time-slot-btn.selected {
+    border-color: #10b981;
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.time-slot-btn.booked {
+    border-color: #ef4444;
+    background: #fee2e2;
+    color: #991b1b;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.info-box {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1.5rem;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(16, 185, 129, 0.3);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .booking-header {
+        padding: 2rem 0;
+    }
+    
+    .time-slot-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .booking-form-card {
+        padding: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="booking-header">
+    <div class="container text-center">
+        <h1><i class="fas fa-calendar-check me-3"></i>Schedule Property Viewing</h1>
+        <p class="lead mb-0">Book your daytime viewing (9 AM - 6 PM)</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row">
+        <!-- Property Summary -->
+        <div class="col-lg-4 mb-4">
+            <div class="property-summary">
+                {% if property.main_image %}
+                    <img src="{{ property.main_image.file.url }}" alt="{{ property.title }}" class="property-summary-image">
+                {% else %}
+                    <img src="{% static 'images/default_property.jpg' %}" alt="{{ property.title }}" class="property-summary-image">
+                {% endif %}
+                
+                <h4 class="text-primary mb-3">{{ property.title }}</h4>
+                
+                <p class="mb-2">
+                    <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                    <strong>{{ property.county.name }}</strong>
+                </p>
+                
+                <p class="mb-2">
+                    <i class="fas fa-tag text-success me-2"></i>
+                    <strong>KSh {{ property.price|intcomma }}</strong>
+                </p>
+                
+                <p class="mb-2">
+                    <i class="fas fa-home text-info me-2"></i>
+                    {{ property.get_property_type_display }}
+                </p>
+                
+                {% if property.bedrooms %}
+                <p class="mb-2">
+                    <i class="fas fa-bed text-secondary me-2"></i>
+                    {{ property.bedrooms }} Bedrooms, {{ property.bathrooms }} Bathrooms
+                </p>
+                {% endif %}
+                
+                <hr>
+                
+                <div class="info-box">
+                    <h6 class="text-primary"><i class="fas fa-info-circle me-2"></i>What to Expect</h6>
+                    <ul class="small mb-0">
+                        <li>Viewing duration: 30-45 minutes</li>
+                        <li>Daytime only (9 AM - 6 PM)</li>
+                        <li>Our agent will meet you there</li>
+                        <li>Feel free to ask questions</li>
+                    </ul>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'listings:property_detail' property.pk %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Property
+                    </a>
+                    <button class="btn btn-success" onclick="openWhatsApp()">
+                        <i class="fab fa-whatsapp me-2"></i>Chat on WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Form -->
+        <div class="col-lg-8">
+            <div class="booking-form-card">
+                <h3 class="mb-4"><i class="fas fa-edit me-2"></i>Booking Details</h3>
+                
+                <div class="info-box">
+                    <strong><i class="fas fa-clock me-2"></i>Viewing Hours:</strong> Monday - Sunday, 9:00 AM - 6:00 PM only
+                </div>
+                
+                <form method="POST" id="bookingForm">
+                    {% csrf_token %}
+                    
+                    <!-- Personal Information -->
+                    <h5 class="mb-3">Your Information</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                Full Name <span class="text-danger">*</span>
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                Email Address <span class="text-danger">*</span>
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">
+                                Phone Number <span class="text-danger">*</span>
+                            </label>
+                            {{ form.phone }}
+                            <small class="text-muted">Include country code (e.g., +254)</small>
+                            {% if form.phone.errors %}
+                                <div class="text-danger small">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.number_of_people.id_for_label }}" class="form-label">
+                                Number of People
+                            </label>
+                            {{ form.number_of_people }}
+                            <small class="text-muted">Max 10 people</small>
+                            {% if form.number_of_people.errors %}
+                                <div class="text-danger small">{{ form.number_of_people.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Viewing Schedule -->
+                    <h5 class="mb-3">Select Date & Time</h5>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.viewing_date.id_for_label }}" class="form-label">
+                            Viewing Date <span class="text-danger">*</span>
+                        </label>
+                        {{ form.viewing_date }}
+                        <small class="text-muted">Viewings available up to 30 days in advance</small>
+                        {% if form.viewing_date.errors %}
+                            <div class="text-danger small">{{ form.viewing_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.viewing_time.id_for_label }}" class="form-label">
+                            Viewing Time <span class="text-danger">*</span>
+                        </label>
+                        {{ form.viewing_time }}
+                        <small class="text-muted">All times are during daytime (9 AM - 6 PM)</small>
+                        {% if form.viewing_time.errors %}
+                            <div class="text-danger small">{{ form.viewing_time.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Special Requests -->
+                    <h5 class="mb-3">Additional Information (Optional)</h5>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.message.id_for_label }}" class="form-label">
+                            Special Requests or Questions
+                        </label>
+                        {{ form.message }}
+                        <small class="text-muted">Any specific areas of the property you'd like to see or questions?</small>
+                        {% if form.message.errors %}
+                            <div class="text-danger small">{{ form.message.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Form Errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-check-circle me-2"></i>Confirm Booking
+                        </button>
+                        <a href="{% url 'listings:property_detail' property.pk %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong><i class="fas fa-shield-alt me-2"></i>Note:</strong> You will receive a confirmation email immediately after booking. 
+                        Our team will contact you 24 hours before the viewing to confirm.
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Viewing Guidelines -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Viewing Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Please arrive <strong>5 minutes early</strong> to the viewing</li>
+                        <li>Bring a valid ID for verification</li>
+                        <li>Feel free to take photos and videos during the viewing</li>
+                        <li>Ask our agent any questions about the property</li>
+                        <li>If you need to cancel, please notify us <strong>24 hours in advance</strong></li>
+                        <li>For urgent viewings or changes, call us at <strong>+254 700 000 000</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-update time slots based on selected date
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('{{ form.viewing_date.id_for_label }}');
+    const timeSelect = document.getElementById('{{ form.viewing_time.id_for_label }}');
+    const bookedSlots = {{ booked_slots|safe }};
+    
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            const selectedDate = this.value;
+            const options = timeSelect.options;
+            
+            // Reset all options
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (option.value) {
+                    option.disabled = false;
+                    option.text = option.text.replace(' (Booked)', '');
+                }
+            }
+            
+            // Disable booked slots for selected date
+            if (bookedSlots[selectedDate]) {
+                for (let i = 0; i < options.length; i++) {
+                    const option = options[i];
+                    if (bookedSlots[selectedDate].includes(option.value)) {
+                        option.disabled = true;
+                        option.text += ' (Booked)';
+                    }
+                }
+            }
+        });
+        
+        // Trigger on page load if date is pre-selected
+        if (dateInput.value) {
+            dateInput.dispatchEvent(new Event('change'));
+        }
+    }
+});
+
+// Form validation
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    const dateInput = document.getElementById('{{ form.viewing_date.id_for_label }}');
+    const timeInput = document.getElementById('{{ form.viewing_time.id_for_label }}');
+    
+    if (!dateInput.value || !timeInput.value) {
+        e.preventDefault();
+        alert('Please select both date and time for your viewing.');
+        return false;
+    }
+});
+</script>
+{% endblock %}
+

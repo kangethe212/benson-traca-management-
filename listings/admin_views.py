@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 import os
 import uuid
 
-from .models import Property, PropertyMedia
+from .models import Property, PropertyMedia, Tenant, Lease
 
 
 @staff_member_required
@@ -116,3 +116,61 @@ def property_media_manager(request, property_id):
         'opts': Property._meta,
     }
     return render(request, 'admin/listings/property/media_manager.html', context)
+
+
+@staff_member_required
+def tenant_approval_dashboard(request):
+    """Dedicated tenant approval dashboard for admins"""
+    from django.utils import timezone
+    
+    # Handle approval/rejection actions
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        tenant_id = request.POST.get('tenant_id')
+        
+        try:
+            tenant = Tenant.objects.get(id=tenant_id)
+            
+            if action == 'approve':
+                tenant.is_verified = True
+                tenant.save()
+                messages.success(request, f'✅ {tenant.full_name} has been approved and verified!')
+            elif action == 'reject':
+                tenant.is_active = False
+                tenant.save()
+                messages.warning(request, f'❌ {tenant.full_name} has been rejected and deactivated.')
+            
+        except Tenant.DoesNotExist:
+            messages.error(request, 'Tenant not found.')
+        
+        return redirect('listings:admin_tenant_approval')
+    
+    # Get all tenants with statistics
+    all_tenants = Tenant.objects.select_related('user').order_by('-created_at')
+    
+    pending_tenants = all_tenants.filter(is_verified=False, is_active=True)
+    verified_tenants = all_tenants.filter(is_verified=True, is_active=True)
+    rejected_tenants = all_tenants.filter(is_active=False)
+    
+    # Get tenants with active leases
+    tenants_with_leases = all_tenants.filter(
+        leases__end_date__gte=timezone.now().date(),
+        leases__status='active'
+    ).distinct()
+    
+    context = {
+        'pending_tenants': pending_tenants,
+        'verified_tenants': verified_tenants,
+        'rejected_tenants': rejected_tenants,
+        'tenants_with_leases': tenants_with_leases,
+        'stats': {
+            'total': all_tenants.count(),
+            'pending': pending_tenants.count(),
+            'verified': verified_tenants.count(),
+            'rejected': rejected_tenants.count(),
+            'with_leases': tenants_with_leases.count(),
+        },
+        'title': 'Tenant Approval Dashboard',
+    }
+    
+    return render(request, 'admin/tenant_approval.html', context)

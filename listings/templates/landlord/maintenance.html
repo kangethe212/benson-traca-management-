@@ -1,0 +1,77 @@
+{% extends 'landlord/base.html' %}
+
+{% block title %}Maintenance Requests{% endblock %}
+{% block page_title %}Maintenance Requests{% endblock %}
+{% block page_subtitle %}Track and manage maintenance{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <div class="btn-group" role="group">
+        <a href="{% url 'listings:landlord:maintenance' %}" class="btn {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+            Pending ({{ status_counts.pending }})
+        </a>
+        <a href="?status=in_progress" class="btn {% if status_filter == 'in_progress' %}btn-info{% else %}btn-outline-info{% endif %}">
+            In Progress ({{ status_counts.in_progress }})
+        </a>
+        <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-success{% else %}btn-outline-success{% endif %}">
+            Completed ({{ status_counts.completed }})
+        </a>
+    </div>
+</div>
+
+{% if maintenance_requests %}
+<div class="data-card">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Property</th>
+                    <th>Tenant</th>
+                    <th>Issue</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in maintenance_requests %}
+                    <tr>
+                        <td>{{ request.reported_date|date:"M d, Y" }}</td>
+                        <td>{{ request.lease.property_item.title|truncatewords:3 }}</td>
+                        <td>{{ request.tenant.full_name }}</td>
+                        <td>
+                            <strong>{{ request.title }}</strong><br>
+                            <small class="text-muted">{{ request.description|truncatewords:10 }}</small>
+                        </td>
+                        <td>
+                            <span class="badge {% if request.priority == 'urgent' %}bg-danger{% elif request.priority == 'high' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ request.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if request.status == 'completed' %}bg-success{% elif request.status == 'in_progress' %}bg-info{% elif request.status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ request.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="data-card text-center py-5">
+    <i class="fas fa-tools fa-5x text-muted mb-3"></i>
+    <h4>No Maintenance Requests</h4>
+    <p class="text-muted">
+        {% if status_filter %}
+            No {{ status_filter }} maintenance requests
+        {% else %}
+            All maintenance requests are up to date
+        {% endif %}
+    </p>
+</div>
+{% endif %}
+{% endblock %}
+

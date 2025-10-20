@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -142,6 +147,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Authentication Settings
+LOGIN_URL = '/tenant/login/'
+LOGIN_REDIRECT_URL = '/tenant/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
+
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -156,20 +166,45 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-# Email Configuration (Development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
-# For production, use:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'your-smtp-host'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your-email@domain.com'
-# EMAIL_HOST_PASSWORD = 'your-email-password'
+# =============================================================================
+# EMAIL CONFIGURATION
+# =============================================================================
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Traca Management <noreply@tracamanagement.co.ke>')
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # Admin email settings
 ADMINS = [
-    ('Admin', 'admin@tracamanagement.co.ke'),
+    ('Admin', os.getenv('ADMIN_EMAIL', 'admin@tracamanagement.co.ke')),
 ]
+MANAGERS = ADMINS
+
+# =============================================================================
+# WHATSAPP CONFIGURATION
+# =============================================================================
+WHATSAPP_PHONE_NUMBER = os.getenv('WHATSAPP_PHONE_NUMBER', '254700000000')
+WHATSAPP_API_TOKEN = os.getenv('WHATSAPP_API_TOKEN', '')
+WHATSAPP_API_URL = os.getenv('WHATSAPP_API_URL', 'https://graph.facebook.com/v18.0')
+
+# =============================================================================
+# TWILIO SMS CONFIGURATION
+# =============================================================================
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', '')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '')
+TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '+254700000000')
+
+# =============================================================================
+# NOTIFICATION SETTINGS
+# =============================================================================
+# Enable/disable notification channels
+ENABLE_EMAIL_NOTIFICATIONS = os.getenv('ENABLE_EMAIL_NOTIFICATIONS', 'True') == 'True'
+ENABLE_SMS_NOTIFICATIONS = os.getenv('ENABLE_SMS_NOTIFICATIONS', 'False') == 'True'
+ENABLE_WHATSAPP_NOTIFICATIONS = os.getenv('ENABLE_WHATSAPP_NOTIFICATIONS', 'False') == 'True'
 
 # Timezone for Kenya
 TIME_ZONE = 'Africa/Nairobi'

@@ -4,225 +4,1132 @@
 
 {% block title %}Home - Traca Management Services Ltd{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Professional Real Estate Hero Section */
+    .hero-section {
+        min-height: 100vh;
+        position: relative;
+        background: linear-gradient(135deg, rgba(0, 51, 102, 0.85) 0%, rgba(26, 77, 115, 0.85) 100%);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+    
+    .hero-background-video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+    
+    .hero-slideshow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+    
+    .hero-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transform: scale(1.05);
+        animation: professionalSlideShow 30s infinite;
+    }
+    
+    .hero-slide:nth-child(1) { animation-delay: 0s; }
+    .hero-slide:nth-child(2) { animation-delay: 6s; }
+    .hero-slide:nth-child(3) { animation-delay: 12s; }
+    .hero-slide:nth-child(4) { animation-delay: 18s; }
+    .hero-slide:nth-child(5) { animation-delay: 24s; }
+    
+    @keyframes professionalSlideShow {
+        0%, 15% { opacity: 1; transform: scale(1); }
+        20%, 95% { opacity: 0; transform: scale(1.05); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    .hero-main-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        min-height: 80vh;
+    }
+    
+    .hero-text-content {
+        color: white;
+    }
+    
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, #FF1493 0%, #e0115f 100%);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
+        opacity: 0;
+        animation: slideInLeft 1s ease-out forwards;
+        animation-delay: 0.3s;
+        transition: all 0.3s ease;
+    }
+    
+    .hero-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 20, 147, 0.4);
+    }
+    
+    .hero-main-title {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1.05;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        opacity: 0;
+        animation: slideInLeft 1s ease-out forwards;
+        animation-delay: 0.6s;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.4rem;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        color: rgba(255, 255, 255, 0.95);
+        opacity: 0;
+        animation: slideInLeft 1s ease-out forwards;
+        animation-delay: 0.9s;
+        letter-spacing: 0.5px;
+    }
+    
+    .hero-description {
+        font-size: 1.15rem;
+        line-height: 1.7;
+        margin-bottom: 3.5rem;
+        color: rgba(255, 255, 255, 0.85);
+        opacity: 0;
+        animation: slideInLeft 1s ease-out forwards;
+        animation-delay: 1.2s;
+        max-width: 520px;
+    }
+    
+    .hero-stats {
+        display: flex;
+        gap: 3rem;
+        margin-bottom: 3.5rem;
+        opacity: 0;
+        animation: slideInLeft 1s ease-out forwards;
+        animation-delay: 1.5s;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        min-width: 120px;
+    }
+    
+    .stat-item:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #FF1493 0%, #e0115f 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: block;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.9);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 600;
+    }
+    
+    .hero-cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        opacity: 0;
+        animation: slideInLeft 1s ease-out forwards;
+        animation-delay: 1.8s;
+    }
+    
+    .hero-cta-primary {
+        background: linear-gradient(135deg, #FF1493 0%, #e0115f 100%);
+        color: white;
+        padding: 1.25rem 3rem;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4);
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    
+    .hero-cta-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .hero-cta-primary:hover::before {
+        left: 100%;
+    }
+    
+    .hero-cta-primary:hover {
+        background: linear-gradient(135deg, #e0115f 0%, #c0104f 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(255, 20, 147, 0.5);
+        color: white;
+    }
+    
+    .hero-cta-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 1.25rem 3rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.4s ease;
+        backdrop-filter: blur(10px);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    
+    .hero-cta-secondary:hover {
+        background: rgba(255, 255, 255, 0.95);
+        color: #003366;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.95);
+    }
+    
+    .hero-search-panel {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 25px;
+        padding: 3rem;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        opacity: 0;
+        animation: slideInRight 1s ease-out forwards;
+        animation-delay: 0.6s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-search-panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #FF1493, #e0115f, #FF1493);
+        background-size: 200% 100%;
+        animation: gradientShift 3s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    .search-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #003366;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .search-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #FF1493, #e0115f);
+        border-radius: 2px;
+    }
+    
+    .search-form {
+        display: grid;
+        gap: 2rem;
+    }
+    
+    .search-input-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    .search-input {
+        padding: 1.25rem 1.5rem;
+        border: 2px solid #e8e8e8;
+        border-radius: 15px;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        background: #fafafa;
+        color: #333;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #FF1493;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .search-input::placeholder {
+        color: #999;
+        font-weight: 400;
+    }
+    
+    .search-btn {
+        background: linear-gradient(135deg, #FF1493 0%, #e0115f 100%);
+        color: white;
+        padding: 1.25rem 2.5rem;
+        border: none;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 8px 25px rgba(255, 20, 147, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .search-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .search-btn:hover::before {
+        left: 100%;
+    }
+    
+    .search-btn:hover {
+        background: linear-gradient(135deg, #e0115f 0%, #c0104f 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(255, 20, 147, 0.4);
+    }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .hero-main-content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 1.5rem 0;
+        }
+        
+        .hero-main-title {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-stats {
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-item {
+            min-width: 90px;
+            padding: 1rem 0.75rem;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+        }
+        
+        .hero-cta-buttons {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .hero-cta-primary,
+        .hero-cta-secondary {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+        
+        .search-input-group {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .hero-search-panel {
+            padding: 2rem 1.5rem;
+            margin: 0 1rem;
+        }
+        
+        .search-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            padding: 1rem;
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+        
+        .hero-badge {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-logo {
+            margin-bottom: 1rem;
+        }
+        
+        .hero-logo img {
+            height: 60px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .hero-main-title {
+            font-size: 2rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+        
+        .hero-description {
+            font-size: 0.95rem;
+        }
+        
+        .hero-stats {
+            gap: 0.75rem;
+        }
+        
+        .stat-item {
+            min-width: 80px;
+            padding: 0.75rem 0.5rem;
+        }
+        
+        .stat-number {
+            font-size: 1.75rem;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+        }
+        
+        .hero-search-panel {
+            padding: 1.5rem 1rem;
+            margin: 0 0.5rem;
+        }
+        
+        .hero-cta-primary,
+        .hero-cta-secondary {
+            padding: 1rem 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .hero-logo img {
+            height: 50px;
+        }
+    }
+    
+    @media (max-width: 360px) {
+        .hero-main-title {
+            font-size: 1.8rem;
+        }
+        
+        .hero-search-panel {
+            padding: 1.25rem 0.75rem;
+            margin: 0 0.25rem;
+        }
+        
+        .search-title {
+            font-size: 1.25rem;
+        }
+        
+        .hero-cta-primary,
+        .hero-cta-secondary {
+            padding: 0.875rem 1.25rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+    
+    /* Floating Property Cards */
+    .floating-properties {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .floating-card {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 1rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        backdrop-filter: blur(10px);
+        animation: float 6s ease-in-out infinite;
+        pointer-events: auto;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    
+    .floating-card:hover {
+        transform: scale(1.1);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
+    
+    .floating-card:nth-child(1) {
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .floating-card:nth-child(2) {
+        top: 60%;
+        right: 15%;
+        animation-delay: 2s;
+    }
+    
+    .floating-card:nth-child(3) {
+        top: 40%;
+        left: 70%;
+        animation-delay: 4s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-20px) rotate(1deg); }
+        66% { transform: translateY(-10px) rotate(-1deg); }
+    }
+    
+    /* Animated Stats */
+    .stats-counter {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #FF1493;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .animated-counter {
+        animation: countUp 2s ease-out;
+    }
+    
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Feature Highlights */
+    .feature-highlight {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .feature-highlight:hover {
+        transform: translateY(-10px);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    
+    /* Enhanced Cards */
+    .card-brand {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .card-brand:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    .footer-brand {
+        background: linear-gradient(135deg, #003366 0%, #1a4d73 100%);
+    }
+    
+    /* Property Gallery Animation */
+    .property-gallery {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .gallery-item {
+        transition: all 0.5s ease;
+        transform-origin: center;
+    }
+    
+    .gallery-item:hover {
+        transform: scale(1.05) rotate(2deg);
+        z-index: 10;
+    }
+    
+    /* Pulse Animation for CTAs */
+    .pulse-btn {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255, 20, 147, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(255, 20, 147, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 20, 147, 0); }
+    }
+    
+    .footer-brand a {
+        color: #C9A227;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .footer-brand a:hover {
+        color: #d4b547;
+    }
+    
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+        transform: scale(1.05);
+    }
+    
+    .gallery-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        padding: 20px 15px 15px;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-overlay {
+        transform: translateY(0);
+    }
+    
+    .service-icon img {
+        border: 3px solid #C9A227;
+        transition: transform 0.3s ease;
+    }
+    
+    .service-icon:hover img {
+        transform: scale(1.1);
+    }
+    
+    .stats-counter {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #003366;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .animated-counter {
+        animation: countUp 2s ease-out;
+    }
+    
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .feature-highlight {
+        background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, rgba(0, 51, 102, 0.1) 100%);
+        border-left: 4px solid #C9A227;
+        padding: 1.5rem;
+        border-radius: 0 10px 10px 0;
+        margin: 1rem 0;
+    }
+    
+    .newsletter-signup {
+        background: linear-gradient(135deg, #003366 0%, #1a4d73 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Hero Section -->
+<!-- Professional Real Estate Hero Section -->
 <div class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4 text-shadow">Your Trusted Partner in Kenyan Real Estate</h1>
-                <p class="lead mb-4">Traca Management Services Ltd provides comprehensive property management, sales, and rental services across major counties in Kenya.</p>
-                <div class="d-flex flex-wrap gap-3">
-                    <a href="{% url 'listings:properties_list' %}" class="btn btn-light btn-lg px-4">
-                        <i class="fas fa-search me-2"></i>Browse Properties
+    <!-- Background Slideshow -->
+    <div class="hero-slideshow">
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 1.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 2.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 3.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 5.jpeg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 6.jpeg' %}');"></div>
+    </div>
+    
+    <!-- Hero Content -->
+    <div class="hero-content">
+        <div class="hero-main-content">
+            <!-- Left Side: Professional Text Content -->
+            <div class="hero-text-content">
+                <div class="hero-logo mb-4" style="opacity: 0; animation: slideInLeft 1s ease-out forwards; animation-delay: 0.2s;">
+                    <img src="{% static 'images/traca-logo-new.png' %}" alt="Traca Management Services" style="height: 80px; width: auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">
+                </div>
+                
+                <div class="hero-badge">
+                    <i class="fas fa-award"></i>
+                    <span>Trusted Since 2004</span>
+                </div>
+                
+                <h1 class="hero-main-title">
+                    Find Your Dream Property in Kenya
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Premium Real Estate Investment Opportunities
+                </p>
+                
+                <p class="hero-description">
+                    Discover exceptional properties across Kenya's 47 counties. From luxury villas in Karen to modern apartments in Westlands, we connect international investors and local buyers with Kenya's finest real estate opportunities.
+                </p>
+                
+                <!-- Key Statistics -->
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Properties Sold</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">47</span>
+                        <span class="stat-label">Counties Served</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">20+</span>
+                        <span class="stat-label">Years Experience</span>
+                    </div>
+                </div>
+                
+                <!-- Call-to-Action Buttons -->
+                <div class="hero-cta-buttons">
+                    <a href="{% url 'listings:properties_list' %}" class="hero-cta-primary">
+                        <i class="fas fa-search"></i>
+                        <span>Browse Properties</span>
                     </a>
-                    <a href="{% url 'listings:management_request' %}" class="btn btn-outline-light btn-lg px-4">
-                        <i class="fas fa-cogs me-2"></i>Property Management
+                    <a href="{% url 'listings:contact' %}" class="hero-cta-secondary">
+                        <i class="fas fa-phone"></i>
+                        <span>Get Consultation</span>
                     </a>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <img src="{% static 'images/hero.jpg' %}" alt="Kenyan Real Estate" class="img-fluid rounded shadow-lg" style="max-height: 400px; object-fit: cover;">
+            
+            <!-- Right Side: Advanced Search Panel -->
+            <div class="hero-search-panel">
+                <h3 class="search-title">Find Your Perfect Property</h3>
+                
+                <form class="search-form" action="{% url 'listings:properties_list' %}" method="GET">
+                    <div class="search-input-group">
+                        <select name="property_type" class="search-input">
+                            <option value="">Property Type</option>
+                            <option value="sale">For Sale</option>
+                            <option value="rent">For Rent</option>
+                        </select>
+                        <select name="county" class="search-input">
+                            <option value="">Select County</option>
+                            <option value="1">Nairobi</option>
+                            <option value="2">Mombasa</option>
+                            <option value="3">Kisumu</option>
+                            <option value="4">Nakuru</option>
+                            <option value="5">Eldoret</option>
+                        </select>
+                    </div>
+                    
+                    <div class="search-input-group">
+                        <input type="number" name="min_price" placeholder="Min Price (KES)" class="search-input">
+                        <input type="number" name="max_price" placeholder="Max Price (KES)" class="search-input">
+                    </div>
+                    
+                    <div class="search-input-group">
+                        <select name="bedrooms" class="search-input">
+                            <option value="">Bedrooms</option>
+                            <option value="1">1+ Bedroom</option>
+                            <option value="2">2+ Bedrooms</option>
+                            <option value="3">3+ Bedrooms</option>
+                            <option value="4">4+ Bedrooms</option>
+                            <option value="5">5+ Bedrooms</option>
+                        </select>
+                        <select name="bathrooms" class="search-input">
+                            <option value="">Bathrooms</option>
+                            <option value="1">1+ Bathroom</option>
+                            <option value="2">2+ Bathrooms</option>
+                            <option value="3">3+ Bathrooms</option>
+                            <option value="4">4+ Bathrooms</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                        <span>Search Properties</span>
+                    </button>
+                </form>
+                
+                <!-- Quick Contact -->
+                <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1.25rem; font-weight: 500;">Need immediate assistance?</p>
+                    <button onclick="openWhatsApp()" style="background: linear-gradient(135deg, #25D366 0%, #20B858 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 25px; font-weight: 700; cursor: pointer; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp Us</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Services Section -->
+<!-- Featured Properties Section -->
 <div class="container py-5">
     <div class="row text-center mb-5">
         <div class="col-12">
-            <h2 class="display-5 text-brand-primary mb-3">Our Services</h2>
-            <p class="lead text-muted">Comprehensive real estate solutions tailored for the Kenyan market</p>
+            <h2 class="display-5 fw-bold mb-3" style="color: #003366;">Featured Properties</h2>
+            <p class="lead text-muted">Handpicked premium properties for sale and rent</p>
         </div>
     </div>
     
     <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card card-brand h-100 text-center">
+        {% for property in featured_properties|slice:":4" %}
+        <div class="col-lg-6">
+            <div class="card h-100 shadow-sm border-0">
+                {% if property.main_image %}
+                    <img src="{{ property.main_image.file.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 250px; object-fit: cover;">
+                {% else %}
+                    <img src="{% static 'images/default_property.jpg' %}" class="card-img-top" alt="No Image" style="height: 250px; object-fit: cover;">
+                {% endif %}
                 <div class="card-body">
-                    <i class="fas fa-home fa-3x text-brand-primary mb-3"></i>
-                    <h5 class="card-title">Property Sales</h5>
-                    <p class="card-text">Find your dream home or investment property with our verified listings across Kenya.</p>
-                    <a href="{% url 'listings:properties_list' %}?property_type=sale" class="btn btn-primary-brand">Browse for Sale</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card card-brand h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-key fa-3x text-brand-primary mb-3"></i>
-                    <h5 class="card-title">Property Rentals</h5>
-                    <p class="card-text">Discover quality rental properties in prime locations across major Kenyan counties.</p>
-                    <a href="{% url 'listings:properties_list' %}?property_type=rent" class="btn btn-primary-brand">Browse for Rent</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card card-brand h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-cogs fa-3x text-brand-primary mb-3"></i>
-                    <h5 class="card-title">Property Management</h5>
-                    <p class="card-text">Let us handle your property management needs - from tenant screening to rent collection.</p>
-                    <a href="{% url 'listings:management_request' %}" class="btn btn-primary-brand">Request Management</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Featured Properties -->
-{% if featured_properties %}
-<div class="container-fluid bg-light py-5">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-12">
-                <h2 class="display-5 text-brand-primary mb-3">Featured Properties</h2>
-                <p class="lead text-muted">Handpicked properties from our premium collection</p>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            {% for property in featured_properties %}
-            <div class="col-lg-4 col-md-6">
-                <div class="card card-brand h-100">
-                    {% if property.main_image %}
-                        <img src="{{ property.main_image.file.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 250px; object-fit: cover;">
-                    {% else %}
-                        <img src="{% static 'images/default_property.jpg' %}" class="card-img-top" alt="No Image" style="height: 250px; object-fit: cover;">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title text-brand-primary">
-                            {{ property.title }}
-                            {% if property.is_verified %}
-                            <span class="badge-verified badge-verified-sm ms-2">
-                                <i class="fas fa-check"></i>Verified
-                            </span>
-                            {% endif %}
-                        </h5>
-                        <p class="card-text text-muted mb-2">
-                            <i class="fas fa-map-marker-alt me-1"></i> {{ property.county.name }}
-                        </p>
-                        <h6 class="text-brand-secondary mb-3">KSh {{ property.price|intcomma }}</h6>
-                        <ul class="list-inline text-muted small">
-                            {% if property.bedrooms %}
-                            <li class="list-inline-item me-3"><i class="fas fa-bed me-1"></i> {{ property.bedrooms }} Beds</li>
-                            {% endif %}
-                            {% if property.bathrooms %}
-                            <li class="list-inline-item me-3"><i class="fas fa-bath me-1"></i> {{ property.bathrooms }} Baths</li>
-                            {% endif %}
-                            {% if property.parking_slots %}
-                            <li class="list-inline-item"><i class="fas fa-car me-1"></i> {{ property.parking_slots }} Parking</li>
-                            {% endif %}
-                        </ul>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title fw-bold" style="color: #003366;">{{ property.title }}</h5>
+                        {% if property.is_verified %}
+                        <span class="badge" style="background: #FF1493; color: white;">
+                            <i class="fas fa-check me-1"></i>Verified
+                        </span>
+                        {% endif %}
                     </div>
-                    <div class="card-footer bg-transparent">
-                        <a href="{% url 'listings:property_detail' property.pk %}" class="btn btn-primary-brand w-100">
-                            <i class="fas fa-eye me-2"></i>View Details
-                        </a>
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-map-marker-alt me-2" style="color: #FF1493;"></i>{{ property.county.name }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold mb-0" style="color: #FF1493;">KSh {{ property.price|intcomma }}</h4>
+                        <div class="text-muted">
+                            {% if property.bedrooms %}<i class="fas fa-bed me-1"></i>{{ property.bedrooms }} bed{% endif %}
+                            {% if property.bathrooms %}<i class="fas fa-bath me-2 ms-2"></i>{{ property.bathrooms }} bath{% endif %}
+                        </div>
                     </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="text-center mt-5">
-            <a href="{% url 'listings:properties_list' %}" class="btn btn-primary-brand btn-lg">
-                <i class="fas fa-search me-2"></i>View All Properties
-            </a>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- Counties Section -->
-{% if counties %}
-<div class="container py-5">
-    <div class="row text-center mb-5">
-        <div class="col-12">
-            <h2 class="display-5 text-brand-primary mb-3">Counties We Serve</h2>
-            <p class="lead text-muted">Operating across major counties in Kenya</p>
-        </div>
-    </div>
-    
-    <div class="row g-3">
-        {% for county in counties %}
-        <div class="col-lg-2 col-md-4 col-sm-6">
-            <div class="card card-brand text-center">
-                <div class="card-body">
-                    <h6 class="card-title text-brand-primary">{{ county.name }}</h6>
-                    <p class="card-text small text-muted">{{ county.property_count }} properties</p>
+                    <a href="{% url 'listings:property_detail' property.pk %}" class="btn w-100" style="background: #FF1493; color: white; border: none; padding: 12px; font-weight: 600;">
+                        <i class="fas fa-eye me-2"></i>View Details
+                    </a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <a href="{% url 'listings:properties_list' %}" class="btn btn-lg" style="background: #003366; color: white; border: none; padding: 15px 40px; font-weight: 600;">
+                <i class="fas fa-search me-2"></i>View All Properties
+            </a>
+        </div>
+    </div>
 </div>
-{% endif %}
 
-<!-- Testimonials -->
-{% if featured_testimonials %}
-<div class="container-fluid bg-light py-5">
+<!-- Services Section -->
+<div class="container-fluid py-5" style="background: #f8f9fa;">
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col-12">
-                <h2 class="display-5 text-brand-primary mb-3">What Our Clients Say</h2>
-                <p class="lead text-muted">Trusted by property owners and tenants across Kenya</p>
+                <h2 class="display-5 fw-bold mb-3" style="color: #003366;">Our Services</h2>
+                <p class="lead text-muted">Complete real estate solutions for your needs</p>
             </div>
         </div>
         
         <div class="row g-4">
-            {% for testimonial in featured_testimonials %}
-            <div class="col-lg-4">
-                <div class="card card-brand h-100">
-                    <div class="card-body text-center">
-                        <div class="mb-3">
-                            {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= testimonial.rating %}
-                                    <i class="fas fa-star text-warning"></i>
-                                {% else %}
-                                    <i class="far fa-star text-muted"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <p class="card-text fst-italic">"{{ testimonial.content }}"</p>
-                        <h6 class="card-title text-brand-primary">{{ testimonial.name }}</h6>
-                        {% if testimonial.role %}
-                        <p class="text-muted small">{{ testimonial.role }}</p>
-                        {% endif %}
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-home fa-3x" style="color: #FF1493;"></i>
                     </div>
+                    <h5 class="fw-bold mb-3" style="color: #003366;">Property Sales</h5>
+                    <p class="text-muted mb-4">Find your dream home or investment property with our verified listings</p>
+                    <a href="{% url 'listings:properties_list' %}?property_type=sale" class="btn" style="background: #FF1493; color: white; border: none; padding: 12px 30px;">
+                        Browse for Sale
+                    </a>
                 </div>
             </div>
-            {% endfor %}
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-key fa-3x" style="color: #FF1493;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: #003366;">Property Rentals</h5>
+                    <p class="text-muted mb-4">Quality rental properties in prime locations across Kenya</p>
+                    <a href="{% url 'listings:properties_list' %}?property_type=rent" class="btn" style="background: #FF1493; color: white; border: none; padding: 12px 30px;">
+                        Browse for Rent
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-cogs fa-3x" style="color: #FF1493;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: #003366;">Property Management</h5>
+                    <p class="text-muted mb-4">Professional property management services for owners</p>
+                    <a href="{% url 'listings:management_request' %}" class="btn" style="background: #FF1493; color: white; border: none; padding: 12px 30px;">
+                        Request Service
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-{% endif %}
 
-<!-- CTA Section -->
-<div class="container py-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="card card-brand text-center">
-                <div class="card-body py-5">
-                    <h2 class="display-5 text-brand-primary mb-3">Ready to Get Started?</h2>
-                    <p class="lead text-muted mb-4">Whether you're looking to buy, rent, or manage a property, we're here to help.</p>
-                    <div class="d-flex flex-wrap justify-content-center gap-3">
-                        <a href="{% url 'listings:properties_list' %}" class="btn btn-primary-brand btn-lg px-4">
-                            <i class="fas fa-search me-2"></i>Browse Properties
-                        </a>
-                        <a href="{% url 'listings:management_request' %}" class="btn btn-outline-primary-brand btn-lg px-4">
-                            <i class="fas fa-cogs me-2"></i>Property Management
-                        </a>
-                        <a href="{% url 'listings:contact' %}" class="btn btn-outline-secondary btn-lg px-4">
-                            <i class="fas fa-envelope me-2"></i>Contact Us
-                        </a>
+<!-- Tenant Portal CTA Section -->
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, rgba(201, 162, 39, 0.1), rgba(0, 51, 102, 0.05));">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-brand-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-home fa-2x"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-brand-primary mb-0">Tenant Portal</h3>
+                        <small class="text-muted">Manage Your Rental Online</small>
+                    </div>
+                </div>
+                <p class="text-muted mb-3">
+                    Already a tenant? Access your personal portal to manage rent payments, submit maintenance requests, view lease documents, and communicate with our property management team—all in one convenient place.
+                </p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Pay rent online securely</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Submit maintenance requests 24/7</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Access lease documents anytime</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Direct messaging with property management</li>
+                </ul>
+                <div class="d-flex gap-3 flex-wrap mt-4">
+                    <a href="{% url 'listings:tenant_registration' %}" class="btn btn-primary-brand btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Register as Tenant
+                    </a>
+                    <a href="{% url 'admin:index' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Tenant Login
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-lg">
+                    <img src="{% static 'images/traca 1.jpg' %}" class="card-img-top" alt="Tenant Portal" style="height: 300px; object-fit: cover;">
+                    <div class="card-body p-4">
+                        <h5 class="text-brand-primary mb-3">Why Use Our Tenant Portal?</h5>
+                        <p class="text-muted mb-0">
+                            Join hundreds of satisfied tenants who manage their rentals online with Traca Management Services. Our secure portal makes property management hassle-free and convenient.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Final CTA Section -->
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #003366 0%, #1a4d73 100%);">
+    <div class="container text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="text-white mb-4 fw-bold">Ready to Find Your Dream Property?</h2>
+                <p class="text-white-50 mb-4">Get started today with our professional real estate services</p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <button onclick="openWhatsApp()" class="btn btn-lg" style="background: #25D366; border: none; color: white; padding: 15px 30px; font-weight: 600;">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp Us
+                    </button>
+                    <a href="{% url 'listings:contact' %}" class="btn btn-outline-light btn-lg" style="padding: 15px 30px; font-weight: 600;">
+                        <i class="fas fa-phone me-2"></i>Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openWhatsApp() {
+    const message = `Hi! I'm interested in learning more about Traca Management Services and your property listings.`;
+    const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+</script>
+
 {% endblock %}

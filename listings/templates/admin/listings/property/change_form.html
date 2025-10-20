@@ -4,6 +4,7 @@
 {% block submit_buttons_bottom %}
 {{ block.super }}
 
+{% if original.pk %}
 <div class="submit-row" style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
     <h3>Property Media Management</h3>
     <p>Use these tools to manage photos and videos for this property:</p>
@@ -39,6 +40,14 @@
         </ul>
     </div>
 </div>
+{% else %}
+<div class="submit-row" style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
+    <div style="padding: 10px; background: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107;">
+        <h4 style="margin: 0 0 5px 0; color: #856404;">📝 Media Upload Available After Saving</h4>
+        <p style="margin: 0; color: #856404;">Save this property first, then you'll be able to upload photos and videos using the media management tools.</p>
+    </div>
+</div>
+{% endif %}
 
 <style>
 .submit-row h3 {

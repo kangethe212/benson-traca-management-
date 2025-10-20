@@ -1,383 +1,914 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Services - Traca Management Services Ltd</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/brand.css' %}">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'listings:home' %}">
-                <i class="fas fa-building me-2"></i>Traca Management Services Ltd
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                    data-bs-target="#navbarNav" aria-controls="navbarNav" 
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listings:home' %}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listings:properties_list' %}">Properties</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="{% url 'listings:services' %}">Services</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listings:about' %}">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listings:contact' %}">Contact</a></li>
-                </ul>
-                <a href="{% url 'listings:management_request' %}" class="btn btn-primary ms-3">List Your Property</a>
+
+{% block title %}Our Services - Traca Management Services Ltd{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Animated Background for Services Page */
+.hero-background {
+    position: relative;
+    min-height: 60vh;
+    background: linear-gradient(135deg, rgba(0, 51, 102, 0.8) 0%, rgba(26, 77, 115, 0.8) 100%);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.hero-slideshow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1.1);
+    animation: servicesSlideShow 20s infinite;
+}
+
+.hero-slide:nth-child(1) { animation-delay: 0s; }
+.hero-slide:nth-child(2) { animation-delay: 4s; }
+.hero-slide:nth-child(3) { animation-delay: 8s; }
+.hero-slide:nth-child(4) { animation-delay: 12s; }
+.hero-slide:nth-child(5) { animation-delay: 16s; }
+
+@keyframes servicesSlideShow {
+    0%, 15% { opacity: 1; transform: scale(1); }
+    20%, 95% { opacity: 0; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.service-hero {
+    background: linear-gradient(135deg, rgba(0, 51, 102, 0.9), rgba(201, 162, 39, 0.8)), url('{% static 'images/hero.jpg' %}');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15) !important;
+}
+
+.service-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #003366, #C9A227);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #003366, #C9A227);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.testimonial-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+}
+
+.faq-accordion .accordion-button {
+    border-radius: 10px !important;
+    border: none;
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.faq-accordion .accordion-button:not(.collapsed) {
+    background: linear-gradient(135deg, #003366, #C9A227);
+    color: white;
+}
+
+.faq-accordion .accordion-item {
+    border: none;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.cta-section {
+    background: linear-gradient(135deg, #003366, #C9A227);
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('{% static 'images/hero.jpg' %}') center/cover;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+.cta-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Mobile Responsive for Services Page */
+@media (max-width: 768px) {
+    .hero-background {
+        min-height: 50vh;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-content .btn {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        margin: 0.25rem;
+    }
+    
+    .hero-content .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .service-card .card-img-top {
+        height: 200px;
+    }
+    
+    .service-card .card-body {
+        padding: 1rem;
+    }
+    
+    .service-card .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .pricing-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .pricing-card .display-4 {
+        font-size: 2rem;
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .team-card .card-body {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-content .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
+        width: 100%;
+        margin: 0.25rem 0;
+    }
+    
+    .service-card .card-img-top {
+        height: 180px;
+    }
+    
+    .service-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .service-card .card-title {
+        font-size: 1rem;
+    }
+    
+    .pricing-card .card-body {
+        padding: 1rem;
+    }
+    
+    .pricing-card .display-4 {
+        font-size: 1.75rem;
+    }
+    
+    .pricing-card .h5 {
+        font-size: 1rem;
+    }
+    
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .team-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .team-card .card-title {
+        font-size: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .service-card .card-img-top {
+        height: 160px;
+    }
+    
+    .service-card .card-body {
+        padding: 0.5rem;
+    }
+    
+    .pricing-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .pricing-card .display-4 {
+        font-size: 1.5rem;
+    }
+    
+    .team-card .card-body {
+        padding: 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Animated Background Hero Section -->
+<div class="hero-background">
+    <!-- Background Slideshow -->
+    <div class="hero-slideshow">
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 1.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 2.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 3.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 5.jpeg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 6.jpeg' %}');"></div>
+    </div>
+    
+    <!-- Hero Content -->
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Our Professional Services</h1>
+            <p class="hero-subtitle">Comprehensive real estate solutions for property owners, buyers, and sellers across all 47 counties in Kenya since 2004</p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="#services" class="btn btn-lg smooth-scroll" style="background: #FF1493; color: white; border: none; padding: 12px 30px; font-weight: 600; border-radius: 25px;">
+                    <i class="fas fa-arrow-down me-2"></i>Explore Services
+                </a>
+                <a href="{% url 'listings:contact' %}" class="btn btn-outline-light btn-lg" style="padding: 12px 30px; font-weight: 600; border-radius: 25px;">
+                    <i class="fas fa-phone me-2"></i>Get Consultation
+                </a>
             </div>
         </div>
-    </nav>
+    </div>
+</div>
 
-    <!-- Hero Section -->
-    <section class="py-5 mt-5" style="background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(255, 105, 180, 0.1));">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="display-4 fw-bold text-primary">Our Services</h1>
-                    <p class="lead">Comprehensive Solutions for Property Owners, Buyers & Sellers Across Key Kenyan Counties</p>
-                </div>
+<!-- Services Offered -->
+<section id="services" class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 text-brand-primary mb-3">Our Comprehensive Services</h2>
+                <p class="lead text-muted">Professional real estate solutions tailored to your needs</p>
             </div>
         </div>
-    </section>
-
-    <!-- Services Offered -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">Services We Offer</h2>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                <i class="fas fa-cogs fa-2x"></i>
-                            </div>
-                            <h5 class="card-title">Property Management</h5>
-                            <p class="card-text">Hassle-free management, rent collection, and maintenance for your investments. We handle everything from tenant screening to property upkeep.</p>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card service-card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-cogs fa-2x text-white"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                <i class="fas fa-handshake fa-2x"></i>
-                            </div>
-                            <h5 class="card-title">Sales & Rentals</h5>
-                            <p class="card-text">Expert marketing and negotiation to connect you with the right buyers or tenants. We ensure maximum value for your property.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                <i class="fas fa-chart-line fa-2x"></i>
-                            </div>
-                            <h5 class="card-title">Property Valuation</h5>
-                            <p class="card-text">Accurate, market-based valuations for informed buying and selling decisions. Our certified valuers provide detailed reports.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                <i class="fas fa-lightbulb fa-2x"></i>
-                            </div>
-                            <h5 class="card-title">Investment Advisory</h5>
-                            <p class="card-text">Guidance on profitable property investments. We help you identify opportunities and maximize returns on your real estate portfolio.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                <i class="fas fa-gavel fa-2x"></i>
-                            </div>
-                            <h5 class="card-title">Legal & Documentation Support</h5>
-                            <p class="card-text">Contracts, title transfer consultancy, and legal support. We ensure all transactions are legally compliant and secure.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                <i class="fas fa-users fa-2x"></i>
-                            </div>
-                            <h5 class="card-title">Tenant & Landlord Support</h5>
-                            <p class="card-text">End-to-end assistance for both tenants and landlords. From finding the right match to resolving disputes professionally.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Why Choose Traca -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-5">Why Choose Traca</h2>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="text-center">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-map-marked-alt fa-2x"></i>
-                        </div>
-                        <h5>Local Expertise</h5>
-                        <p class="text-muted">Deep knowledge of the Kenyan real estate market across all major counties.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="text-center">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-shield-alt fa-2x"></i>
-                        </div>
-                        <h5>Verified Listings</h5>
-                        <p class="text-muted">All properties are thoroughly verified to ensure authenticity and quality.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="text-center">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-dollar-sign fa-2x"></i>
-                        </div>
-                        <h5>Transparent Pricing</h5>
-                        <p class="text-muted">No hidden fees or surprises. Clear, upfront pricing for all our services.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="text-center">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-headset fa-2x"></i>
-                        </div>
-                        <h5>Full Support</h5>
-                        <p class="text-muted">Complete support from start to finish, ensuring your satisfaction throughout the process.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">What Our Clients Say</h2>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex mb-3">
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                            </div>
-                            <p class="card-text">"Traca Management Services made finding my dream home in Nairobi effortless. Their team was professional, responsive, and truly understood my needs."</p>
-                            <footer class="blockquote-footer">
-                                <cite title="Source Title">Sarah Mwangi, Property Buyer</cite>
-                            </footer>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex mb-3">
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                            </div>
-                            <p class="card-text">"Listing my commercial property with Traca was the best decision. They handled everything from marketing to negotiations, securing a great deal."</p>
-                            <footer class="blockquote-footer">
-                                <cite title="Source Title">James Kimani, Property Seller</cite>
-                            </footer>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex mb-3">
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                                <i class="fas fa-star text-warning"></i>
-                            </div>
-                            <p class="card-text">"Their property management services are top-notch. I no longer worry about my rental units; Traca ensures everything runs smoothly."</p>
-                            <footer class="blockquote-footer">
-                                <cite title="Source Title">Grace Wanjiku, Landlord</cite>
-                            </footer>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Call to Action -->
-    <section class="py-5 bg-primary text-white">
-        <div class="container text-center">
-            <h2 class="mb-3">Need Property Advice?</h2>
-            <p class="lead mb-4">Our experts are here to guide you through buying, selling, or managing property.</p>
-            <a href="{% url 'listings:contact' %}" class="btn btn-light btn-lg">Contact Us Today</a>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-5">Frequently Asked Questions</h2>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="accordion" id="faqAccordion">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="faq1">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
-                                    How much does property management cost?
-                                </button>
-                            </h2>
-                            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Our property management fees are competitive and transparent. We typically charge 8-10% of monthly rental income, which includes rent collection, maintenance coordination, and tenant management.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="faq2">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
-                                    How long does property valuation take?
-                                </button>
-                            </h2>
-                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Property valuations typically take 3-5 business days from the initial inspection. We provide detailed reports with market analysis and comparable sales data.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="faq3">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
-                                    Which counties do you cover?
-                                </button>
-                            </h2>
-                            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    We primarily serve Nairobi, Kiambu, Machakos, Murang'a, Kajiado, and Nyandarua counties. However, we can provide services in other counties upon request.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="faq4">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
-                                    What documents are required for selling property?
-                                </button>
-                            </h2>
-                            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    You'll need the title deed, rates clearance certificate, land rent clearance, and any relevant planning approvals. We can help you gather all necessary documentation.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer-content">
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="fas fa-building me-2"></i>
-                        Traca Management Services Ltd
-                    </h5>
-                    <p style="opacity: 0.9;">
-                        Your trusted partner in Kenyan real estate. We provide professional property services 
-                        across all 47 counties with verified listings and expert guidance.
-                    </p>
-                    <div class="mt-3">
-                        <a href="#" class="social-icon">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="social-icon">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="social-icon">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                        <a href="#" class="social-icon">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2">
-                    <h6 class="fw-bold mb-3">Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{% url 'listings:home' %}">Home</a></li>
-                        <li class="mb-2"><a href="{% url 'listings:properties_list' %}">Properties</a></li>
-                        <li class="mb-2"><a href="{% url 'listings:services' %}">Services</a></li>
-                        <li class="mb-2"><a href="{% url 'listings:about' %}">About Us</a></li>
-                        <li class="mb-2"><a href="{% url 'listings:contact' %}">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3">
-                    <h6 class="fw-bold mb-3">Our Services</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#">Property Management</a></li>
-                        <li class="mb-2"><a href="#">Sales & Rentals</a></li>
-                        <li class="mb-2"><a href="#">Property Valuations</a></li>
-                        <li class="mb-2"><a href="#">Investment Advisory</a></li>
-                        <li class="mb-2"><a href="#">Legal Support</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3">
-                    <h6 class="fw-bold mb-3">Contact Info</h6>
-                    <div class="mb-3">
-                        <i class="fas fa-phone me-2"></i>
-                        <span>+254 700 000 000</span>
-                    </div>
-                    <div class="mb-3">
-                        <i class="fas fa-envelope me-2"></i>
-                        <span>info@tracamanagement.co.ke</span>
-                    </div>
-                    <div class="mb-3">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        <span>Westlands, Nairobi, Kenya</span>
+                        <h5 class="card-title text-brand-primary mb-3">Property Management</h5>
+                        <p class="card-text text-muted mb-4">Complete property management including rent collection, maintenance coordination, tenant screening, and property upkeep. We handle everything so you don't have to.</p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="fas fa-check text-success me-2"></i>Rent collection & accounting</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Maintenance coordination</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Tenant screening & placement</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Property inspections</li>
+                        </ul>
                     </div>
                 </div>
             </div>
             
-            <hr class="my-4">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; {{ year }} Traca Management Services Ltd. All rights reserved.</p>
+            <div class="col-md-6 col-lg-4">
+                <div class="card service-card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-handshake fa-2x text-white"></i>
+                        </div>
+                        <h5 class="card-title text-brand-primary mb-3">Sales & Rentals</h5>
+                        <p class="card-text text-muted mb-4">Expert marketing and negotiation services to connect you with the right buyers or tenants. We ensure maximum value for your property investment.</p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="fas fa-check text-success me-2"></i>Professional marketing</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Expert negotiations</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Market analysis</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Transaction management</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="me-3" style="opacity: 0.8;">Privacy Policy</a>
-                    <a href="#" class="me-3" style="opacity: 0.8;">Terms of Service</a>
-                    <a href="#" style="opacity: 0.8;">Careers</a>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card service-card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-chart-line fa-2x text-white"></i>
+                        </div>
+                        <h5 class="card-title text-brand-primary mb-3">Property Valuation</h5>
+                        <p class="card-text text-muted mb-4">Accurate, market-based valuations for informed buying and selling decisions. Our certified valuers provide detailed reports with comprehensive market analysis.</p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="fas fa-check text-success me-2"></i>Market analysis</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Detailed reports</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Certified valuers</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Legal compliance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card service-card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-lightbulb fa-2x text-white"></i>
+                        </div>
+                        <h5 class="card-title text-brand-primary mb-3">Investment Advisory</h5>
+                        <p class="card-text text-muted mb-4">Strategic guidance on profitable property investments. We help you identify opportunities and maximize returns on your real estate portfolio.</p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="fas fa-check text-success me-2"></i>Market research</li>
+                            <li><i class="fas fa-check text-success me-2"></i>ROI analysis</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Risk assessment</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Portfolio optimization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card service-card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-gavel fa-2x text-white"></i>
+                        </div>
+                        <h5 class="card-title text-brand-primary mb-3">Legal & Documentation</h5>
+                        <p class="card-text text-muted mb-4">Comprehensive legal support including contracts, title transfers, and documentation. We ensure all transactions are legally compliant and secure.</p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="fas fa-check text-success me-2"></i>Contract preparation</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Title transfers</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Legal compliance</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Documentation support</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card service-card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-users fa-2x text-white"></i>
+                        </div>
+                        <h5 class="card-title text-brand-primary mb-3">Tenant & Landlord Support</h5>
+                        <p class="card-text text-muted mb-4">End-to-end assistance for both tenants and landlords. From finding the right match to resolving disputes professionally and efficiently.</p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="fas fa-check text-success me-2"></i>Tenant screening</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Dispute resolution</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Lease management</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Support services</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<!-- Why Choose Traca -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 text-brand-primary mb-3">Why Choose Traca Management Services</h2>
+                <p class="lead text-muted">Two decades of excellence in Kenyan real estate</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marked-alt fa-2x text-white"></i>
+                    </div>
+                    <h5 class="text-brand-primary mb-3">Local Expertise</h5>
+                    <p class="text-muted">Deep knowledge of the Kenyan real estate market across all 47 counties. We understand local dynamics, pricing, and opportunities.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt fa-2x text-white"></i>
+                    </div>
+                    <h5 class="text-brand-primary mb-3">Verified Listings</h5>
+                    <p class="text-muted">All properties undergo thorough verification to ensure authenticity, legal compliance, and quality standards.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-dollar-sign fa-2x text-white"></i>
+                    </div>
+                    <h5 class="text-brand-primary mb-3">Transparent Pricing</h5>
+                    <p class="text-muted">No hidden fees or surprises. Clear, upfront pricing for all our services with detailed breakdowns.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset fa-2x text-white"></i>
+                    </div>
+                    <h5 class="text-brand-primary mb-3">24/7 Support</h5>
+                    <p class="text-muted">Complete support from start to finish, ensuring your satisfaction throughout the entire process.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="text-brand-primary mb-2">20+ Years of Experience</h4>
+                                <p class="text-muted mb-0">Since 2004, we've been helping Kenyans find their perfect properties and manage their real estate investments with confidence.</p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="display-4 text-brand-secondary fw-bold">20+</div>
+                                <small class="text-muted">Years of Excellence</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 text-brand-primary mb-3">What Our Clients Say</h2>
+                <p class="lead text-muted">Real testimonials from satisfied customers across Kenya</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card testimonial-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="card-text text-muted mb-4">"Traca Management Services made finding my dream home in Nairobi effortless. Their team was professional, responsive, and truly understood my needs. The property verification process gave me confidence in my purchase."</p>
+                        <footer class="blockquote-footer">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <img src="{% static 'images/traca 6.jpeg' %}" alt="Sarah Mwangi" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                </div>
+                                <div>
+                                    <cite title="Source Title" class="text-brand-primary fw-bold">Sarah Mwangi</cite><br>
+                                    <small class="text-muted">Property Buyer, Nairobi</small>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card testimonial-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="card-text text-muted mb-4">"Listing my commercial property with Traca was the best decision. They handled everything from marketing to negotiations, securing a great deal. Their market knowledge is exceptional."</p>
+                        <footer class="blockquote-footer">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <img src="{% static 'images/traca 7.jpeg' %}" alt="James Kimani" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                </div>
+                                <div>
+                                    <cite title="Source Title" class="text-brand-primary fw-bold">James Kimani</cite><br>
+                                    <small class="text-muted">Property Seller, Kiambu</small>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card testimonial-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="card-text text-muted mb-4">"Their property management services are top-notch. I no longer worry about my rental units; Traca ensures everything runs smoothly. The rent collection is always on time."</p>
+                        <footer class="blockquote-footer">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <img src="{% static 'images/traca 8.jpeg' %}" alt="Grace Wanjiku" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                </div>
+                                <div>
+                                    <cite title="Source Title" class="text-brand-primary fw-bold">Grace Wanjiku</cite><br>
+                                    <small class="text-muted">Landlord, Machakos</small>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 text-brand-primary mb-3">Transparent Pricing</h2>
+                <p class="lead text-muted">No hidden fees, no surprises. Clear pricing for all our services</p>
+            </div>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card service-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-home fa-2x text-white"></i>
+                        </div>
+                        <h5 class="card-title text-brand-primary mb-3">Property Sales</h5>
+                        <div class="mb-3">
+                            <span class="display-6 fw-bold text-brand-secondary">3%</span>
+                            <small class="text-muted d-block">Commission on Sale Price</small>
+                        </div>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li><i class="fas fa-check text-success me-2"></i>Professional marketing</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Expert negotiations</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Legal documentation</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Market analysis</li>
+                        </ul>
+                        <a href="{% url 'listings:contact' %}" class="btn btn-primary-brand w-100">Get Quote</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card service-card h-100 border-primary">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h6 class="mb-0">Most Popular</h6>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-cogs fa-2x text-white"></i>
+                        </div>
+                        <h5 class="card-title text-brand-primary mb-3">Property Management</h5>
+                        <div class="mb-3">
+                            <span class="display-6 fw-bold text-brand-secondary">8%</span>
+                            <small class="text-muted d-block">of Monthly Rental Income</small>
+                        </div>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li><i class="fas fa-check text-success me-2"></i>Rent collection</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Tenant screening</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Maintenance coordination</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Property inspections</li>
+                        </ul>
+                        <a href="{% url 'listings:management_request' %}" class="btn btn-primary-brand w-100">Start Management</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card service-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-chart-line fa-2x text-white"></i>
+                        </div>
+                        <h5 class="card-title text-brand-primary mb-3">Property Valuation</h5>
+                        <div class="mb-3">
+                            <span class="display-6 fw-bold text-brand-secondary">KSh 15,000</span>
+                            <small class="text-muted d-block">Per Property</small>
+                        </div>
+                        <ul class="list-unstyled text-start mb-4">
+                            <li><i class="fas fa-check text-success me-2"></i>Detailed report</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Market analysis</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Certified valuers</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Legal compliance</li>
+                        </ul>
+                        <a href="{% url 'listings:contact' %}" class="btn btn-primary-brand w-100">Book Valuation</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section py-5 text-white">
+    <div class="container text-center cta-content">
+        <h2 class="display-5 fw-bold mb-3">Ready to Get Started?</h2>
+        <p class="lead mb-4">Our expert team is here to guide you through buying, selling, or managing your property. Get professional advice tailored to your needs.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'listings:contact' %}" class="btn btn-light btn-lg px-4">
+                <i class="fas fa-phone me-2"></i>Contact Us Today
+            </a>
+            <button class="btn btn-success btn-lg px-4" onclick="openWhatsApp()">
+                <i class="fab fa-whatsapp me-2"></i>Chat on WhatsApp
+            </button>
+            <a href="{% url 'listings:management_request' %}" class="btn btn-outline-light btn-lg px-4">
+                <i class="fas fa-plus me-2"></i>List Your Property
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Quick WhatsApp Actions -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h3 class="display-6 text-brand-primary mb-3">Quick WhatsApp Services</h3>
+                <p class="lead text-muted">Get instant help with our WhatsApp integration</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card service-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #25d366, #128c7e);">
+                            <i class="fab fa-whatsapp fa-2x text-white"></i>
+                        </div>
+                        <h5 class="text-brand-primary mb-3">Maintenance Request</h5>
+                        <p class="text-muted mb-4">Report maintenance issues quickly and get immediate assistance from our support team.</p>
+                        <button class="btn btn-success w-100" onclick="sendMaintenanceRequest()">
+                            <i class="fab fa-whatsapp me-2"></i>Report Issue
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card service-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #25d366, #128c7e);">
+                            <i class="fab fa-whatsapp fa-2x text-white"></i>
+                        </div>
+                        <h5 class="text-brand-primary mb-3">Rent Payment</h5>
+                        <p class="text-muted mb-4">Get help with rent payment inquiries, payment methods, and payment schedules.</p>
+                        <button class="btn btn-success w-100" onclick="sendRentPaymentInquiry()">
+                            <i class="fab fa-whatsapp me-2"></i>Payment Help
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card service-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #25d366, #128c7e);">
+                            <i class="fab fa-whatsapp fa-2x text-white"></i>
+                        </div>
+                        <h5 class="text-brand-primary mb-3">General Inquiry</h5>
+                        <p class="text-muted mb-4">Ask any property-related questions and get expert advice from our team.</p>
+                        <button class="btn btn-success w-100" onclick="openWhatsApp()">
+                            <i class="fab fa-whatsapp me-2"></i>Start Chat
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 text-brand-primary mb-3">Frequently Asked Questions</h2>
+                <p class="lead text-muted">Get answers to common questions about our services</p>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion faq-accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                <i class="fas fa-question-circle me-2"></i>How much does property management cost?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Our property management fees are competitive and transparent. We typically charge 8-10% of monthly rental income, which includes rent collection, maintenance coordination, tenant management, and regular property inspections. There are no hidden fees or surprises.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                <i class="fas fa-clock me-2"></i>How long does property valuation take?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Property valuations typically take 3-5 business days from the initial inspection. We provide detailed reports with market analysis, comparable sales data, and professional recommendations. Rush services are available for urgent cases.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                <i class="fas fa-map-marker-alt me-2"></i>Which counties do you cover?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We serve all 47 counties in Kenya! While we have strong presence in Nairobi, Kiambu, Machakos, Murang'a, Kajiado, and Nyandarua counties, we can provide services in any county upon request. Our network of professionals covers the entire country.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                <i class="fas fa-file-alt me-2"></i>What documents are required for selling property?
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You'll need the title deed, rates clearance certificate, land rent clearance, and any relevant planning approvals. We can help you gather all necessary documentation and ensure everything is in order for a smooth transaction.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq5">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
+                                <i class="fas fa-shield-alt me-2"></i>How do you verify properties?
+                            </button>
+                        </h2>
+                        <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Our verification process includes document verification, physical property inspection, legal compliance checks, and market value assessment. Only properties that meet our strict quality standards receive our verified badge.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq6">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6">
+                                <i class="fas fa-phone me-2"></i>How can I contact you for support?
+                            </button>
+                        </h2>
+                        <div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can reach us through multiple channels: WhatsApp for instant support, phone calls, email, or by visiting our office. We also have a 24/7 emergency hotline for urgent property management issues.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Smooth scrolling for hero button
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.smooth-scroll').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Receipt - {{ payment.receipt_number }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+        .receipt-box { border: 2px solid #000; padding: 20px; margin: 20px 0; }
+        .row { display: flex; justify-content: space-between; margin: 10px 0; }
+        .label { font-weight: bold; }
+        .amount { font-size: 24px; color: #059669; font-weight: bold; }
+        .footer { margin-top: 40px; text-align: center; font-size: 12px; border-top: 1px solid #ccc; padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TRACA MANAGEMENT SERVICES LTD</h1>
+        <p>Payment Receipt</p>
+        <h3>Receipt #{{ payment.receipt_number }}</h3>
+    </div>
+    
+    <div class="receipt-box">
+        <h3>PAYMENT CONFIRMED</h3>
+        
+        <div class="row">
+            <div><span class="label">Tenant:</span> {{ tenant.full_name }}</div>
+            <div><span class="label">Date:</span> {{ payment.payment_date }}</div>
+        </div>
+        
+        <div class="row">
+            <div><span class="label">Property:</span> {{ lease.property_item.title }}</div>
+            <div><span class="label">Location:</span> {{ lease.property_item.county.name }}</div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div><span class="label">Payment Type:</span> {{ payment.get_payment_type_display }}</div>
+            <div><span class="label">Method:</span> {{ payment.get_payment_method_display }}</div>
+        </div>
+        
+        <div class="row">
+            <div><span class="label">Transaction Ref:</span> {{ payment.transaction_ref }}</div>
+            <div><span class="label">Status:</span> {{ payment.get_status_display }}</div>
+        </div>
+        
+        {% if payment.period_start %}
+        <div class="row">
+            <div><span class="label">Period:</span> {{ payment.period_start }} to {{ payment.period_end }}</div>
+        </div>
+        {% endif %}
+        
+        <hr>
+        
+        <div class="row">
+            <div class="label">AMOUNT PAID:</div>
+            <div class="amount">KSh {{ payment.amount|floatformat:2 }}</div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p><strong>Traca Management Services Ltd</strong></p>
+        <p>Phone: +254 700 000 000 | Email: info@tracamanagement.co.ke</p>
+        <p>This is a computer-generated receipt. No signature required.</p>
+        <p>Issued: {{ payment.created_at|date:"F d, Y h:i A" }}</p>
+    </div>
+    
+    <script>window.print();</script>
+</body>
+</html>
+

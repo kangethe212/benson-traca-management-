@@ -209,7 +209,8 @@ def property_search_api(request):
         properties = properties.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
-            Q(county__name__icontains=query)
+            Q(county__name__icontains=query) |
+            Q(county__main_towns__icontains=query)
         )
     
     # Apply filters

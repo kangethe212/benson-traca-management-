@@ -1,0 +1,91 @@
+{% extends 'landlord/base.html' %}
+
+{% block title %}Financial Reports{% endblock %}
+{% block page_title %}Financial Reports{% endblock %}
+{% block page_subtitle %}Track your rental income{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <div class="text-center">
+                <h6 class="text-muted">Total Collected</h6>
+                <h3 class="text-success mb-0">KSh {{ total_collected|floatformat:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <div class="text-center">
+                <h6 class="text-muted">Pending Payments</h6>
+                <h3 class="text-warning mb-0">KSh {{ pending_payments|floatformat:0 }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <div class="text-center">
+                <h6 class="text-muted">Expected Monthly</h6>
+                <h3 class="text-primary mb-0">KSh {{ expected_monthly|floatformat:0 }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="data-card mb-4">
+    <h5 class="mb-3">Monthly Income (Current Year)</h5>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Income</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month in monthly_data %}
+                    <tr>
+                        <td>{{ month.month }}</td>
+                        <td class="text-success">KSh {{ month.total|floatformat:0 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="data-card">
+    <h5 class="mb-3">Recent Payments</h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Tenant</th>
+                    <th>Property</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in all_payments %}
+                    <tr>
+                        <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                        <td>{{ payment.lease.tenant.full_name }}</td>
+                        <td>{{ payment.lease.property_item.title|truncatewords:3 }}</td>
+                        <td>{{ payment.get_payment_type_display }}</td>
+                        <td class="text-success">KSh {{ payment.amount|floatformat:0 }}</td>
+                        <td>
+                            <span class="badge {% if payment.status == 'confirmed' %}bg-success{% elif payment.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ payment.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

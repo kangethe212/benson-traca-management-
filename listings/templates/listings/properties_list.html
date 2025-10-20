@@ -6,6 +6,71 @@
 
 {% block extra_css %}
 <style>
+/* Animated Background for Properties Page */
+.hero-background {
+    position: relative;
+    min-height: 60vh;
+    background: linear-gradient(135deg, rgba(0, 51, 102, 0.8) 0%, rgba(26, 77, 115, 0.8) 100%);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.hero-slideshow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1.1);
+    animation: propertiesSlideShow 20s infinite;
+}
+
+.hero-slide:nth-child(1) { animation-delay: 0s; }
+.hero-slide:nth-child(2) { animation-delay: 4s; }
+.hero-slide:nth-child(3) { animation-delay: 8s; }
+.hero-slide:nth-child(4) { animation-delay: 12s; }
+.hero-slide:nth-child(5) { animation-delay: 16s; }
+
+@keyframes propertiesSlideShow {
+    0%, 15% { opacity: 1; transform: scale(1); }
+    20%, 95% { opacity: 0; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
 .property-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: none;
@@ -48,22 +113,293 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.search-highlight {
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, rgba(0, 51, 102, 0.1) 100%);
+    border-left: 4px solid #C9A227;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1rem 0;
+}
+
+.quick-filter-btn {
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.quick-filter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.sort-dropdown {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: border-color 0.3s ease;
+}
+
+.sort-dropdown:focus {
+    border-color: #C9A227;
+    box-shadow: 0 0 0 0.2rem rgba(201, 162, 39, 0.25);
+}
+
+.price-range-slider {
+    margin: 1rem 0;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+}
+
+.loading-spinner {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+}
+
 .sort-dropdown .dropdown-toggle {
     border-radius: 8px;
     font-weight: 500;
+}
+
+.county-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.county-suggestion {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f8f9fa;
+    transition: background-color 0.2s;
+}
+
+.county-suggestion:hover {
+    background-color: #f8f9fa;
+}
+
+.county-suggestion:last-child {
+    border-bottom: none;
+}
+
+.county-suggestion .county-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.county-suggestion .county-details {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+.county-modal .modal-dialog {
+    max-width: 800px;
+}
+
+.county-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.county-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.county-card:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0,123,255,0.15);
+    transform: translateY(-2px);
+}
+
+.county-card.selected {
+    border-color: #007bff;
+    background-color: #e7f3ff;
+}
+
+.county-card .county-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.county-card .property-count {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Mobile Responsive for Properties Page */
+@media (max-width: 768px) {
+    .hero-background {
+        min-height: 50vh;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-content .btn {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .property-card .card-img-top {
+        height: 200px;
+    }
+    
+    .property-card .card-body {
+        padding: 1rem;
+    }
+    
+    .property-card .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-card {
+        margin-bottom: 1rem;
+    }
+    
+    .filter-card .card-body {
+        padding: 1rem;
+    }
+    
+    .stats-card .card-body {
+        padding: 1rem;
+    }
+    
+    .stats-card h5 {
+        font-size: 1.1rem;
+    }
+    
+    .stats-card .display-6 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-content .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .property-card .card-img-top {
+        height: 180px;
+    }
+    
+    .property-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .property-card .card-title {
+        font-size: 1rem;
+    }
+    
+    .filter-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .btn-group .btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .form-select,
+    .form-control {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .property-card .card-img-top {
+        height: 160px;
+    }
+    
+    .property-card .card-body {
+        padding: 0.5rem;
+    }
+    
+    .filter-card .card-body {
+        padding: 0.5rem;
+    }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid bg-light py-5">
+<!-- Animated Background Hero Section -->
+<div class="hero-background">
+    <!-- Background Slideshow -->
+    <div class="hero-slideshow">
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 1.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 2.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 3.jpg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 5.jpeg' %}');"></div>
+        <div class="hero-slide" style="background-image: url('{% static 'images/traca 6.jpeg' %}');"></div>
+    </div>
+    
+    <!-- Hero Content -->
     <div class="container">
-        <h1 class="display-4 text-center text-brand-primary mb-4">Our Properties</h1>
-        <p class="lead text-center text-muted">Find your next home, office, or investment opportunity.</p>
+        <div class="hero-content">
+            <h1 class="hero-title">Our Properties</h1>
+            <p class="hero-subtitle">Find your next home, office, or investment opportunity in Kenya</p>
+            <div class="mt-4">
+                <a href="#properties" class="btn btn-lg smooth-scroll" style="background: #FF1493; color: white; border: none; padding: 12px 30px; font-weight: 600; border-radius: 25px;">
+                    <i class="fas fa-search me-2"></i>Browse Properties
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="container py-5">
+<div class="container py-5" id="properties">
     <!-- Property Statistics -->
     {% if stats %}
     <div class="row mb-4">
@@ -94,9 +430,77 @@
     </div>
     {% endif %}
 
+    <!-- County Selector -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marker-alt me-2"></i>Browse Properties by County
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Traca Management Services operates across all 47 counties in Kenya. Select a county to view properties in that area.</p>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="county-search" placeholder="Type to search counties (e.g., Nairobi, Mombasa, Kisumu)..." onkeyup="filterCounties()" autocomplete="off">
+                            </div>
+                            <div id="county-suggestions" class="county-suggestions" style="display: none;"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary btn-lg flex-fill" onclick="showCountyModal()">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Select County
+                                </button>
+                                <button class="btn btn-outline-primary btn-lg" onclick="clearCountyFilter()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        {% if request.GET.county %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-filter me-2"></i>
+                            <strong>Filtered by County:</strong> 
+                            {% for county in counties %}
+                                {% if county.slug == request.GET.county %}
+                                    {{ county.name }} ({{ county.properties.count }} properties)
+                                {% endif %}
+                            {% endfor %}
+                            <a href="{% url 'listings:properties_list' %}" class="btn btn-sm btn-outline-primary ms-2">
+                                <i class="fas fa-times me-1"></i>Clear
+                            </a>
+                        </div>
+                        {% endif %}
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            You can also search for specific towns like "Westlands", "Karen", "Thika", "Eldoret", etc.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Search & Filter Sidebar -->
         <div class="col-lg-4 mb-4">
+            <!-- Quick Filters -->
+            <div class="search-highlight mb-4">
+                <h6 class="text-brand-primary mb-2"><i class="fas fa-bolt me-2"></i>Quick Filters</h6>
+                <div class="d-flex flex-wrap">
+                    <a href="{% url 'listings:properties_list' %}?property_type=sale" class="btn btn-outline-primary quick-filter-btn">For Sale</a>
+                    <a href="{% url 'listings:properties_list' %}?property_type=rent" class="btn btn-outline-success quick-filter-btn">For Rent</a>
+                    <a href="{% url 'listings:properties_list' %}?bedrooms=3" class="btn btn-outline-info quick-filter-btn">3+ Beds</a>
+                    <a href="{% url 'listings:properties_list' %}?min_price=0&max_price=5000000" class="btn btn-outline-warning quick-filter-btn">Under 5M</a>
+                </div>
+            </div>
+            
             <div class="card filter-card">
                 <div class="card-header bg-primary-brand text-white">
                     <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Advanced Search</h5>
@@ -254,9 +658,22 @@
                                 {% endif %}
                                 
                                 <div class="mt-auto">
-                                    <a href="{% url 'listings:property_detail' property.pk %}" class="btn btn-primary-brand w-100">
+                                    <a href="{% url 'listings:property_detail' property.pk %}" class="btn btn-primary-brand w-100 mb-2">
                                         <i class="fas fa-eye me-2"></i>View Details
                                     </a>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-secondary flex-fill" 
+                                                data-property-id="{{ property.pk }}"
+                                                onclick="addToComparison({{ property.pk }}, '{{ property.title|escapejs }}', '{{ property.price }}', '{% if property.main_image %}{{ property.main_image.file.url }}{% else %}{% static 'images/default_property.jpg' %}{% endif %}', '{{ property.county.name }}')"
+                                                title="Add to comparison">
+                                            <i class="fas fa-balance-scale"></i>
+                                        </button>
+                                        <button class="btn btn-outline-primary flex-fill" 
+                                                onclick="shareProperty('{{ property.title|escapejs }}', '{{ property.price|intcomma }}', '{{ property.county.name }}')"
+                                                title="Share property">
+                                            <i class="fas fa-share-alt"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -305,4 +722,180 @@
         </div>
     </div>
 </div>
+
+<!-- County Selection Modal -->
+<div class="modal fade county-modal" id="countyModal" tabindex="-1" aria-labelledby="countyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="countyModalLabel">
+                    <i class="fas fa-map-marker-alt me-2"></i>Select a County
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="modal-county-search" placeholder="Search counties..." onkeyup="filterModalCounties()">
+                </div>
+                <div class="county-grid" id="county-grid">
+                    {% for county in counties %}
+                    <div class="county-card" data-county-slug="{{ county.slug }}" onclick="selectCounty('{{ county.slug }}', '{{ county.name }}', {{ county.properties.count }})">
+                        <div class="county-name">{{ county.name }}</div>
+                        <div class="property-count">{{ county.properties.count }} properties</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="applyCountyFilter()">Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedCountyData = null;
+
+function showCountyModal() {
+    const modal = new bootstrap.Modal(document.getElementById('countyModal'));
+    modal.show();
+}
+
+function selectCounty(slug, name, count) {
+    // Remove previous selection
+    document.querySelectorAll('.county-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selection to clicked card
+    const selectedCard = document.querySelector(`[data-county-slug="${slug}"]`);
+    selectedCard.classList.add('selected');
+    
+    // Store selection data
+    selectedCountyData = { slug, name, count };
+}
+
+function applyCountyFilter() {
+    if (selectedCountyData) {
+        const url = new URL(window.location);
+        url.searchParams.set('county', selectedCountyData.slug);
+        window.location.href = url.toString();
+    }
+}
+
+function clearCountyFilter() {
+    const countySearch = document.getElementById('county-search');
+    countySearch.value = '';
+    
+    // Remove county parameter from URL
+    const url = new URL(window.location);
+    url.searchParams.delete('county');
+    window.location.href = url.toString();
+}
+
+function filterCounties() {
+    const searchInput = document.getElementById('county-search');
+    const suggestionsDiv = document.getElementById('county-suggestions');
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    if (searchTerm.length < 2) {
+        suggestionsDiv.style.display = 'none';
+        return;
+    }
+    
+    // Get counties data from the modal cards
+    const countyCards = document.querySelectorAll('.county-card');
+    const matchingCounties = [];
+    
+    countyCards.forEach(card => {
+        const countyName = card.querySelector('.county-name').textContent.toLowerCase();
+        const countySlug = card.dataset.countySlug;
+        const propertyCount = card.querySelector('.property-count').textContent;
+        
+        if (countyName.includes(searchTerm)) {
+            matchingCounties.push({
+                name: card.querySelector('.county-name').textContent,
+                slug: countySlug,
+                count: propertyCount
+            });
+        }
+    });
+    
+    if (matchingCounties.length > 0) {
+        suggestionsDiv.innerHTML = matchingCounties.map(county => `
+            <div class="county-suggestion" onclick="selectCountyFromSearch('${county.slug}', '${county.name}')">
+                <div class="county-name">${county.name}</div>
+                <div class="county-details">${county.count}</div>
+            </div>
+        `).join('');
+        suggestionsDiv.style.display = 'block';
+    } else {
+        suggestionsDiv.style.display = 'none';
+    }
+}
+
+function selectCountyFromSearch(slug, name) {
+    const url = new URL(window.location);
+    url.searchParams.set('county', slug);
+    window.location.href = url.toString();
+}
+
+function filterModalCounties() {
+    const searchInput = document.getElementById('modal-county-search');
+    const countyGrid = document.getElementById('county-grid');
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    const countyCards = countyGrid.querySelectorAll('.county-card');
+    
+    countyCards.forEach(card => {
+        const countyName = card.querySelector('.county-name').textContent.toLowerCase();
+        if (countyName.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', function(event) {
+    const suggestionsDiv = document.getElementById('county-suggestions');
+    const searchInput = document.getElementById('county-search');
+    
+    if (!searchInput.contains(event.target) && !suggestionsDiv.contains(event.target)) {
+        suggestionsDiv.style.display = 'none';
+    }
+});
+
+// Set the selected county based on current URL parameters
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedCounty = urlParams.get('county');
+    
+    if (selectedCounty) {
+        // Highlight the selected county in the modal
+        const selectedCard = document.querySelector(`[data-county-slug="${selectedCounty}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+    }
+});
+    
+    // Smooth scrolling for hero button
+    document.querySelectorAll('.smooth-scroll').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

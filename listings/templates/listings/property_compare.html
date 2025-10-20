@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Compare Properties - Traca Management Services Ltd{% endblock %}
+
+{% block extra_css %}
+<style>
+.comparison-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+}
+
+.comparison-table-container {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.comparison-table thead th {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.comparison-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s ease;
+}
+
+.comparison-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.comparison-table tbody td {
+    padding: 1.25rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.comparison-table tbody td.row-label {
+    background: #f8f9fa;
+    font-weight: 600;
+    text-align: left;
+    color: #1e3a8a;
+}
+
+.property-image-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto;
+}
+
+.property-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.property-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-top: 0.75rem;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.best-value {
+    background: #d1fae5;
+    color: #065f46;
+    font-weight: bold;
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+
+.worst-value {
+    color: #6c757d;
+}
+
+.feature-yes {
+    color: #10b981;
+    font-size: 1.5rem;
+}
+
+.feature-no {
+    color: #ef4444;
+    font-size: 1.5rem;
+}
+
+.price-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.view-property-btn {
+    margin-top: 1rem;
+}
+
+.comparison-legend {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.remove-property-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    transition: all 0.3s ease;
+}
+
+.remove-property-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .comparison-table thead th,
+    .comparison-table tbody td {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .property-image {
+        height: 120px;
+    }
+    
+    .property-title {
+        font-size: 0.95rem;
+        min-height: 40px;
+    }
+    
+    .comparison-header {
+        padding: 2rem 0;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="comparison-header">
+    <div class="container text-center">
+        <h1><i class="fas fa-balance-scale me-3"></i>Property Comparison</h1>
+        <p class="lead mb-0">Compare {{ property_count }} properties side-by-side</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Legend -->
+    <div class="comparison-legend">
+        <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Legend</h6>
+        <div class="legend-item">
+            <div class="legend-box" style="background: #d1fae5;"></div>
+            <span>Best Value</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background: #f8f9fa;"></div>
+            <span>Standard Value</span>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{% url 'listings:properties_list' %}" class="btn btn-primary">
+            <i class="fas fa-search me-2"></i>Browse More Properties
+        </a>
+        <button class="btn btn-outline-danger" onclick="clearAllComparisons()">
+            <i class="fas fa-trash me-2"></i>Clear Comparison
+        </button>
+        <button class="btn btn-outline-secondary" onclick="window.print()">
+            <i class="fas fa-print me-2"></i>Print Comparison
+        </button>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="comparison-table-container">
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Feature</th>
+                    {% for property in properties %}
+                    <th>
+                        <div class="property-image-wrapper">
+                            <button class="remove-property-btn" onclick="removeFromComparison({{ property.id }})" title="Remove from comparison">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            {% if property.main_image %}
+                                <img src="{{ property.main_image.file.url }}" alt="{{ property.title }}" class="property-image">
+                            {% else %}
+                                <img src="{% static 'images/default_property.jpg' %}" alt="{{ property.title }}" class="property-image">
+                            {% endif %}
+                        </div>
+                        <div class="property-title">{{ property.title|truncatewords:8 }}</div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Price -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-tag me-2"></i>Price</td>
+                    {% for property in properties %}
+                    <td class="{% if property.price == best_values.lowest_price %}best-value{% endif %}">
+                        <span class="price-badge" style="background: {% if property.price == best_values.lowest_price %}#d1fae5; color: #065f46{% else %}#f8f9fa; color: #333{% endif %};">
+                            KSh {{ property.price|intcomma }}
+                        </span>
+                        {% if property.price == best_values.lowest_price %}
+                        <div class="small mt-1 text-success"><i class="fas fa-check-circle me-1"></i>Best Price</div>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Location -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-map-marker-alt me-2"></i>Location</td>
+                    {% for property in properties %}
+                    <td>{{ property.county.name }}</td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Property Type -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-home me-2"></i>Type</td>
+                    {% for property in properties %}
+                    <td>
+                        <span class="badge bg-{% if property.property_type == 'sale' %}success{% else %}primary{% endif %}">
+                            {{ property.get_property_type_display }}
+                        </span>
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Bedrooms -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-bed me-2"></i>Bedrooms</td>
+                    {% for property in properties %}
+                    <td class="{% if property.bedrooms == best_values.most_bedrooms %}best-value{% endif %}">
+                        {{ property.bedrooms|default:"—" }}
+                        {% if property.bedrooms == best_values.most_bedrooms %}
+                        <i class="fas fa-star text-warning ms-1"></i>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Bathrooms -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-bath me-2"></i>Bathrooms</td>
+                    {% for property in properties %}
+                    <td class="{% if property.bathrooms == best_values.most_bathrooms %}best-value{% endif %}">
+                        {{ property.bathrooms|default:"—" }}
+                        {% if property.bathrooms == best_values.most_bathrooms %}
+                        <i class="fas fa-star text-warning ms-1"></i>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Area -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-ruler-combined me-2"></i>Area (sq ft)</td>
+                    {% for property in properties %}
+                    <td class="{% if property.area == best_values.largest_area %}best-value{% endif %}">
+                        {{ property.area|intcomma|default:"—" }}
+                        {% if property.area == best_values.largest_area %}
+                        <i class="fas fa-star text-warning ms-1"></i>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Parking -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-car me-2"></i>Parking Slots</td>
+                    {% for property in properties %}
+                    <td class="{% if property.parking_slots == best_values.most_parking %}best-value{% endif %}">
+                        {{ property.parking_slots|default:"—" }}
+                        {% if property.parking_slots == best_values.most_parking %}
+                        <i class="fas fa-star text-warning ms-1"></i>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Furnished -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-couch me-2"></i>Furnished</td>
+                    {% for property in properties %}
+                    <td>
+                        {% if property.is_furnished %}
+                        <i class="fas fa-check-circle feature-yes"></i>
+                        {% else %}
+                        <i class="fas fa-times-circle feature-no"></i>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Pet Friendly -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-paw me-2"></i>Pet Friendly</td>
+                    {% for property in properties %}
+                    <td>
+                        {% if property.pet_friendly %}
+                        <i class="fas fa-check-circle feature-yes"></i>
+                        {% else %}
+                        <i class="fas fa-times-circle feature-no"></i>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Verified -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-shield-alt me-2"></i>Verified</td>
+                    {% for property in properties %}
+                    <td>
+                        {% if property.is_verified %}
+                        <span class="badge bg-success"><i class="fas fa-check me-1"></i>Verified</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Not Verified</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Listed Date -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-calendar me-2"></i>Listed</td>
+                    {% for property in properties %}
+                    <td>{{ property.created_at|date:"M d, Y" }}</td>
+                    {% endfor %}
+                </tr>
+
+                <!-- Actions -->
+                <tr>
+                    <td class="row-label"><i class="fas fa-link me-2"></i>Actions</td>
+                    {% for property in properties %}
+                    <td>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'listings:property_detail' property.pk %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                            <button class="btn btn-outline-success btn-sm" onclick="shareProperty('{{ property.title|escapejs }}', '{{ property.price|intcomma }}', '{{ property.county.name }}')">
+                                <i class="fas fa-share-alt me-1"></i>Share
+                            </button>
+                        </div>
+                    </td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="text-center mt-5">
+        <h3 class="mb-4">Ready to Schedule a Viewing?</h3>
+        <p class="text-muted mb-4">Contact us to arrange property viewings or get more information</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{% url 'listings:contact' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-envelope me-2"></i>Contact Us
+            </a>
+            <button class="btn btn-success btn-lg" onclick="openWhatsApp()">
+                <i class="fab fa-whatsapp me-2"></i>Chat on WhatsApp
+            </button>
+            <a href="{% url 'listings:properties_list' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-search me-2"></i>View More Properties
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle removal from comparison
+function removeFromComparison(propertyId) {
+    // Get current comparison list from parent function
+    if (typeof window.removeFromComparison === 'function') {
+        window.parent.removeFromComparison(propertyId);
+    }
+    
+    // Get current URL and remove the property ID
+    const url = new URL(window.location);
+    const ids = url.searchParams.get('ids');
+    
+    if (ids) {
+        const idArray = ids.split(',').map(id => id.trim());
+        const newIds = idArray.filter(id => id !== propertyId.toString());
+        
+        if (newIds.length < 2) {
+            // Redirect to properties list if less than 2 properties
+            window.location.href = '{% url "listings:properties_list" %}';
+        } else {
+            // Update URL with new IDs
+            url.searchParams.set('ids', newIds.join(','));
+            window.location.href = url.toString();
+        }
+    }
+}
+
+// Share property function
+function shareProperty(title, price, location) {
+    const url = window.location.href;
+    const text = `Check out this property: ${title} - KSh ${price} in ${location}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: text,
+            url: url
+        }).catch(err => console.log('Error sharing:', err));
+    } else {
+        alert('Property details copied! Share link: ' + url);
+    }
+}
+
+// Print styling
+window.addEventListener('beforeprint', function() {
+    document.querySelectorAll('.remove-property-btn').forEach(btn => {
+        btn.style.display = 'none';
+    });
+});
+
+window.addEventListener('afterprint', function() {
+    document.querySelectorAll('.remove-property-btn').forEach(btn => {
+        btn.style.display = 'flex';
+    });
+});
+</script>
+{% endblock %}
+

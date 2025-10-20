@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viewing Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .success-badge {
+            background: white;
+            color: #059669;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .content {
+            background: #f9fafb;
+            padding: 30px;
+            border: 1px solid #e5e7eb;
+        }
+        .viewing-details {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+        .detail-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .detail-value {
+            font-size: 1.1rem;
+            color: #1e3a8a;
+            margin-top: 4px;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+            margin: 20px 0;
+        }
+        .next-steps {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .step {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        .step::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            background: #10b981;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .contact-box {
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            font-size: 12px;
+        }
+        .btn {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="success-badge">✓ CONFIRMED</div>
+        <h1>Property Viewing Booked!</h1>
+        <p>Traca Management Services</p>
+    </div>
+    
+    <div class="content">
+        <h2>Dear {{ customer_name }},</h2>
+        
+        <p>Great news! Your property viewing has been <strong>confirmed</strong>. We're excited to show you this property!</p>
+        
+        <div class="viewing-details">
+            <h3 style="color: #10b981; margin-top: 0;">Viewing Details</h3>
+            
+            <div class="detail-item">
+                <div class="detail-label">PROPERTY</div>
+                <div class="detail-value">{{ property_title }}</div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">LOCATION</div>
+                <div class="detail-value">
+                    📍 {{ property_location }}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">PRICE</div>
+                <div class="detail-value">
+                    💰 {{ property_price }}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">VIEWING DATE</div>
+                <div class="detail-value" style="color: #059669; font-size: 1.3rem;">
+                    📅 {{ viewing_date }}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">VIEWING TIME</div>
+                <div class="detail-value" style="color: #059669; font-size: 1.3rem;">
+                    🕐 {{ viewing_time }}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">NUMBER OF PEOPLE</div>
+                <div class="detail-value">{{ number_of_people }} person(s)</div>
+            </div>
+            
+            {% if special_requests != 'None' %}
+            <div class="detail-item">
+                <div class="detail-label">YOUR REQUESTS</div>
+                <div class="detail-value">{{ special_requests }}</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="highlight">
+            <strong>⏰ Important Reminder:</strong> Please arrive <strong>5 minutes early</strong> to the viewing. 
+            Our agent will meet you at the property at the scheduled time.
+        </div>
+        
+        <div class="next-steps">
+            <h4 style="color: #1e3a8a; margin-top: 0;">What Happens Next?</h4>
+            
+            <div class="step">
+                <strong>24 Hours Before:</strong> We'll call you to confirm the viewing
+            </div>
+            
+            <div class="step">
+                <strong>On the Day:</strong> Our agent will meet you at the property
+            </div>
+            
+            <div class="step">
+                <strong>During Viewing:</strong> Feel free to ask questions and take photos
+            </div>
+            
+            <div class="step">
+                <strong>After Viewing:</strong> We'll follow up to answer any questions
+            </div>
+        </div>
+        
+        <h4>What to Bring:</h4>
+        <ul>
+            <li>Valid ID for verification</li>
+            <li>This confirmation email (printed or on your phone)</li>
+            <li>Questions you have about the property</li>
+        </ul>
+        
+        <div class="contact-box">
+            <h4 style="margin-top: 0;">Need to Make Changes?</h4>
+            <p>If you need to cancel or reschedule (at least 24 hours notice):</p>
+            
+            <div>
+                <strong>📞 Call:</strong> {{ contact_phone }}<br>
+                <strong>📧 Email:</strong> {{ contact_email }}<br>
+                <strong>💬 WhatsApp:</strong> {{ whatsapp_number }}
+            </div>
+        </div>
+        
+        <center style="margin: 30px 0;">
+            <a href="{{ property_url }}" class="btn">View Property Details</a>
+        </center>
+        
+        <p><strong>We look forward to seeing you!</strong></p>
+        
+        <p>Best regards,<br>
+        <strong>The Traca Management Team</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>Traca Management Services Ltd<br>
+        Professional Property Management in Kenya<br>
+        © {{ current_year }} All rights reserved</p>
+        
+        <p style="margin-top: 15px;">
+            This is an automated confirmation email.<br>
+            Please save this email for your records.
+        </p>
+    </div>
+</body>
+</html>
+

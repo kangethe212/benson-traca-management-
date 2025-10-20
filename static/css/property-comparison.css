@@ -1,0 +1,291 @@
+/**
+ * Property Comparison Styles
+ * Traca Management Services
+ */
+
+/* Comparison Button */
+.btn-compare {
+    position: relative;
+}
+
+.comparison-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff1493;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Comparison Sidebar */
+.comparison-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.comparison-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+}
+
+.comparison-header h5 {
+    margin: 0;
+    color: white;
+}
+
+.comparison-header .btn-close {
+    filter: invert(1);
+}
+
+.comparison-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.comparison-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.3s ease;
+}
+
+.comparison-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.comparison-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.comparison-item-details {
+    flex: 1;
+}
+
+.comparison-item-details h6 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.comparison-item-details p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.comparison-footer {
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+.comparison-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Comparison Page */
+.comparison-table {
+    overflow-x: auto;
+}
+
+.comparison-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.comparison-table th {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.comparison-table td {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+.comparison-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.comparison-table .property-image {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.comparison-highlight {
+    background: #e7f3ff !important;
+    font-weight: bold;
+}
+
+.comparison-best {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.comparison-worst {
+    color: #6c757d;
+}
+
+/* Social Share Buttons */
+.social-share-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+.social-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+
+.social-share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    color: white;
+}
+
+.social-share-btn.whatsapp {
+    background: #25d366;
+}
+
+.social-share-btn.facebook {
+    background: #1877f2;
+}
+
+.social-share-btn.twitter {
+    background: #1da1f2;
+}
+
+.social-share-btn.linkedin {
+    background: #0077b5;
+}
+
+.social-share-btn.email {
+    background: #ea4335;
+}
+
+.social-share-btn.copy-link {
+    background: #6c757d;
+}
+
+.social-share-btn.copy-link.copied {
+    background: #28a745;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .comparison-sidebar {
+        width: 100%;
+    }
+    
+    .comparison-table table {
+        font-size: 0.85rem;
+    }
+    
+    .comparison-table .property-image {
+        width: 150px;
+        height: 100px;
+    }
+    
+    .social-share-buttons {
+        justify-content: center;
+    }
+    
+    .social-share-btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 140px;
+    }
+}
+
+@media (max-width: 480px) {
+    .comparison-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .comparison-item img {
+        width: 100%;
+        height: 150px;
+    }
+    
+    .social-share-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+

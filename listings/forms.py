@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Property, PropertyMedia, Inquiry, County, Amenity, ManagementRequest
+from datetime import date, timedelta
+from .models import Property, PropertyMedia, Inquiry, County, Amenity, ManagementRequest, PropertyViewing
 
 
 class PropertyForm(forms.ModelForm):
@@ -299,3 +300,121 @@ class ContactForm(forms.Form):
             if len(clean_phone) < 9:
                 raise ValidationError("Please enter a valid phone number.")
         return phone
+
+
+class PropertyViewingForm(forms.ModelForm):
+    """Form for booking property viewings - Daytime only (9 AM - 6 PM)"""
+    
+    class Meta:
+        model = PropertyViewing
+        fields = ['name', 'email', 'phone', 'viewing_date', 'viewing_time', 'number_of_people', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Your full name'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'your.email@example.com'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '+254 700 000 000'
+            }),
+            'viewing_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'min': date.today().isoformat()
+            }),
+            'viewing_time': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'number_of_people': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1',
+                'max': '10',
+                'value': '1'
+            }),
+            'message': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Any special requests or questions? (Optional)'
+            })
+        }
+        help_texts = {
+            'viewing_date': 'Select a date for your property viewing',
+            'viewing_time': 'Choose a time slot (viewings available 9 AM - 6 PM)',
+            'number_of_people': 'How many people will attend the viewing?'
+        }
+    
+    def __init__(self, *args, **kwargs):
+        self.property_item = kwargs.pop('property', None)
+        super().__init__(*args, **kwargs)
+        
+        # Make message optional
+        self.fields['message'].required = False
+        
+        # Set minimum date to today
+        self.fields['viewing_date'].widget.attrs['min'] = date.today().isoformat()
+    
+    def clean_viewing_date(self):
+        """Validate viewing date is in the future"""
+        viewing_date = self.cleaned_data.get('viewing_date')
+        
+        if viewing_date:
+            # Cannot book past dates
+            if viewing_date < date.today():
+                raise ValidationError("You cannot book viewings for past dates.")
+            
+            # Cannot book too far in advance (max 30 days)
+            max_date = date.today() + timedelta(days=30)
+            if viewing_date > max_date:
+                raise ValidationError("Viewings can only be booked up to 30 days in advance.")
+            
+            # No viewings on Sundays (optional - remove if needed)
+            # if viewing_date.weekday() == 6:
+            #     raise ValidationError("Sorry, we don't schedule viewings on Sundays. Please choose a weekday or Saturday.")
+        
+        return viewing_date
+    
+    def clean_phone(self):
+        """Validate phone number"""
+        phone = self.cleaned_data.get('phone')
+        if phone:
+            # Remove spaces and special characters
+            clean_phone = ''.join(filter(str.isdigit, phone))
+            if len(clean_phone) < 9:
+                raise ValidationError("Please enter a valid phone number with at least 9 digits.")
+        return phone
+    
+    def clean_number_of_people(self):
+        """Validate number of people"""
+        number = self.cleaned_data.get('number_of_people')
+        if number:
+            if number < 1:
+                raise ValidationError("At least one person must attend the viewing.")
+            if number > 10:
+                raise ValidationError("Maximum 10 people per viewing. For larger groups, please contact us directly.")
+        return number
+    
+    def clean(self):
+        """Check for time slot availability"""
+        cleaned_data = super().clean()
+        viewing_date = cleaned_data.get('viewing_date')
+        viewing_time = cleaned_data.get('viewing_time')
+        
+        if self.property_item and viewing_date and viewing_time:
+            # Check if this time slot is already booked
+            existing_booking = PropertyViewing.objects.filter(
+                property_item=self.property_item,
+                viewing_date=viewing_date,
+                viewing_time=viewing_time,
+                status__in=['pending', 'confirmed']
+            ).exists()
+            
+            if existing_booking:
+                raise ValidationError(
+                    "This time slot is already booked. Please choose another date or time."
+                )
+        
+        return cleaned_data

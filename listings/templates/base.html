@@ -1,9 +1,41 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Traca Management Services Ltd{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/traca-logo-new.png' %}">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX'); // Replace with your actual Google Analytics ID
+    </script>
+    
+    <!-- Meta Tags for SEO & Social Sharing -->
+    <meta name="description" content="{% block meta_description %}Traca Management Services - Professional property management, sales, and rentals in Kenya. Find your perfect property today!{% endblock %}">
+    <meta name="keywords" content="property management Kenya, houses for rent Kenya, apartments for sale Kenya, real estate Kenya">
+    <meta name="author" content="Traca Management Services Ltd">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}Traca Management Services - Property Management in Kenya{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Professional property management, sales, and rental services across Kenya{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'images/traca-logo-new.png' %}{% endblock %}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta property="twitter:title" content="{% block twitter_title %}Traca Management Services{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Professional property management in Kenya{% endblock %}">
+    <meta property="twitter:image" content="{% block twitter_image %}{% static 'images/traca-logo-new.png' %}{% endblock %}">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,8 +44,142 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Custom Brand CSS -->
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/brand.css' %}">
+    
+    <!-- Traca Chatbot CSS -->
+    <link rel="stylesheet" href="{% static 'css/traca-chatbot.css' %}">
+    
+    <!-- WhatsApp Button CSS -->
+    <link rel="stylesheet" href="{% static 'css/whatsapp-button.css' %}">
+    
+    <!-- Property Comparison CSS -->
+    <link rel="stylesheet" href="{% static 'css/property-comparison.css' %}">
+    
+    <!-- Mobile Responsive Base Styles -->
+    <style>
+    /* Mobile Responsive for Navigation */
+    @media (max-width: 768px) {
+        .navbar-brand img {
+            height: 35px !important;
+        }
+        
+        .navbar-brand span {
+            font-size: 0.9rem;
+        }
+        
+        .navbar-nav .btn {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .navbar-toggler {
+            border: none;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .navbar-collapse {
+            margin-top: 1rem;
+        }
+        
+        .navbar-nav .nav-link {
+            padding: 0.5rem 0;
+            text-align: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .navbar-brand img {
+            height: 30px !important;
+        }
+        
+        .navbar-brand span {
+            font-size: 0.8rem;
+        }
+        
+        .navbar-nav .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            width: 100%;
+            margin-top: 0.75rem;
+        }
+    }
+    
+    /* Mobile Responsive for Footer */
+    @media (max-width: 768px) {
+        .footer-brand {
+            padding: 3rem 0 2rem !important;
+        }
+        
+        .footer-brand .col-lg-4,
+        .footer-brand .col-md-6 {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .footer-brand img {
+            height: 50px !important;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-brand h5 {
+            font-size: 1.1rem;
+        }
+        
+        .footer-brand .list-unstyled li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-brand .social-links {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .footer-brand .social-links a {
+            margin: 0 0.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .footer-brand {
+            padding: 2rem 0 1.5rem !important;
+        }
+        
+        .footer-brand img {
+            height: 40px !important;
+        }
+        
+        .footer-brand h5 {
+            font-size: 1rem;
+        }
+        
+        .footer-brand .list-unstyled li {
+            font-size: 0.9rem;
+        }
+        
+        .footer-brand .social-links a {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Mobile Responsive for Messages */
+    @media (max-width: 768px) {
+        .container .alert {
+            margin: 0 1rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .container .alert {
+            margin: 0 0.5rem;
+            font-size: 0.85rem;
+            padding: 0.75rem;
+        }
+    }
+    </style>
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -21,9 +187,10 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'listings:home' %}">
-                <i class="fas fa-building me-2 text-brand-primary"></i>
-                Traca Management Services
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'listings:home' %}">
+                <img src="{% static 'images/traca-logo-new.png' %}" alt="Traca Management Services" class="me-2" style="height: 45px; width: auto;">
+                <span class="d-none d-md-inline">Traca Management Services</span>
+                <span class="d-md-none">Traca</span>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -50,9 +217,33 @@
                 </ul>
                 
                 <ul class="navbar-nav">
+                    <li class="nav-item me-2">
+                        <button class="btn btn-outline-primary position-relative btn-compare" onclick="showComparisonSidebar()" title="Compare Properties">
+                            <i class="fas fa-balance-scale"></i>
+                            <span class="comparison-badge" style="display: none;">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item dropdown me-2">
+                        <a class="nav-link dropdown-toggle text-brand-primary" href="#" id="portalsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>Portals
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="portalsDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'listings:tenant_registration' %}">
+                                    <i class="fas fa-home me-2 text-primary"></i>Tenant Portal
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'listings:landlord:login' %}">
+                                    <i class="fas fa-building me-2 text-primary"></i>Landlord Portal
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-primary-brand text-white px-3" href="{% url 'listings:management_request' %}">
-                            <i class="fas fa-cogs me-1"></i>Property Management
+                            <i class="fas fa-cogs me-1"></i>List Property
                         </a>
                     </li>
                 </ul>
@@ -82,6 +273,9 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
+                    <div class="mb-3">
+                        <img src="{% static 'images/traca-logo-new.png' %}" alt="Traca Management Services" style="height: 60px; width: auto; filter: brightness(0) invert(1);">
+                    </div>
                     <h5 class="text-brand-primary mb-3">
                         <i class="fas fa-building me-2"></i>Traca Management Services Ltd
                     </h5>
@@ -139,6 +333,21 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Traca Chatbot JS -->
+    <script src="{% static 'js/traca-chatbot.js' %}"></script>
+    
+    <!-- WhatsApp Configuration -->
+    <script src="{% static 'js/whatsapp-config.js' %}"></script>
+    
+    <!-- WhatsApp Button JS -->
+    <script src="{% static 'js/whatsapp-button.js' %}"></script>
+    
+    <!-- Property Comparison JS -->
+    <script src="{% static 'js/property-comparison.js' %}"></script>
+    
+    <!-- Social Sharing JS -->
+    <script src="{% static 'js/social-share.js' %}"></script>
     
     {% block extra_js %}{% endblock %}
 </body>

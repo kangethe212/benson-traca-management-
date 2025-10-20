@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Inquiry Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9fafb;
+            padding: 30px;
+            border: 1px solid #e5e7eb;
+        }
+        .property-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            font-size: 12px;
+        }
+        .button {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .contact-info {
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏠 Traca Management Services</h1>
+        <p>Professional Property Management</p>
+    </div>
+    
+    <div class="content">
+        <h2>Thank You for Your Inquiry!</h2>
+        
+        <p>Dear {{ customer_name }},</p>
+        
+        <p>We have received your inquiry about the following property:</p>
+        
+        <div class="property-details">
+            <h3>{{ property_title }}</h3>
+            <p><strong>Location:</strong> {{ property_location }}</p>
+            <p><strong>Price:</strong> KES {{ property_price|floatformat:2|default:"Contact us" }}</p>
+            <p><strong>Type:</strong> {{ property_type }}</p>
+        </div>
+        
+        <p>Our team will review your inquiry and get back to you within <strong>24 hours</strong>.</p>
+        
+        <div class="contact-info">
+            <h4>In the meantime, you can reach us at:</h4>
+            <p>
+                📞 Phone: {{ contact_phone }}<br>
+                📧 Email: {{ contact_email }}<br>
+                💬 WhatsApp: {{ whatsapp_number }}
+            </p>
+        </div>
+        
+        <center>
+            <a href="{{ property_url }}" class="button">View Property Details</a>
+        </center>
+        
+        <p>We look forward to helping you find your perfect property!</p>
+        
+        <p>Best regards,<br>
+        <strong>The Traca Management Team</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>Traca Management Services Ltd<br>
+        Professional Property Management in Kenya<br>
+        © {{ current_year }} All rights reserved</p>
+        
+        <p>This is an automated message. Please do not reply to this email.</p>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,264 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+    .approval-card {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    
+    .approval-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .tenant-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .btn-approve {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    
+    .btn-approve:hover {
+        background: #059669;
+        color: white;
+    }
+    
+    .btn-reject {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    
+    .btn-reject:hover {
+        background: #dc2626;
+        color: white;
+    }
+    
+    .badge-new {
+        background: #fbbf24;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+    
+    .badge-verified {
+        background: #10b981;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+    
+    .badge-rejected {
+        background: #6b7280;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>🏠 Tenant Approval Dashboard</h1>
+    <p class="help">Manage tenant registrations and approvals</p>
+    
+    {% if messages %}
+    <div class="messagelist">
+        {% for message in messages %}
+        <div class="{% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Statistics -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total }}</div>
+            <div>Total Tenants</div>
+        </div>
+        <div class="stat-card" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);">
+            <div class="stat-number">{{ stats.pending }}</div>
+            <div>⏳ Pending Approval</div>
+        </div>
+        <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <div class="stat-number">{{ stats.verified }}</div>
+            <div>✅ Verified</div>
+        </div>
+        <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+            <div class="stat-number">{{ stats.with_leases }}</div>
+            <div>🏘️ With Active Leases</div>
+        </div>
+    </div>
+    
+    <!-- Pending Approvals Section -->
+    <div style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 2px solid #fbbf24;">
+        <h2 style="color: #f59e0b; margin-bottom: 1rem;">
+            ⏳ Pending Tenant Approvals ({{ stats.pending }})
+        </h2>
+        
+        {% if pending_tenants %}
+        <div>
+            {% for tenant in pending_tenants %}
+            <div class="approval-card" style="padding: 1.5rem; background: #fffbeb; border-color: #fbbf24;">
+                <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 1.5rem; align-items: center;">
+                    <!-- Avatar -->
+                    <div>
+                        {% if tenant.profile_image %}
+                        <img src="{{ tenant.profile_image.url }}" alt="{{ tenant.full_name }}" class="tenant-avatar">
+                        {% else %}
+                        <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
+                            {{ tenant.full_name|slice:":1"|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Tenant Info -->
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <h3 style="margin: 0; color: #1e3a8a;">{{ tenant.full_name }}</h3>
+                            <span class="badge-new">🆕 NEW</span>
+                        </div>
+                        <div style="color: #6b7280; margin-bottom: 0.5rem;">
+                            <strong>📧 Email:</strong> {{ tenant.user.email }}<br>
+                            <strong>📞 Phone:</strong> {{ tenant.phone|default:"Not provided" }}<br>
+                            {% if tenant.id_number %}
+                            <strong>🆔 ID Number:</strong> {{ tenant.id_number }}<br>
+                            {% endif %}
+                            {% if tenant.occupation %}
+                            <strong>💼 Occupation:</strong> {{ tenant.occupation }} {% if tenant.employer %}at {{ tenant.employer }}{% endif %}<br>
+                            {% endif %}
+                            <strong>📅 Registered:</strong> {{ tenant.created_at|date:"M d, Y h:i A" }}
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <form method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="tenant_id" value="{{ tenant.id }}">
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn-approve" onclick="return confirm('Approve {{ tenant.full_name }}?')">
+                                ✅ Approve
+                            </button>
+                        </form>
+                        <form method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="tenant_id" value="{{ tenant.id }}">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn-reject" onclick="return confirm('Reject {{ tenant.full_name }}? This will deactivate their account.')">
+                                ❌ Reject
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem; color: #9ca3af;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+            <h3>No Pending Approvals</h3>
+            <p>All tenant registrations have been processed!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Verified Tenants Section -->
+    <div style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 2px solid #10b981;">
+        <h2 style="color: #10b981; margin-bottom: 1rem;">
+            ✅ Verified Tenants ({{ stats.verified }})
+        </h2>
+        
+        {% if verified_tenants %}
+        <div style="display: grid; gap: 1rem;">
+            {% for tenant in verified_tenants %}
+            <div class="approval-card" style="padding: 1rem; background: #f0fdf4;">
+                <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center;">
+                    <div>
+                        {% if tenant.profile_image %}
+                        <img src="{{ tenant.profile_image.url }}" alt="{{ tenant.full_name }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                        <div style="width: 40px; height: 40px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                            {{ tenant.full_name|slice:":1"|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <strong style="color: #1e3a8a;">{{ tenant.full_name }}</strong>
+                        <span class="badge-verified">VERIFIED</span><br>
+                        <small style="color: #6b7280;">{{ tenant.user.email }} | {{ tenant.phone }}</small>
+                    </div>
+                    
+                    <div>
+                        <small style="color: #6b7280;">Verified {{ tenant.updated_at|timesince }} ago</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 2rem; color: #9ca3af;">
+            <p>No verified tenants yet</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Quick Links -->
+    <div style="background: #f8fafc; border-radius: 12px; padding: 1.5rem; border: 2px solid #e5e7eb;">
+        <h3 style="color: #1e3a8a; margin-bottom: 1rem;">🔗 Quick Links</h3>
+        <div style="display: grid; gap: 0.5rem;">
+            <a href="{% url 'admin:listings_tenant_changelist' %}" style="color: #3b82f6; text-decoration: none;">
+                → View All Tenants (Django Admin)
+            </a>
+            <a href="{% url 'admin:listings_lease_changelist' %}" style="color: #3b82f6; text-decoration: none;">
+                → Manage Leases
+            </a>
+            <a href="{% url 'admin:listings_payment_changelist' %}" style="color: #3b82f6; text-decoration: none;">
+                → View Payments
+            </a>
+            <a href="{% url 'admin:listings_tenantservice_changelist' %}" style="color: #3b82f6; text-decoration: none;">
+                → Manage Services
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

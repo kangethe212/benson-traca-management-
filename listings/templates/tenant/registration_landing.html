@@ -1,0 +1,142 @@
+{% extends 'tenant/base_tenant.html' %}
+{% load static %}
+
+{% block title %}Tenant Portal - Traca Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-10 col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <div class="mb-3">
+                    <i class="fas fa-home" style="font-size: 5rem; color: #1e3a8a;"></i>
+                </div>
+                <h1 class="fw-bold mb-2" style="color: #1e3a8a;">Welcome to Tenant Portal</h1>
+                <p class="text-muted fs-5">Manage your tenancy, access services, and more</p>
+            </div>
+            
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Choice Cards -->
+            <div class="row g-4">
+                <!-- Login Card -->
+                <div class="col-md-6">
+                    <div class="card shadow-lg border-0 h-100" style="border-radius: 16px; transition: transform 0.3s;">
+                        <div class="card-body p-5 text-center">
+                            <div class="mb-4">
+                                <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="fas fa-sign-in-alt text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            
+                            <h3 class="fw-bold mb-3" style="color: #1e3a8a;">Already a Tenant?</h3>
+                            <p class="text-muted mb-4">Login to access your dashboard, view services, and manage your tenancy</p>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'listings:tenant_login' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 12px; font-weight: 600; padding: 15px;">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login to Portal
+                                </a>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <small class="text-muted">
+                                    <i class="fas fa-check-circle me-1" style="color: #10b981;"></i>View 30+ services<br>
+                                    <i class="fas fa-check-circle me-1" style="color: #10b981;"></i>Track payments<br>
+                                    <i class="fas fa-check-circle me-1" style="color: #10b981;"></i>Request maintenance
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Register Card -->
+                <div class="col-md-6">
+                    <div class="card shadow-lg border-0 h-100" style="border-radius: 16px; transition: transform 0.3s;">
+                        <div class="card-body p-5 text-center">
+                            <div class="mb-4">
+                                <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="fas fa-user-plus text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            
+                            <h3 class="fw-bold mb-3" style="color: #1e3a8a;">New Tenant?</h3>
+                            <p class="text-muted mb-4">Create your account and join the Traca Management community</p>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'listings:tenant_register' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; border: none; border-radius: 12px; font-weight: 600; padding: 15px;">
+                                    <i class="fas fa-user-plus me-2"></i>Create Account
+                                </a>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <small class="text-muted">
+                                    <i class="fas fa-check-circle me-1" style="color: #3b82f6;"></i>Quick registration<br>
+                                    <i class="fas fa-check-circle me-1" style="color: #3b82f6;"></i>Admin approval<br>
+                                    <i class="fas fa-check-circle me-1" style="color: #3b82f6;"></i>Full portal access
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="card border-0 shadow-sm mt-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e5e7eb 100%); border-radius: 16px;">
+                <div class="card-body p-4">
+                    <h4 class="text-center mb-4" style="color: #1e3a8a; font-weight: 600;">
+                        <i class="fas fa-concierge-bell me-2"></i>What You Get
+                    </h4>
+                    <div class="row g-3 text-center">
+                        <div class="col-md-3 col-6">
+                            <i class="fas fa-tools mb-2" style="font-size: 2rem; color: #f59e0b;"></i>
+                            <p class="mb-0 small"><strong>Maintenance</strong><br>Quick repairs</p>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <i class="fas fa-broom mb-2" style="font-size: 2rem; color: #10b981;"></i>
+                            <p class="mb-0 small"><strong>Cleaning</strong><br>Professional service</p>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <i class="fas fa-shield-alt mb-2" style="font-size: 2rem; color: #ef4444;"></i>
+                            <p class="mb-0 small"><strong>Security</strong><br>24/7 support</p>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <i class="fas fa-dumbbell mb-2" style="font-size: 2rem; color: #8b5cf6;"></i>
+                            <p class="mb-0 small"><strong>Lifestyle</strong><br>Gym & amenities</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Back to Home -->
+            <div class="text-center mt-4">
+                <a href="{% url 'listings:home' %}" class="text-muted">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}
+

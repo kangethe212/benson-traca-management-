@@ -300,24 +300,194 @@
                             <label for="{{ form.message.id_for_label }}" class="form-label">Message</label>
                             {{ form.message }}
                         </div>
-                        <button type="submit" class="btn btn-primary-brand w-100">
+                        <button type="submit" class="btn btn-primary-brand w-100 mb-2">
                             <i class="fas fa-paper-plane me-2"></i>Send Inquiry
                         </button>
+                        
+                        <!-- WhatsApp Quick Actions -->
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success" onclick="sendPropertyInquiry('{{ property.title }}', 'KSh {{ property.price|floatformat:0|intcomma }}')">
+                                <i class="fab fa-whatsapp me-2"></i>Quick WhatsApp Inquiry
+                            </button>
+                            <button type="button" class="btn btn-outline-success" onclick="openWhatsApp()">
+                                <i class="fab fa-whatsapp me-2"></i>Chat on WhatsApp
+                            </button>
+                        </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Why Choose Traca -->
+            <div class="card property-detail-card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Why Choose Traca?</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-shield-alt fa-lg text-success me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Verified Properties</h6>
+                                <small class="text-muted">All properties are thoroughly verified</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-dollar-sign fa-lg text-success me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Transparent Pricing</h6>
+                                <small class="text-muted">No hidden fees or surprises</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-headset fa-lg text-success me-3"></i>
+                            <div>
+                                <h6 class="mb-0">24/7 Support</h6>
+                                <small class="text-muted">Round-the-clock customer service</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-map-marked-alt fa-lg text-success me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Nationwide Coverage</h6>
+                                <small class="text-muted">Serving all 47 counties</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card property-detail-card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'listings:book_viewing' property.pk %}" class="btn btn-warning btn-lg" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; color: white;">
+                            <i class="fas fa-calendar-check me-2"></i>Schedule Daytime Viewing (9AM-6PM)
+                        </a>
+                        <button type="button" class="btn btn-success" onclick="sendPropertyInquiry('{{ property.title }}', 'KSh {{ property.price|floatformat:0|intcomma }}')">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp Now
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="callPropertyAgent()">
+                            <i class="fas fa-phone me-2"></i>Call Agent
+                        </button>
+                        <a href="{% url 'listings:contact' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-2"></i>Get More Info
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Sharing & Comparison -->
+            <div class="card property-detail-card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-share-alt me-2"></i>Share & Compare</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-3">Share this property:</h6>
+                    <div class="social-share-buttons mb-3">
+                        <button class="social-share-btn whatsapp" onclick="shareOnWhatsApp('{{ request.build_absolute_uri }}', 'Check out this property: {{ property.title }} - KSh {{ property.price|intcomma }} in {{ property.county.name }}')">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="social-share-btn facebook" onclick="shareOnFacebook('{{ request.build_absolute_uri }}')">
+                            <i class="fab fa-facebook"></i> Facebook
+                        </button>
+                        <button class="social-share-btn twitter" onclick="shareOnTwitter('{{ request.build_absolute_uri }}', '{{ property.title }} - KSh {{ property.price|intcomma }}')">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </button>
+                        <button class="social-share-btn linkedin" onclick="shareOnLinkedIn('{{ request.build_absolute_uri }}')">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </button>
+                        <button class="social-share-btn email" onclick="shareViaEmail('{{ property.title }}', 'Check out this property: {{ property.title }} - KSh {{ property.price|intcomma }} in {{ property.county.name }}%0A%0A{{ request.build_absolute_uri }}')">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                        <button class="social-share-btn copy-link" onclick="copyLinkToClipboard('{{ request.build_absolute_uri }}', this)">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                    </div>
+                    <hr>
+                    <h6 class="mb-3">Add to comparison:</h6>
+                    <div class="d-grid">
+                        <button class="btn btn-outline-secondary" 
+                                data-property-id="{{ property.pk }}"
+                                onclick="addToComparison({{ property.pk }}, '{{ property.title|escapejs }}', '{{ property.price }}', '{% if property.main_image %}{{ property.main_image.file.url }}{% else %}{% static 'images/default_property.jpg' %}{% endif %}', '{{ property.county.name }}')">
+                            <i class="fas fa-balance-scale me-2"></i>Add to Comparison
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Property Management CTA -->
             <div class="card property-detail-card">
-                <div class="card-body text-center">
+                <div class="card-body text-center" style="background: linear-gradient(135deg, #003366 0%, #C9A227 100%); color: white;">
                     <div class="mb-3">
-                        <i class="fas fa-cogs fa-3x text-brand-primary"></i>
+                        <i class="fas fa-cogs fa-3x"></i>
                     </div>
-                    <h5 class="text-brand-primary">Need Property Management?</h5>
-                    <p class="text-muted">Let Traca Management Services handle your property for you.</p>
-                    <a href="{% url 'listings:management_request' %}" class="btn btn-primary-brand">
-                        <i class="fas fa-cogs me-2"></i>Request Management
-                    </a>
+                    <h5 class="mb-3">Need Property Management?</h5>
+                    <p class="mb-3">Let Traca Management Services handle your property for you. Professional management with 20+ years experience.</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'listings:management_request' %}" class="btn btn-light">
+                            <i class="fas fa-cogs me-2"></i>Request Management
+                        </a>
+                        <button type="button" class="btn btn-outline-light" onclick="openWhatsApp()">
+                            <i class="fab fa-whatsapp me-2"></i>Chat About Management
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action Section -->
+    <div class="container-fluid mt-5" style="background: linear-gradient(135deg, #003366 0%, #C9A227 100%);">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8 text-white">
+                    <h2 class="display-5 fw-bold mb-3">Ready to Make This Property Yours?</h2>
+                    <p class="lead mb-4">Don't miss out on this amazing opportunity! Contact us today for a viewing or to make an offer. Our expert team is here to help you every step of the way.</p>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-0">Quick Response</h6>
+                                    <small>Within 1 hour</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-shield-alt fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-0">Secure Process</h6>
+                                    <small>100% safe & verified</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-handshake fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-0">Expert Support</h6>
+                                    <small>Professional guidance</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="d-grid gap-3">
+                        <button type="button" class="btn btn-light btn-lg" onclick="sendPropertyInquiry('{{ property.title }}', 'KSh {{ property.price|floatformat:0|intcomma }}')">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp Now
+                        </button>
+                        <button type="button" class="btn btn-success btn-lg" onclick="callPropertyAgent()">
+                            <i class="fas fa-phone me-2"></i>Call Now
+                        </button>
+                        <button type="button" class="btn btn-outline-light btn-lg" onclick="scheduleViewing()">
+                            <i class="fas fa-calendar me-2"></i>Schedule Viewing
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -389,4 +559,55 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+function sendPropertyInquiry(propertyTitle, propertyPrice) {
+    const message = `Hi! I'm interested in this property:
+    
+🏠 *${propertyTitle}*
+💰 Price: ${propertyPrice}
+📱 From Traca Management Services
+
+Please provide more details and arrange a viewing.`;
+    
+    const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+function callPropertyAgent() {
+    // You can replace this with your actual phone number
+    const phoneNumber = '+254700000000';
+    window.location.href = `tel:${phoneNumber}`;
+}
+
+function scheduleViewing() {
+    const message = `Hi! I'd like to schedule a viewing for this property:
+    
+🏠 *{{ property.title }}*
+💰 Price: KSh {{ property.price|floatformat:0|intcomma }}
+📍 Location: {{ property.county.name }}
+
+Please let me know your available times for viewing.`;
+    
+    const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+function openWhatsApp() {
+    const message = `Hi! I'm interested in learning more about your property management services.`;
+    const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+// Add smooth scrolling for better UX
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click tracking for analytics (you can integrate with Google Analytics)
+    const ctaButtons = document.querySelectorAll('[onclick*="sendPropertyInquiry"], [onclick*="callPropertyAgent"], [onclick*="scheduleViewing"]');
+    ctaButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            console.log('CTA clicked:', this.textContent.trim());
+        });
+    });
+});
+</script>
 {% endblock %}

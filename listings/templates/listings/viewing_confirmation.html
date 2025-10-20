@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Viewing Confirmed - Traca Management Services{% endblock %}
+
+{% block extra_css %}
+<style>
+.confirmation-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.success-icon {
+    font-size: 5rem;
+    color: white;
+    animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.confirmation-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-top: -3rem;
+}
+
+.detail-row {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    font-size: 1.1rem;
+    color: #1e3a8a;
+    font-weight: 500;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.action-buttons .btn {
+    flex: 1;
+    min-width: 200px;
+}
+
+.next-steps-card {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin-top: 2rem;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+    margin-top: 1rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0.5rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -1.7rem;
+    top: 1.2rem;
+    width: 2px;
+    height: calc(100% - 0.7rem);
+    background: #e5e7eb;
+}
+
+.timeline-item:last-child::after {
+    display: none;
+}
+
+/* Print Styles */
+@media print {
+    .confirmation-header {
+        background: none !important;
+        color: #000 !important;
+        padding: 1rem 0 !important;
+        page-break-after: avoid;
+    }
+    
+    .success-icon {
+        display: none;
+    }
+    
+    .action-buttons,
+    .next-steps-card .btn,
+    nav,
+    footer,
+    .btn,
+    button {
+        display: none !important;
+    }
+    
+    .confirmation-card {
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+        page-break-inside: avoid;
+    }
+    
+    .detail-row {
+        page-break-inside: avoid;
+    }
+    
+    body {
+        background: white !important;
+    }
+    
+    .next-steps-card,
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        page-break-inside: avoid;
+    }
+    
+    h1, h2, h3, h4, h5 {
+        color: #000 !important;
+    }
+    
+    .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #000;
+        padding-bottom: 1rem;
+    }
+    
+    .print-footer {
+        display: block !important;
+        text-align: center;
+        margin-top: 2rem;
+        border-top: 2px solid #000;
+        padding-top: 1rem;
+        font-size: 0.8rem;
+    }
+}
+
+.print-header,
+.print-footer {
+    display: none;
+}
+
+.download-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.download-buttons .btn {
+    min-width: 180px;
+}
+
+@media (max-width: 768px) {
+    .confirmation-header {
+        padding: 3rem 0;
+    }
+    
+    .success-icon {
+        font-size: 3.5rem;
+    }
+    
+    .confirmation-card {
+        padding: 1.5rem;
+        margin-top: -2rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .download-buttons {
+        flex-direction: column;
+    }
+    
+    .download-buttons .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Success Header -->
+<div class="confirmation-header">
+    <div class="container">
+        <div class="success-icon mb-4">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1 class="mb-3">Viewing Confirmed!</h1>
+        <p class="lead">Your property viewing has been successfully scheduled</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Print-only Header -->
+    <div class="print-header">
+        <h2>TRACA MANAGEMENT SERVICES LTD</h2>
+        <p>Property Viewing Confirmation Receipt</p>
+        <p>Booking ID: #{{ viewing.id }}</p>
+        <p>Date Issued: {{ viewing.created_at|date:"F d, Y h:i A" }}</p>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Download/Print Buttons -->
+            <div class="download-buttons">
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Print Confirmation
+                </button>
+                <button class="btn btn-success" onclick="downloadAsImage()">
+                    <i class="fas fa-download me-2"></i>Save as Image
+                </button>
+                <button class="btn btn-info" onclick="emailConfirmation()">
+                    <i class="fas fa-envelope me-2"></i>Email to Myself
+                </button>
+            </div>
+            
+            <!-- Confirmation Details -->
+            <div class="confirmation-card" id="confirmationCard">
+                <h3 class="text-center mb-4 text-success">
+                    <i class="fas fa-calendar-check me-2"></i>Booking Confirmed
+                </h3>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Property</div>
+                    <div class="detail-value">{{ property.title }}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Location</div>
+                    <div class="detail-value">
+                        <i class="fas fa-map-marker-alt me-2"></i>{{ property.county.name }}
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Viewing Date</div>
+                    <div class="detail-value text-primary">
+                        <i class="fas fa-calendar me-2"></i>{{ viewing.viewing_date|date:"l, F d, Y" }}
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Viewing Time</div>
+                    <div class="detail-value text-primary">
+                        <i class="fas fa-clock me-2"></i>{{ viewing.get_viewing_time_display }}
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Number of People</div>
+                    <div class="detail-value">{{ viewing.number_of_people }}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Customer Name</div>
+                    <div class="detail-value">{{ viewing.name }}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Contact Email</div>
+                    <div class="detail-value">{{ viewing.email }}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Contact Phone</div>
+                    <div class="detail-value">{{ viewing.phone }}</div>
+                </div>
+                
+                {% if viewing.message %}
+                <div class="detail-row">
+                    <div class="detail-label">Special Requests</div>
+                    <div class="detail-value">{{ viewing.message }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="alert alert-success mt-4">
+                    <strong><i class="fas fa-envelope-circle-check me-2"></i>Confirmation Sent!</strong><br>
+                    A confirmation email has been sent to <strong>{{ viewing.email }}</strong>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="{% url 'listings:property_detail' property.pk %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>View Property Details
+                    </a>
+                    <a href="{% url 'listings:properties_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-search me-2"></i>Browse More Properties
+                    </a>
+            <button class="btn btn-success" onclick="shareOnWhatsApp('{{ request.build_absolute_uri }}', 'I just booked a viewing for {{ property.title }} on {{ viewing.viewing_date }} at {{ viewing.get_viewing_time_display }}!')">
+                <i class="fab fa-whatsapp me-2"></i>Share on WhatsApp
+            </button>
+                </div>
+            </div>
+            
+            <!-- Next Steps -->
+            <div class="next-steps-card">
+                <h5 class="text-primary mb-3"><i class="fas fa-list-check me-2"></i>What Happens Next?</h5>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <strong>Right Now</strong>
+                        <p class="text-muted mb-0">You'll receive a confirmation email with all the details</p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <strong>24 Hours Before</strong>
+                        <p class="text-muted mb-0">Our team will contact you to confirm the viewing</p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <strong>On Viewing Day</strong>
+                        <p class="text-muted mb-0">Our agent will meet you at the property at the scheduled time</p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <strong>After Viewing</strong>
+                        <p class="text-muted mb-0">We'll follow up to answer any questions and help you with next steps</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-phone me-2"></i>Need to Make Changes?</h5>
+                </div>
+                <div class="card-body">
+                    <p>If you need to cancel or reschedule your viewing, please contact us:</p>
+                    
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <i class="fas fa-phone fa-2x text-primary mb-2"></i>
+                            <p class="mb-0"><strong>Call Us</strong></p>
+                            <p class="text-primary">+254 700 000 000</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                            <p class="mb-0"><strong>Email Us</strong></p>
+                            <p class="text-primary">info@tracamanagement.co.ke</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <i class="fab fa-whatsapp fa-2x text-success mb-2"></i>
+                            <p class="mb-0"><strong>WhatsApp</strong></p>
+                            <button class="btn btn-success btn-sm" onclick="openWhatsApp()">
+                                Chat Now
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <strong><i class="fas fa-exclamation-triangle me-2"></i>Important:</strong> 
+                        Please notify us at least 24 hours in advance if you need to cancel or reschedule.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Print-only Footer -->
+    <div class="print-footer">
+        <p><strong>Traca Management Services Ltd</strong></p>
+        <p>Professional Property Management in Kenya</p>
+        <p>Phone: +254 700 000 000 | Email: info@tracamanagement.co.ke</p>
+        <p>This is a valid booking confirmation. Please present this at the viewing.</p>
+        <p>Printed: {{ viewing.created_at|date:"F d, Y h:i A" }}</p>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+// Print confirmation
+function printConfirmation() {
+    window.print();
+}
+
+// Download as image
+function downloadAsImage() {
+    const card = document.getElementById('confirmationCard');
+    
+    // Use html2canvas to capture the confirmation card
+    html2canvas(card, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false
+    }).then(canvas => {
+        // Convert canvas to blob
+        canvas.toBlob(blob => {
+            // Create download link
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = 'viewing-confirmation-{{ viewing.id }}.png';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            // Show success message
+            alert('Confirmation saved as image! Check your Downloads folder.');
+        });
+    });
+}
+
+// Email confirmation to customer
+function emailConfirmation() {
+    const subject = 'Property Viewing Confirmation - {{ property.title }}';
+    const body = `
+Property Viewing Confirmation
+
+Booking ID: #{{ viewing.id }}
+Property: {{ property.title }}
+Location: {{ property.county.name }}
+Date: {{ viewing.viewing_date|date:"l, F d, Y" }}
+Time: {{ viewing.get_viewing_time_display }}
+Number of People: {{ viewing.number_of_people }}
+
+Customer: {{ viewing.name }}
+Email: {{ viewing.email }}
+Phone: {{ viewing.phone }}
+
+Please arrive 5 minutes early. Bring a valid ID.
+
+If you need to cancel or reschedule, contact us at least 24 hours in advance.
+
+Contact Us:
+Phone: +254 700 000 000
+Email: info@tracamanagement.co.ke
+
+Best regards,
+Traca Management Services
+
+View online: {{ request.build_absolute_uri }}
+    `.trim();
+    
+    const mailtoLink = `mailto:{{ viewing.email }}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+}
+
+// Add print shortcut (Ctrl+P or Cmd+P)
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        window.print();
+    }
+});
+
+// Show print dialog automatically if URL has ?print=true
+if (window.location.search.includes('print=true')) {
+    setTimeout(() => window.print(), 500);
+}
+</script>
+{% endblock %}
+

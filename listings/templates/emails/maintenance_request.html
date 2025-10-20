@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Request Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9fafb;
+            padding: 30px;
+            border: 1px solid #e5e7eb;
+        }
+        .request-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ef4444;
+        }
+        .priority-high {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        .priority-normal {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 Maintenance Request</h1>
+        <p>Traca Management Services</p>
+    </div>
+    
+    <div class="content">
+        <h2>Request Received Successfully</h2>
+        
+        <p>Dear {{ requester_name }},</p>
+        
+        <p>We have received your maintenance request and our team has been notified.</p>
+        
+        <div class="request-details">
+            <h3>Request Details</h3>
+            <p><strong>Request ID:</strong> #{{ request_id }}</p>
+            <p><strong>Priority:</strong> <span class="priority-{{ priority|lower }}">{{ priority }}</span></p>
+            <p><strong>Issue Description:</strong></p>
+            <p>{{ description }}</p>
+            <p><strong>Submitted:</strong> {{ submitted_date }}</p>
+        </div>
+        
+        <p><strong>What happens next?</strong></p>
+        <ul>
+            <li>Our maintenance team will review your request</li>
+            <li>You will receive a call within 4-6 hours</li>
+            <li>A technician will be assigned to your case</li>
+            <li>We'll schedule a convenient time for the visit</li>
+        </ul>
+        
+        <p>If this is an emergency, please call us immediately at <strong>{{ emergency_phone }}</strong></p>
+        
+        <p>Thank you for choosing Traca Management Services.</p>
+        
+        <p>Best regards,<br>
+        <strong>The Traca Maintenance Team</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>Traca Management Services Ltd<br>
+        24/7 Maintenance Support<br>
+        © {{ current_year }} All rights reserved</p>
+    </div>
+</body>
+</html>
+

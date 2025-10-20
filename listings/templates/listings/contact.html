@@ -1,298 +1,641 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Traca Management Services Ltd</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/brand.css' %}">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'listings:home' %}">
-                <i class="fas fa-building me-2"></i>Traca Management Services Ltd
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                    data-bs-target="#navbarNav" aria-controls="navbarNav" 
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listings:home' %}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listings:properties_list' %}">Properties</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listings:services' %}">Services</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'listings:about' %}">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="{% url 'listings:contact' %}">Contact</a></li>
-                </ul>
-                <a href="{% url 'listings:list_property' %}" class="btn btn-primary ms-3">List Your Property</a>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section class="py-5 mt-5" style="background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(255, 105, 180, 0.1));">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="display-4 fw-bold text-primary">Contact Us</h1>
-                    <p class="lead">Get in touch with our team for all your real estate needs</p>
+{% block title %}Contact Us - Traca Management Services Ltd{% endblock %}
+
+{% block extra_css %}
+<style>
+.contact-hero {
+    background: linear-gradient(135deg, rgba(0, 51, 102, 0.9), rgba(201, 162, 39, 0.8)), url('{% static 'images/hero.jpg' %}');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.contact-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
+}
+
+.contact-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #003366, #C9A227);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    transition: transform 0.3s ease;
+}
+
+.contact-card:hover .contact-icon {
+    transform: scale(1.1);
+}
+
+.info-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-3px);
+}
+
+.info-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #003366, #C9A227);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.map-container {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+}
+
+.form-control:focus {
+    border-color: #C9A227;
+    box-shadow: 0 0 0 0.2rem rgba(201, 162, 39, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #003366, #C9A227);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-weight: 600;
+    transition: transform 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #002244, #b8941f);
+}
+
+/* Mobile Responsive for Contact Page */
+@media (max-width: 768px) {
+    .contact-hero {
+        background-attachment: scroll;
+        padding: 80px 0 60px;
+    }
+    
+    .contact-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .contact-card .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .contact-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .info-card .card-body {
+        padding: 1rem;
+    }
+    
+    .info-card .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .form-control,
+    .form-select {
+        font-size: 1rem;
+        padding: 0.75rem;
+    }
+    
+    .btn-primary {
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+    }
+    
+    .map-container {
+        height: 300px;
+        margin-top: 2rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-hero {
+        padding: 60px 0 40px;
+    }
+    
+    .contact-card .card-body {
+        padding: 1rem;
+    }
+    
+    .contact-card .card-title {
+        font-size: 1rem;
+    }
+    
+    .contact-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+    
+    .info-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .info-card .card-title {
+        font-size: 1rem;
+    }
+    
+    .form-control,
+    .form-select {
+        font-size: 0.95rem;
+        padding: 0.625rem;
+    }
+    
+    .btn-primary {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .map-container {
+        height: 250px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .contact-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .info-card .card-body {
+        padding: 0.5rem;
+    }
+    
+    .form-control,
+    .form-select {
+        padding: 0.5rem;
+    }
+    
+    .btn-primary {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .map-container {
+        height: 200px;
+    }
+    
+    .hero-title {
+        font-size: 1.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.95rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="contact-hero py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-8 mx-auto text-center text-white">
+                <h1 class="display-4 fw-bold mb-4 text-shadow">Get in Touch</h1>
+                <p class="lead mb-4 text-white-50">Ready to start your real estate journey? Contact our expert team for personalized assistance with all your property needs.</p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="#contact-form" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-envelope me-2"></i>Send Message
+                    </a>
+                    <button class="btn btn-outline-light btn-lg px-4" onclick="openWhatsApp()">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp Chat
+                    </button>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Contact Form and Info -->
-    <section class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
-                            <h3 class="mb-0"><i class="fas fa-envelope me-2"></i>Send us a Message</h3>
-                        </div>
-                        <div class="card-body">
-                            <form method="post">
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.name.id_for_label }}" class="form-label">Full Name *</label>
-                                        {{ form.name }}
+<!-- Contact Form and Info -->
+<section id="contact-form" class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 text-brand-primary mb-3">Contact Information</h2>
+                <p class="lead text-muted">Get in touch with our expert team</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card contact-card">
+                    <div class="card-header bg-brand-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-envelope me-2"></i>Send us a Message</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post" id="contactForm">
+                            {% csrf_token %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.email.id_for_label }}" class="form-label">Email Address *</label>
-                                        {{ form.email }}
-                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">Full Name *</label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                                    {% endif %}
                                 </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.phone.id_for_label }}" class="form-label">Phone Number</label>
-                                        {{ form.phone }}
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.subject.id_for_label }}" class="form-label">Subject *</label>
-                                        {{ form.subject }}
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">Email Address *</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                    {% endif %}
                                 </div>
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.message.id_for_label }}" class="form-label">Message *</label>
-                                    {{ form.message }}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label fw-bold">Phone Number</label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                        <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+                                    {% endif %}
                                 </div>
-                                
-                                <button type="submit" class="btn btn-primary btn-lg">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.subject.id_for_label }}" class="form-label fw-bold">Subject *</label>
+                                    {{ form.subject }}
+                                    {% if form.subject.errors %}
+                                        <div class="text-danger small">{{ form.subject.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="{{ form.message.id_for_label }}" class="form-label fw-bold">Message *</label>
+                                {{ form.message }}
+                                {% if form.message.errors %}
+                                    <div class="text-danger small">{{ form.message.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-flex gap-3 flex-wrap">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
                                     <i class="fas fa-paper-plane me-2"></i>Send Message
                                 </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4">
-                    <!-- Contact Information -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title mb-4">Get in Touch</h5>
-                            
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-phone"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1">Phone</h6>
-                                    <p class="text-muted mb-0">+254 700 000 000</p>
-                                </div>
+                                <button type="button" class="btn btn-success btn-lg" onclick="openWhatsApp()">
+                                    <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-undo me-2"></i>Clear Form
+                                </button>
                             </div>
-                            
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1">Email</h6>
-                                    <p class="text-muted mb-0">info@tracamanagement.co.ke</p>
-                                </div>
-                            </div>
-                            
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1">Address</h6>
-                                    <p class="text-muted mb-0">Westlands, Nairobi, Kenya</p>
-                                </div>
-                            </div>
-                            
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1">Business Hours</h6>
-                                    <p class="text-muted mb-0">Mon - Fri: 8:00 AM - 6:00 PM<br>Sat: 9:00 AM - 4:00 PM</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Social Media -->
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Follow Us</h5>
-                            <div class="d-flex">
-                                <a href="#" class="social-icon me-2">
-                                    <i class="fab fa-facebook-f"></i>
-                                </a>
-                                <a href="#" class="social-icon me-2">
-                                    <i class="fab fa-instagram"></i>
-                                </a>
-                                <a href="#" class="social-icon me-2">
-                                    <i class="fab fa-linkedin-in"></i>
-                                </a>
-                                <a href="#" class="social-icon">
-                                    <i class="fab fa-whatsapp"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services Overview -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-5">How We Can Help You</h2>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="text-center">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-home fa-2x"></i>
-                        </div>
-                        <h5>Property Sales</h5>
-                        <p class="text-muted">Expert assistance in buying or selling properties across Kenya.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="text-center">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-key fa-2x"></i>
-                        </div>
-                        <h5>Property Rentals</h5>
-                        <p class="text-muted">Find the perfect rental property or list your property for rent.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="text-center">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-cogs fa-2x"></i>
-                        </div>
-                        <h5>Property Management</h5>
-                        <p class="text-muted">Comprehensive property management services for landlords.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="text-center">
-                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-chart-line fa-2x"></i>
-                        </div>
-                        <h5>Property Valuation</h5>
-                        <p class="text-muted">Professional property valuation services for informed decisions.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer-content">
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="fas fa-building me-2"></i>
-                        Traca Management Services Ltd
-                    </h5>
-                    <p style="opacity: 0.9;">
-                        Your trusted partner in Kenyan real estate. We provide professional property services 
-                        across all 47 counties with verified listings and expert guidance.
-                    </p>
-                    <div class="mt-3">
-                        <a href="#" class="social-icon">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="social-icon">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="social-icon">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                        <a href="#" class="social-icon">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2">
-                    <h6 class="fw-bold mb-3">Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{% url 'listings:home' %}">Home</a></li>
-                        <li class="mb-2"><a href="{% url 'listings:properties_list' %}">Properties</a></li>
-                        <li class="mb-2"><a href="{% url 'listings:services' %}">Services</a></li>
-                        <li class="mb-2"><a href="{% url 'listings:about' %}">About Us</a></li>
-                        <li class="mb-2"><a href="{% url 'listings:contact' %}">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3">
-                    <h6 class="fw-bold mb-3">Our Services</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#">Property Management</a></li>
-                        <li class="mb-2"><a href="#">Sales & Rentals</a></li>
-                        <li class="mb-2"><a href="#">Property Valuations</a></li>
-                        <li class="mb-2"><a href="#">Investment Advisory</a></li>
-                        <li class="mb-2"><a href="#">Legal Support</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3">
-                    <h6 class="fw-bold mb-3">Contact Info</h6>
-                    <div class="mb-3">
-                        <i class="fas fa-phone me-2"></i>
-                        <span>+254 700 000 000</span>
-                    </div>
-                    <div class="mb-3">
-                        <i class="fas fa-envelope me-2"></i>
-                        <span>info@tracamanagement.co.ke</span>
-                    </div>
-                    <div class="mb-3">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        <span>Westlands, Nairobi, Kenya</span>
+                        </form>
                     </div>
                 </div>
             </div>
             
-            <hr class="my-4">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; {{ year }} Traca Management Services Ltd. All rights reserved.</p>
+            <div class="col-lg-4">
+                <!-- Contact Information -->
+                <div class="card info-card mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title text-brand-primary mb-4">Contact Details</h5>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="info-icon me-3">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Phone</h6>
+                                <p class="text-muted mb-0">+254 796 465 104</p>
+                                <small class="text-muted">Available 24/7</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="info-icon me-3">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Email</h6>
+                                <p class="text-muted mb-0">info@tracamanagement.co.ke</p>
+                                <small class="text-muted">Response within 2 hours</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="info-icon me-3">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Address</h6>
+                                <p class="text-muted mb-0">Westlands, Nairobi, Kenya</p>
+                                <small class="text-muted">Visit our office</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center">
+                            <div class="info-icon me-3">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Business Hours</h6>
+                                <p class="text-muted mb-0">Mon - Fri: 8:00 AM - 6:00 PM<br>Sat: 9:00 AM - 4:00 PM</p>
+                                <small class="text-muted">Emergency support 24/7</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="me-3" style="opacity: 0.8;">Privacy Policy</a>
-                    <a href="#" class="me-3" style="opacity: 0.8;">Terms of Service</a>
-                    <a href="#" style="opacity: 0.8;">Careers</a>
+                
+                <!-- Social Media -->
+                <div class="card info-card">
+                    <div class="card-body p-4">
+                        <h5 class="card-title text-brand-primary mb-3">Follow Us</h5>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="fab fa-facebook-f me-1"></i>Facebook
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="fab fa-instagram me-1"></i>Instagram
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="fab fa-linkedin-in me-1"></i>LinkedIn
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<!-- Google Maps Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 text-brand-primary mb-3">Find Our Office</h2>
+                <p class="lead text-muted">Visit us at our Westlands office in Nairobi</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt fa-2x text-white"></i>
+                    </div>
+                    <h5 class="text-brand-primary mb-3">Our Location</h5>
+                    <p class="text-muted">Westlands, Nairobi, Kenya<br>Near Sarit Centre</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="contact-icon">
+                        <i class="fas fa-car fa-2x text-white"></i>
+                    </div>
+                    <h5 class="text-brand-primary mb-3">Parking Available</h5>
+                    <p class="text-muted">Free parking for visitors<br>Secure parking area</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="contact-icon">
+                        <i class="fas fa-bus fa-2x text-white"></i>
+                    </div>
+                    <h5 class="text-brand-primary mb-3">Public Transport</h5>
+                    <p class="text-muted">Easy access via matatus<br>Near major bus routes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Overview -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 text-brand-primary mb-3">How We Can Help You</h2>
+                <p class="lead text-muted">Comprehensive real estate services across Kenya</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card contact-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="contact-icon">
+                            <i class="fas fa-home fa-2x text-white"></i>
+                        </div>
+                        <h5 class="text-brand-primary mb-3">Property Sales</h5>
+                        <p class="text-muted">Expert assistance in buying or selling properties across all 47 counties in Kenya.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card contact-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="contact-icon">
+                            <i class="fas fa-key fa-2x text-white"></i>
+                        </div>
+                        <h5 class="text-brand-primary mb-3">Property Rentals</h5>
+                        <p class="text-muted">Find the perfect rental property or list your property for rent with our expert team.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card contact-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="contact-icon">
+                            <i class="fas fa-cogs fa-2x text-white"></i>
+                        </div>
+                        <h5 class="text-brand-primary mb-3">Property Management</h5>
+                        <p class="text-muted">Comprehensive property management services for landlords and property owners.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card contact-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="contact-icon">
+                            <i class="fas fa-chart-line fa-2x text-white"></i>
+                        </div>
+                        <h5 class="text-brand-primary mb-3">Property Valuation</h5>
+                        <p class="text-muted">Professional property valuation services for informed investment decisions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize Google Maps
+function initMap() {
+    // Traca Management Services office location in Westlands, Nairobi
+    const officeLocation = { lat: -1.2657, lng: 36.8065 }; // Westlands, Nairobi coordinates
+    
+    // Create map
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: officeLocation,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        styles: [
+            {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
+            }
+        ]
+    });
+    
+    // Create marker
+    const marker = new google.maps.Marker({
+        position: officeLocation,
+        map: map,
+        title: "Traca Management Services Ltd",
+        icon: {
+            url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="20" r="18" fill="#003366" stroke="#C9A227" stroke-width="2"/>
+                    <text x="20" y="26" text-anchor="middle" fill="white" font-family="Arial" font-size="16" font-weight="bold">T</text>
+                </svg>
+            `),
+            scaledSize: new google.maps.Size(40, 40)
+        }
+    });
+    
+    // Create info window
+    const infoWindow = new google.maps.InfoWindow({
+        content: `
+            <div style="padding: 10px; max-width: 250px;">
+                <h6 style="margin: 0 0 5px 0; color: #003366; font-weight: bold;">Traca Management Services Ltd</h6>
+                <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Westlands, Nairobi, Kenya</p>
+                <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">Phone: +254 796 465 104</p>
+                <p style="margin: 0; color: #666; font-size: 14px;">Email: info@tracamanagement.co.ke</p>
+            </div>
+        `
+    });
+    
+    // Show info window on marker click
+    marker.addListener("click", () => {
+        infoWindow.open(map, marker);
+    });
+    
+    // Show info window by default
+    infoWindow.open(map, marker);
+}
+
+// Load Google Maps API
+function loadGoogleMaps() {
+    const script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBvOkBwJhJhJhJhJhJhJhJhJhJhJhJhJhJ&callback=initMap';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+}
+
+// Initialize map when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadGoogleMaps();
+    
+    // Add form validation and submission handling
+    const contactForm = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            // Add loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+            submitBtn.disabled = true;
+            
+            // Re-enable button after 3 seconds in case of error
+            setTimeout(function() {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Message';
+                submitBtn.disabled = false;
+            }, 3000);
+        });
+    }
+    
+    // Add smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

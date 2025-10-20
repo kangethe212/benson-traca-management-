@@ -8,12 +8,14 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 
-from .models import Property, County, Agent, Amenity, Testimonial, Inquiry, ManagementRequest, PropertyMedia
-from .forms import PropertyForm, InquiryForm, ContactForm, PropertySearchForm, ManagementRequestForm
+from .models import Property, County, Agent, Amenity, Testimonial, Inquiry, ManagementRequest, PropertyMedia, PropertyViewing
+from .forms import PropertyForm, InquiryForm, ContactForm, PropertySearchForm, ManagementRequestForm, PropertyViewingForm
+from .notifications import NotificationService
+from datetime import date, timedelta
 
 
 def home(request):
-    """Homepage with featured properties, testimonials, and counties"""
+    """Homepage with featured properties and testimonials"""
     # Get featured properties (sale and rent)
     featured_properties = Property.objects.filter(
         property_type__in=['sale', 'rent']
@@ -25,15 +27,9 @@ def home(request):
         is_approved=True
     ).select_related('property')[:3]
     
-    # Get active counties with property counts
-    counties = County.objects.filter(is_active=True).annotate(
-        property_count=Count('properties')
-    ).order_by('name')
-    
     context = {
         'featured_properties': featured_properties,
         'featured_testimonials': featured_testimonials,
-        'counties': counties,
         'year': timezone.now().year,
     }
     return render(request, 'listings/home.html', context)
@@ -49,6 +45,15 @@ def properties_list(request):
         property_type__in=['sale', 'rent']
     ).select_related('county').prefetch_related('media')
     
+    # Check for county filter from URL parameter (from county selector)
+    county_slug = request.GET.get('county')
+    if county_slug:
+        try:
+            county_obj = County.objects.get(slug=county_slug, is_active=True)
+            properties = properties.filter(county=county_obj)
+        except County.DoesNotExist:
+            pass  # Invalid county slug, ignore
+    
     # Apply filters if form is valid
     if search_form.is_valid():
         # Keyword search (title and description)
@@ -57,7 +62,8 @@ def properties_list(request):
             properties = properties.filter(
                 Q(title__icontains=keyword) | 
                 Q(description__icontains=keyword) |
-                Q(county__name__icontains=keyword)
+                Q(county__name__icontains=keyword) |
+                Q(county__main_towns__icontains=keyword)
             )
         
         # County filter
@@ -209,11 +215,15 @@ def property_detail(request, pk):
         property_features.append(f"{property_obj.area} sq ft")
     
     # Get similar properties in same price range
-    price_range = property_obj.price * 0.2 if property_obj.price else 0
+    from decimal import Decimal
+    price_range = Decimal(str(property_obj.price)) * Decimal('0.2') if property_obj.price else Decimal('0')
+    min_price = property_obj.price - price_range
+    max_price = property_obj.price + price_range
+    
     similar_properties = Property.objects.filter(
         property_type=property_obj.property_type,
-        price__gte=property_obj.price - price_range,
-        price__lte=property_obj.price + price_range
+        price__gte=min_price,
+        price__lte=max_price
     ).exclude(pk=pk).select_related('county').prefetch_related('media')[:3]
     
     context = {
@@ -464,3 +474,225 @@ def property_search_api(request):
         })
     
     return JsonResponse({'properties': results})
+
+
+def property_compare(request):
+    """Property comparison page"""
+    # Get property IDs from query parameter
+    ids_param = request.GET.get('ids', '')
+    
+    if not ids_param:
+        messages.warning(request, 'No properties selected for comparison.')
+        return redirect('listings:properties_list')
+    
+    # Parse property IDs
+    try:
+        property_ids = [int(id.strip()) for id in ids_param.split(',') if id.strip()]
+    except ValueError:
+        messages.error(request, 'Invalid property IDs.')
+        return redirect('listings:properties_list')
+    
+    # Limit to 3 properties maximum
+    if len(property_ids) > 3:
+        property_ids = property_ids[:3]
+        messages.info(request, 'Maximum 3 properties can be compared at once.')
+    
+    if len(property_ids) < 2:
+        messages.warning(request, 'Please select at least 2 properties to compare.')
+        return redirect('listings:properties_list')
+    
+    # Get properties
+    properties = Property.objects.filter(
+        id__in=property_ids,
+        property_type__in=['sale', 'rent']
+    ).select_related('county').prefetch_related('media')
+    
+    if properties.count() < 2:
+        messages.error(request, 'Some properties could not be found.')
+        return redirect('listings:properties_list')
+    
+    # Ensure properties are in the same order as requested
+    properties_dict = {prop.id: prop for prop in properties}
+    ordered_properties = [properties_dict[pid] for pid in property_ids if pid in properties_dict]
+    
+    # Calculate best values for highlighting
+    prices = [p.price for p in ordered_properties]
+    bedrooms = [p.bedrooms for p in ordered_properties if p.bedrooms]
+    bathrooms = [p.bathrooms for p in ordered_properties if p.bathrooms]
+    areas = [p.area for p in ordered_properties if p.area]
+    parking = [p.parking_slots for p in ordered_properties if p.parking_slots]
+    
+    best_values = {
+        'lowest_price': min(prices) if prices else None,
+        'highest_price': max(prices) if prices else None,
+        'most_bedrooms': max(bedrooms) if bedrooms else None,
+        'most_bathrooms': max(bathrooms) if bathrooms else None,
+        'largest_area': max(areas) if areas else None,
+        'most_parking': max(parking) if parking else None,
+    }
+    
+    context = {
+        'properties': ordered_properties,
+        'best_values': best_values,
+        'property_count': len(ordered_properties),
+        'year': timezone.now().year,
+    }
+    
+    return render(request, 'listings/property_compare.html', context)
+
+
+def book_property_viewing(request, pk):
+    """Book a property viewing - Daytime only (9 AM - 6 PM)"""
+    property_obj = get_object_or_404(Property, pk=pk, property_type__in=['sale', 'rent'])
+    
+    # Get booked time slots for next 30 days to show availability
+    today = date.today()
+    end_date = today + timedelta(days=30)
+    
+    booked_slots = PropertyViewing.objects.filter(
+        property_item=property_obj,
+        viewing_date__gte=today,
+        viewing_date__lte=end_date,
+        status__in=['pending', 'confirmed']
+    ).values('viewing_date', 'viewing_time')
+    
+    # Convert to dict for easier lookup in template
+    booked_dict = {}
+    for slot in booked_slots:
+        date_key = slot['viewing_date'].isoformat()
+        if date_key not in booked_dict:
+            booked_dict[date_key] = []
+        booked_dict[date_key].append(slot['viewing_time'])
+    
+    if request.method == 'POST':
+        form = PropertyViewingForm(request.POST, property=property_obj)
+        if form.is_valid():
+            viewing = form.save(commit=False)
+            viewing.property_item = property_obj
+            viewing.save()
+            
+            # Send notifications
+            send_viewing_notifications(viewing, property_obj)
+            
+            # Mark as notified
+            viewing.is_notified = True
+            viewing.confirmation_sent = True
+            viewing.save()
+            
+            messages.success(
+                request,
+                f'Viewing booked successfully for {viewing.viewing_date} at {viewing.get_viewing_time_display()}! '
+                'Check your email for confirmation.'
+            )
+            return redirect('listings:viewing_confirmation', pk=viewing.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = PropertyViewingForm(property=property_obj)
+    
+    context = {
+        'property': property_obj,
+        'form': form,
+        'booked_slots': booked_dict,
+        'time_slots': PropertyViewing.TIME_SLOTS,
+        'min_date': today.isoformat(),
+        'max_date': end_date.isoformat(),
+        'year': timezone.now().year,
+    }
+    
+    return render(request, 'listings/book_viewing.html', context)
+
+
+def viewing_confirmation(request, pk):
+    """Viewing confirmation page"""
+    viewing = get_object_or_404(PropertyViewing, pk=pk)
+    
+    context = {
+        'viewing': viewing,
+        'property': viewing.property_item,
+        'year': timezone.now().year,
+    }
+    
+    return render(request, 'listings/viewing_confirmation.html', context)
+
+
+def send_viewing_notifications(viewing, property_obj):
+    """Send notifications for new viewing booking"""
+    from django.conf import settings
+    from django.template.loader import render_to_string
+    from django.utils.html import strip_tags
+    
+    # Prepare data
+    viewing_data = {
+        'customer_name': viewing.name,
+        'customer_email': viewing.email,
+        'customer_phone': viewing.phone,
+        'property_title': property_obj.title,
+        'property_location': property_obj.county.name,
+        'property_price': f"KSh {property_obj.price:,.0f}" if property_obj.price else "Contact us",
+        'viewing_date': viewing.viewing_date.strftime('%A, %B %d, %Y'),
+        'viewing_time': viewing.get_viewing_time_display(),
+        'number_of_people': viewing.number_of_people,
+        'special_requests': viewing.message or 'None',
+        'contact_phone': '+254 700 000 000',
+        'contact_email': 'info@tracamanagement.co.ke',
+        'whatsapp_number': settings.WHATSAPP_PHONE_NUMBER,
+        'current_year': timezone.now().year,
+        'property_url': request.build_absolute_uri(property_obj.get_absolute_url()) if 'request' in locals() else '',
+    }
+    
+    # Send confirmation email to customer
+    try:
+        html_message = render_to_string('emails/viewing_confirmation.html', viewing_data)
+        plain_message = strip_tags(html_message)
+        
+        NotificationService.send_email(
+            subject=f"Viewing Confirmed - {property_obj.title}",
+            message=plain_message,
+            recipient_list=[viewing.email],
+            html_message=html_message
+        )
+    except Exception as e:
+        print(f"Error sending customer confirmation: {e}")
+    
+    # Send notification to admin
+    admin_message = f"""
+New Property Viewing Booked!
+
+Property: {property_obj.title}
+Location: {property_obj.county.name}
+Price: {viewing_data['property_price']}
+
+Customer Details:
+Name: {viewing.name}
+Email: {viewing.email}
+Phone: {viewing.phone}
+
+Viewing Schedule:
+Date: {viewing_data['viewing_date']}
+Time: {viewing_data['viewing_time']}
+Number of People: {viewing.number_of_people}
+
+Special Requests: {viewing.message or 'None'}
+
+Please prepare the property for viewing and contact the customer if needed.
+    """
+    
+    try:
+        admin_recipient = {'email': settings.ADMINS[0][1]}
+        NotificationService.send_notification(
+            recipient=admin_recipient,
+            subject=f"🏠 New Viewing Booked - {property_obj.title}",
+            message=admin_message,
+            channels=['email']
+        )
+    except Exception as e:
+        print(f"Error sending admin notification: {e}")
+    
+    # Send SMS if it's a same-day or next-day booking
+    if settings.ENABLE_SMS_NOTIFICATIONS and viewing.viewing_date <= date.today() + timedelta(days=1):
+        try:
+            sms_message = f"URGENT: Viewing booked for {property_obj.title} on {viewing_data['viewing_date']} at {viewing_data['viewing_time']}. Customer: {viewing.name}, Phone: {viewing.phone}"
+            NotificationService.send_sms(settings.WHATSAPP_PHONE_NUMBER, sms_message)
+        except Exception as e:
+            print(f"Error sending SMS: {e}")
