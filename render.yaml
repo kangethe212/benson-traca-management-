@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: traca-management-web
+    env: python
+    branch: master
+    repo: kangethe212/TRACA-MANAGEMENT-SERVICE-LTD
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    autoDeploy: true
+    plan: free
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateRandomValue: true
+
+databases:
+  - name: traca-management-db
+    plan: starter
+    postgresVersion: "14"

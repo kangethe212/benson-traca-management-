@@ -2,7 +2,26 @@
 
 A comprehensive Django-based property management platform with separate portals for landlords and tenants, featuring modern UI, complete CRUD operations, and advanced property management tools.
 
+# Traca Property Management Service
+
+This project is a Django application for property management.
+
 ## 🚀 Features
+## Deploying to Render (recommended)
+
+1. Sign in to https://render.com using GitHub and grant access to this repository.
+2. In Render, choose "New -> Web Service" and connect the repo. Use branch `master`.
+3. Build Command: `pip install -r requirements.txt`
+4. Start Command: `bash start.sh`
+5. Add environment variables in Render dashboard:
+	- SECRET_KEY (use generated secret; do NOT use the one in code)
+	- DEBUG = False
+	- DATABASE_URL (if you create a managed Postgres on Render)
+	- Any API keys your app needs: TWILIO_AUTH_TOKEN, WHATSAPP_API_TOKEN, EMAIL_HOST_PASSWORD, etc.
+6. (Optional) Create a managed Postgres via Render -> New -> PostgreSQL. Copy the `DATABASE_URL` and paste in the Web Service Environment.
+7. Deploy. Render will give you a stable public URL you can share with anyone.
+
+There is also a `render.yaml` manifest in the repo which can be used by Render to auto-create services when connecting the repository.
 
 ### 🏠 Main Website
 - Property listings with advanced search and filtering
