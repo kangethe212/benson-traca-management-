@@ -16,7 +16,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-wgz7pj+ta2hjjk+raicfd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*', '.railway.app', '.up.railway.app']
+ALLOWED_HOSTS = ['*', '.render.com', '.onrender.com']
 
 # Application definition
 INSTALLED_APPS = [

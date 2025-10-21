@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: traca-management-service
+    env: python
+    branch: master
+    buildCommand: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+    startCommand: bash start.sh
+    autoDeploy: true
+    plan: free
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateRandomValue: true
+      - key: DJANGO_SETTINGS_MODULE
+        value: "myproject.settings_production"
+
+databases:
+  - name: traca-management-db
+    plan: starter
+    postgresVersion: "14"
