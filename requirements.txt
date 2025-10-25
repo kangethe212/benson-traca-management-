@@ -8,5 +8,7 @@ python-dotenv==1.0.0
 djangorestframework==3.14.0
 django-filter==23.3
 psycopg2-binary==2.9.7
+django-jazzmin==2.6.0
+requests==2.31.0
 setuptools>=65.0.0
 wheel>=0.38.0

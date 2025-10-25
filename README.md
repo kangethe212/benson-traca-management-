@@ -104,11 +104,9 @@ python manage.py runserver
 - **Tenant Portal:** `http://127.0.0.1:8000/tenant/`
 - **Admin Panel:** `http://127.0.0.1:8000/admin/`
 
-## 🔐 Default Credentials
+## 🔐 Credentials
 
-- **Admin:** `admin` / `admin123`
-- **Landlord:** `landlord@example.com` / `password123`
-- **Tenant:** `tenant@example.com` / `password123`
+- Use your own credentials in production. Any example credentials are for local development only and must not be used in live environments.
 
 ## 📁 Project Structure
 

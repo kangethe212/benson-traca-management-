@@ -34,7 +34,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-placeholder')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -49,6 +49,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',  # Jazzmin admin interface - must be before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -96,12 +97,21 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Use PostgreSQL for production, SQLite for development
+if os.getenv('DATABASE_URL'):
+    # Production database (Railway PostgreSQL)
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
     }
-}
+else:
+    # Development database (SQLite)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -138,7 +148,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -214,3 +224,191 @@ ENABLE_WHATSAPP_NOTIFICATIONS = os.getenv('ENABLE_WHATSAPP_NOTIFICATIONS', 'Fals
 
 # Timezone for Kenya
 TIME_ZONE = 'Africa/Nairobi'
+
+# =============================================================================
+# JAZZMIN CONFIGURATION
+# =============================================================================
+JAZZMIN_SETTINGS = {
+    # title of the window (Will default to current_admin_site.site_title if absent or None)
+    "site_title": "Traca Management Admin",
+
+    # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
+    "site_header": "Traca Management",
+
+    # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
+    "site_brand": "Traca Management",
+
+    # Logo to use for your site, must be present in static files, used for brand on top left
+    "site_logo": "images/traca-logo-new.png",
+
+    # Logo to use for your site, must be present in static files, used for login form logo (if not present, site_logo will be used)
+    "login_logo": "images/traca-logo-new.png",
+
+    # Logo to use for login form in dark themes (if not present, login_logo will be used)
+    "login_logo_dark": "images/traca-logo-new.png",
+
+    # CSS classes that are applied to the logo above
+    "site_logo_classes": "img-circle",
+
+    # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
+    "site_icon": "images/traca-logo-new.png",
+
+    # Welcome text on the login screen
+    "welcome_sign": "Welcome to Traca Management Admin Panel",
+
+    # Copyright on the footer
+    "copyright": "Traca Management Services Ltd",
+
+    # List of model admins to search from the search bar, search bar omitted if excluded
+    "search_model": ["auth.User", "listings.Property", "listings.Tenant", "listings.Landlord"],
+
+    # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
+    "user_avatar": None,
+
+    ############
+    # Top Menu #
+    ############
+
+    # Links to put along the top menu
+    "topmenu_links": [
+
+        # Url that gets reversed (Permissions can be added)
+        {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+
+        # external url that opens in a new window (Permissions can be added)
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+
+        # model admin to link to (Permissions checked against model)
+        {"model": "auth.User"},
+
+        # App with dropdown menu to all its models pages (Permissions checked against models)
+        {"app": "listings"},
+    ],
+
+    #############
+    # User Menu #
+    #############
+
+    # Additional links to include in the user menu on the top right ("app" url type is not allowed)
+    "usermenu_links": [
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+        {"model": "auth.user"}
+    ],
+
+    #############
+    # Side Menu #
+    #############
+
+    # Whether to display the side menu
+    "show_sidebar": True,
+
+    # Whether to aut expand the menu
+    "navigation_expanded": True,
+
+    # Hide these apps when generating side menu e.g (auth)
+    "hide_apps": [],
+
+    # Hide these models when generating side menu (e.g auth.user)
+    "hide_models": [],
+
+    # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
+    "order_with_respect_to": ["auth", "listings", "listings.Property", "listings.Tenant", "listings.Landlord"],
+
+    # Custom links to append to app groups, keyed on app name
+    "custom_links": {
+        "listings": [{
+            "name": "Property Analytics",
+            "url": "admin:listings_property_changelist",
+            "icon": "fas fa-chart-bar",
+            "permissions": ["listings.view_property"]
+        }]
+    },
+
+    # Custom icons for side menu apps/models See https://fontawesome.com/icons?d=gallery&m=free
+    # for the full list of 5.13.0 free icon classes
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "listings.Property": "fas fa-building",
+        "listings.Tenant": "fas fa-user-friends",
+        "listings.Landlord": "fas fa-user-tie",
+        "listings.Lease": "fas fa-file-contract",
+        "listings.Payment": "fas fa-credit-card",
+        "listings.MaintenanceRequest": "fas fa-tools",
+        "listings.Message": "fas fa-envelope",
+        "listings.County": "fas fa-map-marker-alt",
+        "listings.Amenity": "fas fa-star",
+        "listings.PropertyViewing": "fas fa-calendar-check",
+        "listings.Inquiry": "fas fa-question-circle",
+        "listings.Testimonial": "fas fa-quote-left",
+        "listings.TenantService": "fas fa-concierge-bell",
+    },
+    # Icons that are used when one is not manually specified
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+
+    #################
+    # Related Modal #
+    #################
+    # Use modals instead of popups
+    "related_modal_active": False,
+
+    #############
+    # UI Tweaks #
+    #############
+    # Relative paths to custom CSS/JS scripts (must be present in static files)
+    "custom_css": None,
+    "custom_js": None,
+    # Whether to link font from fonts.googleapis.com (use custom_css to supply font otherwise)
+    "use_google_fonts_cdn": True,
+    # Whether to show the UI customizer on the sidebar
+    "show_ui_builder": False,
+
+    ###############
+    # Change view #
+    ###############
+    # Render out the change view as a single form, or in tabs, current options are
+    # - single
+    # - horizontal_tabs (default)
+    # - vertical_tabs
+    # - collapsible
+    # - carousel
+    "changeform_format": "horizontal_tabs",
+    # override change forms on a per modeladmin basis
+    "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},
+    # Add a language dropdown into the admin
+    "language_chooser": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-primary",
+    "accent": "accent-primary",
+    "navbar": "navbar-primary navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
