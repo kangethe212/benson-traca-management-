@@ -8,7 +8,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 
-from .models import Property, County, Agent, Amenity, Testimonial, Inquiry, ManagementRequest, PropertyMedia, PropertyViewing
+from .models import Property, County, Agent, Amenity, Testimonial, Inquiry, ManagementRequest, PropertyMedia, PropertyViewing, TeamMember
 from .forms import PropertyForm, InquiryForm, ContactForm, PropertySearchForm, ManagementRequestForm, PropertyViewingForm
 from .notifications import NotificationService
 from datetime import date, timedelta
@@ -16,10 +16,10 @@ from datetime import date, timedelta
 
 def home(request):
     """Homepage with featured properties and testimonials"""
-    # Get featured properties (sale and rent)
+    # Get featured properties (sale and rent) - show up to 12
     featured_properties = Property.objects.filter(
         property_type__in=['sale', 'rent']
-    ).select_related('county').prefetch_related('media')[:6]
+    ).select_related('county').prefetch_related('media')[:12]
     
     # Get featured testimonials
     featured_testimonials = Testimonial.objects.filter(
@@ -45,14 +45,11 @@ def properties_list(request):
         property_type__in=['sale', 'rent']
     ).select_related('county').prefetch_related('media')
     
-    # Check for county filter from URL parameter (from county selector)
-    county_slug = request.GET.get('county')
-    if county_slug:
-        try:
-            county_obj = County.objects.get(slug=county_slug, is_active=True)
-            properties = properties.filter(county=county_obj)
-        except County.DoesNotExist:
-            pass  # Invalid county slug, ignore
+    # Check for county filter from URL parameter (from home page search)
+    county_name = request.GET.get('county')
+    if county_name:
+        # Search by county name (case-insensitive)
+        properties = properties.filter(county__name__icontains=county_name)
     
     # Apply filters if form is valid
     if search_form.is_valid():
@@ -66,10 +63,10 @@ def properties_list(request):
                 Q(county__main_towns__icontains=keyword)
             )
         
-        # County filter
+        # County filter (text input)
         county = search_form.cleaned_data.get('county')
         if county:
-            properties = properties.filter(county=county)
+            properties = properties.filter(county__name__icontains=county)
         
         # Property type filter
         property_type = search_form.cleaned_data.get('property_type')
@@ -243,68 +240,97 @@ def management_request(request):
     """Property management request form (GET → form, POST → save ManagementRequest)"""
     if request.method == 'POST':
         form = ManagementRequestForm(request.POST, request.FILES)
+        print(f"Form is valid: {form.is_valid()}")
+        if not form.is_valid():
+            print(f"Form errors: {form.errors}")
         if form.is_valid():
-            # Create a property first
-            property_obj = Property.objects.create(
-                title=f"Property for Management - {form.cleaned_data['landlord_name']}",
-                property_type=form.cleaned_data['property_type'],
-                county=form.cleaned_data['county'],
-                description=form.cleaned_data['service_terms'],
-                price=form.cleaned_data['rent_amount']
-            )
-            
-            # Create management request
-            management_request = form.save(commit=False)
-            management_request.property = property_obj
-            management_request.save()
-            
-            # Handle uploaded images
-            images = request.FILES.getlist('property_images')
-            for i, image in enumerate(images):
-                PropertyMedia.objects.create(
-                    property=property_obj,
-                    media_type='image',
-                    file=image,
-                    order=i,
-                    is_primary=(i == 0)  # First image is primary
-                )
-            
-            # Handle uploaded videos
-            videos = request.FILES.getlist('property_videos')
-            for i, video in enumerate(videos):
-                PropertyMedia.objects.create(
-                    property=property_obj,
-                    media_type='video',
-                    file=video,
-                    order=i + len(images)
-                )
-            
-            # Send email notification to admins
             try:
-                mail_admins(
-                    subject=f"New Property Management Request from {form.cleaned_data['landlord_name']}",
-                    message=f"""
-                    New property management request received:
-                    
-                    Landlord: {form.cleaned_data['landlord_name']}
-                    Contact: {form.cleaned_data['landlord_contact']}
-                    Property Type: {form.cleaned_data['property_type']}
-                    County: {form.cleaned_data['county']}
-                    Rent Amount: KSh {form.cleaned_data['rent_amount']:,.0f}
-                    
-                    Service Terms:
-                    {form.cleaned_data['service_terms']}
-                    """,
-                    fail_silently=True
+                # Get or create county from the county name
+                county_name = form.cleaned_data['county']
+                print(f"Creating county: {county_name}")
+                county_obj, created = County.objects.get_or_create(
+                    name=county_name,
+                    defaults={
+                        'slug': county_name.lower().replace(' ', '-'),
+                        'is_active': True
+                    }
                 )
-            except Exception:
-                pass
-            
-            messages.success(
-                request, 
-                'Your property management request has been submitted successfully! We will contact you within 24 hours.'
-            )
-            return redirect('listings:home')
+                print(f"County created: {created}, County: {county_obj}")
+                
+                # Create a property first
+                print("Creating property...")
+                property_obj = Property.objects.create(
+                    title=f"Property for Management - {form.cleaned_data['landlord_name']}",
+                    property_type=form.cleaned_data['property_type'],
+                    county=county_obj,
+                    town=form.cleaned_data.get('town', ''),
+                    description=form.cleaned_data['service_terms'],
+                    price=form.cleaned_data['rent_amount']
+                )
+                print(f"Property created: {property_obj.id}")
+                
+                # Create management request
+                print("Creating management request...")
+                mgmt_request = form.save(commit=False)
+                mgmt_request.property = property_obj
+                mgmt_request.save()
+                print(f"ManagementRequest created: {mgmt_request.id}")
+                
+                # Handle uploaded images
+                images = request.FILES.getlist('property_images')
+                print(f"Processing {len(images)} images...")
+                for i, image in enumerate(images):
+                    PropertyMedia.objects.create(
+                        property=property_obj,
+                        media_type='image',
+                        file=image,
+                        order=i,
+                        is_primary=(i == 0)  # First image is primary
+                    )
+                
+                # Handle uploaded videos
+                videos = request.FILES.getlist('property_videos')
+                print(f"Processing {len(videos)} videos...")
+                for i, video in enumerate(videos):
+                    PropertyMedia.objects.create(
+                        property=property_obj,
+                        media_type='video',
+                        file=video,
+                        order=i + len(images)
+                    )
+                
+                # Send email notification to admins
+                try:
+                    mail_admins(
+                        subject=f"New Property Management Request from {form.cleaned_data['landlord_name']}",
+                        message=f"""
+                        New property management request received:
+                        
+                        Landlord: {form.cleaned_data['landlord_name']}
+                        Contact: {form.cleaned_data['landlord_contact']}
+                        Property Type: {form.cleaned_data['property_type']}
+                        County: {form.cleaned_data['county']}
+                        Rent Amount: KSh {form.cleaned_data['rent_amount']:,.0f}
+                        
+                        Service Terms:
+                        {form.cleaned_data['service_terms']}
+                        """,
+                        fail_silently=True
+                    )
+                except Exception as e:
+                    print(f"Email error: {e}")
+                
+                messages.success(
+                    request, 
+                    'Your property management request has been submitted successfully! We will contact you within 24 hours.'
+                )
+                print("Redirecting to home...")
+                return redirect('listings:home')
+            except Exception as e:
+                print(f"Error in management request processing: {e}")
+                import traceback
+                traceback.print_exc()
+                messages.error(request, 'There was an error processing your request. Please try again.')
     else:
         form = ManagementRequestForm()
     
@@ -370,8 +396,8 @@ def services_view(request):
 
 def about_view(request):
     """About page"""
-    # Get team members (agents)
-    team_members = Agent.objects.filter(is_active=True).select_related('user')[:6]
+    # Get team members from TeamMember model
+    team_members = TeamMember.objects.filter(is_active=True).order_by('order', 'name')
     
     # Get company stats
     total_properties = Property.objects.count()

@@ -479,13 +479,15 @@
                     <div class="card team-card text-center">
                         <div class="card-body">
                             <div class="mb-3">
-                                <i class="fas fa-user-circle fa-5x text-brand-primary"></i>
+                                {% if member.photo %}
+                                    <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
+                                {% else %}
+                                    <i class="fas fa-user-circle fa-5x text-brand-primary"></i>
+                                {% endif %}
                             </div>
-                            <h5 class="card-title text-brand-primary">{{ member.full_name }}</h5>
-                            <p class="text-muted">{{ member.phone }}</p>
-                            {% if member.bio %}
+                            <h5 class="card-title text-brand-primary">{{ member.name }}</h5>
+                            <p class="text-muted">{{ member.title }}</p>
                             <p class="card-text">{{ member.bio }}</p>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -496,11 +498,11 @@
                             <div class="card team-card text-center">
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <img src="{% static 'images/traca 6.jpeg' %}" alt="Benson Mwangi" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
+                                        <img src="{% static 'images/traca 6.jpeg' %}" alt="Mr. Njuguna" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
                                     </div>
-                                    <h5 class="card-title text-brand-primary">Benson Mwangi</h5>
+                                    <h5 class="card-title text-brand-primary">Mr. Njuguna</h5>
                                     <p class="text-muted">CEO & Founder</p>
-                                    <p class="card-text">Visionary leader with over 10 years of experience in real estate and property management across Kenya.</p>
+                                    <p class="card-text">Visionary leader with over 30 years of experience in real estate and property management across Kenya.</p>
                                 </div>
                             </div>
                         </div>
@@ -508,23 +510,23 @@
                             <div class="card team-card text-center">
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <img src="{% static 'images/traca 7.jpeg' %}" alt="Sarah Kimani" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
+                                        <img src="{% static 'images/traca 7.jpeg' %}" alt="David Mwangi" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
                                     </div>
-                                    <h5 class="card-title text-brand-primary">Sarah Kimani</h5>
-                                    <p class="text-muted">Head of Operations</p>
-                                    <p class="card-text">Operations expert ensuring seamless service delivery and client satisfaction across all our properties.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card team-card text-center">
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <img src="{% static 'images/traca 8.jpeg' %}" alt="David Ochieng" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
-                                    </div>
-                                    <h5 class="card-title text-brand-primary">David Ochieng</h5>
+                                    <h5 class="card-title text-brand-primary">David Mwangi</h5>
                                     <p class="text-muted">Head of Sales</p>
                                     <p class="card-text">Sales strategist with deep market knowledge and a proven track record in property transactions.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card team-card text-center">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <img src="{% static 'images/traca 8.jpeg' %}" alt="Benson Maina" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #C9A227;">
+                                    </div>
+                                    <h5 class="card-title text-brand-primary">Benson Maina</h5>
+                                    <p class="text-muted">Head of Marketing</p>
+                                    <p class="card-text">Marketing expert driving brand growth and client acquisition through innovative strategies and digital platforms.</p>
                                 </div>
                             </div>
                         </div>
@@ -583,19 +585,19 @@
             <div class="row g-4 text-center">
                 <div class="col-md-3">
                     <div class="stats-card">
-                        <h3 class="display-4 fw-bold">{{ total_properties|default:"150" }}+</h3>
+                        <h3 class="display-4 fw-bold">200+</h3>
                         <p class="mb-0">Properties Managed</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-card">
-                        <h3 class="display-4 fw-bold">{{ total_agents|default:"25" }}+</h3>
+                        <h3 class="display-4 fw-bold">25+</h3>
                         <p class="mb-0">Expert Agents</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-card">
-                        <h3 class="display-4 fw-bold">{{ counties_served|default:"47" }}</h3>
+                        <h3 class="display-4 fw-bold">47</h3>
                         <p class="mb-0">Counties Served</p>
                     </div>
                 </div>

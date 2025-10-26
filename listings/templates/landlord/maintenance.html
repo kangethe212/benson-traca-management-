@@ -29,30 +29,62 @@
                     <th>Date</th>
                     <th>Property</th>
                     <th>Tenant</th>
+                    <th>Contact</th>
                     <th>Issue</th>
                     <th>Priority</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for request in maintenance_requests %}
                     <tr>
                         <td>{{ request.reported_date|date:"M d, Y" }}</td>
-                        <td>{{ request.lease.property_item.title|truncatewords:3 }}</td>
-                        <td>{{ request.tenant.full_name }}</td>
+                        <td>
+                            <strong>{{ request.lease.property_item.title|truncatewords:3 }}</strong><br>
+                            <small class="text-muted">{{ request.lease.property_item.county.name }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ request.tenant.full_name }}</strong><br>
+                            <small class="text-muted">Lease: {{ request.lease.start_date|date:"M Y" }} - {{ request.lease.end_date|date:"M Y" }}</small>
+                        </td>
+                        <td>
+                            <small class="text-muted">
+                                📞 {{ request.tenant.phone }}<br>
+                                📧 {{ request.tenant.user.email }}
+                            </small>
+                        </td>
                         <td>
                             <strong>{{ request.title }}</strong><br>
                             <small class="text-muted">{{ request.description|truncatewords:10 }}</small>
+                            {% if request.category %}
+                                <br><span class="badge bg-light text-dark">{{ request.category }}</span>
+                            {% endif %}
                         </td>
                         <td>
-                            <span class="badge {% if request.priority == 'urgent' %}bg-danger{% elif request.priority == 'high' %}bg-warning{% else %}bg-info{% endif %}">
+                            <span class="badge {% if request.priority == 'urgent' %}bg-danger{% elif request.priority == 'high' %}bg-warning{% elif request.priority == 'normal' %}bg-info{% else %}bg-secondary{% endif %}">
                                 {{ request.get_priority_display }}
                             </span>
                         </td>
                         <td>
-                            <span class="badge {% if request.status == 'completed' %}bg-success{% elif request.status == 'in_progress' %}bg-info{% elif request.status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            <span class="badge {% if request.status == 'completed' %}bg-success{% elif request.status == 'in_progress' %}bg-info{% elif request.status == 'pending' %}bg-warning{% elif request.status == 'assigned' %}bg-primary{% else %}bg-secondary{% endif %}">
                                 {{ request.get_status_display }}
                             </span>
+                            {% if request.assigned_to %}
+                                <br><small class="text-muted">Assigned to: {{ request.assigned_to.get_full_name|default:request.assigned_to.username }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group-vertical btn-group-sm">
+                                <a href="{% url 'listings:landlord:tenant_detail' request.tenant.id %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-user"></i> View Tenant
+                                </a>
+                                {% if request.admin_notes %}
+                                    <button class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip" title="{{ request.admin_notes }}">
+                                        <i class="fas fa-sticky-note"></i> Notes
+                                    </button>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}

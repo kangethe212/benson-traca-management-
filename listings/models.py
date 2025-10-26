@@ -135,6 +135,7 @@ class Property(models.Model):
     title = models.CharField(max_length=200)
     property_type = models.CharField(max_length=20, choices=PROPERTY_TYPES)
     county = models.ForeignKey(County, on_delete=models.CASCADE, related_name='properties')
+    town = models.CharField(max_length=100, blank=True, help_text="Specific town or area within the county")
     landlord = models.ForeignKey('Landlord', on_delete=models.CASCADE, related_name='properties', null=True, blank=True, help_text="Property owner/landlord")
     
     # Pricing and Details
@@ -707,3 +708,23 @@ class TenantService(models.Model):
         if self.is_free:
             return "Free"
         return f"KSh {self.price:,.0f}"
+
+
+class TeamMember(models.Model):
+    """Team members for the about page"""
+    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    bio = models.TextField()
+    photo = models.ImageField(upload_to='team/', help_text="Upload team member photo (120x120px recommended)")
+    order = models.PositiveIntegerField(default=0, help_text="Display order (0 = first)")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name = "Team Member"
+        verbose_name_plural = "Team Members"
+
+    def __str__(self):
+        return f"{self.name} - {self.title}"

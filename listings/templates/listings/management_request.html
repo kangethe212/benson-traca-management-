@@ -57,7 +57,17 @@
                                 {% if form.county.errors %}
                                     <div class="text-danger small">{{ form.county.errors.0 }}</div>
                                 {% endif %}
+                                <div class="form-text">{{ form.county.help_text }}</div>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.town.id_for_label }}" class="form-label">Town/Area *</label>
+                            {{ form.town }}
+                            {% if form.town.errors %}
+                                <div class="text-danger small">{{ form.town.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{{ form.town.help_text }}</div>
                         </div>
 
                         <div class="mb-3">

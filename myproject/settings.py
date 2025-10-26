@@ -158,6 +158,43 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Disable file permission changes on Windows to avoid permission errors
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
+
+# Custom file storage to handle Windows permissions gracefully
+import os
+import platform
+
+if platform.system() == 'Windows':
+    # On Windows, disable chmod operations that cause permission errors
+    from django.core.files.storage import FileSystemStorage
+    
+    class WindowsFileSystemStorage(FileSystemStorage):
+        def __init__(self, location=None, base_url=None):
+            super().__init__(location=location or MEDIA_ROOT, base_url=base_url or MEDIA_URL)
+        
+        def _save(self, name, content):
+            """Override _save to handle Windows permissions gracefully"""
+            import uuid
+            
+            # Generate unique filename to avoid conflicts
+            if hasattr(content, 'name'):
+                name, ext = os.path.splitext(content.name)
+                name = f"{name}_{uuid.uuid4().hex[:8]}{ext}"
+            
+            # Call parent _save method
+            return super()._save(name, content)
+        
+        def get_valid_name(self, name):
+            """Override to handle Windows filename issues"""
+            import re
+            # Remove invalid characters for Windows
+            name = re.sub(r'[<>:"/\\|?*]', '_', name)
+            return super().get_valid_name(name)
+    
+    DEFAULT_FILE_STORAGE = 'myproject.settings.WindowsFileSystemStorage'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

@@ -6,7 +6,7 @@ from .models import (
     County, Agent, Landlord, Amenity, Property, PropertyMedia, Inquiry, Testimonial, 
     ManagementRequest, PropertyViewing, Tenant, Lease, Payment, 
     MaintenanceRequest as TenantMaintenanceRequest, TenantDocument, Message,
-    TenantService
+    TenantService, TeamMember
 )
 
 
@@ -210,7 +210,7 @@ class PropertyAdmin(admin.ModelAdmin):
     list_filter = [
         'property_type', 'county', 'is_verified', 'bedrooms', 'bathrooms', 'created_at'
     ]
-    search_fields = ['title', 'description', 'county__name']
+    search_fields = ['title', 'description', 'county__name', 'town']
     list_editable = ['is_verified']
     readonly_fields = ['created_at', 'media_count']
     inlines = [PropertyMediaInline]
@@ -224,7 +224,7 @@ class PropertyAdmin(admin.ModelAdmin):
             'fields': ('price', 'area', 'bedrooms', 'bathrooms', 'bathtubs', 'washrooms', 'parking_slots')
         }),
         ('Location', {
-            'fields': ('county',)
+            'fields': ('county', 'town')
         }),
         ('Media & Verification', {
             'fields': ('is_verified', 'virtual_tour_url', 'video_tour', 'media_count')
@@ -248,7 +248,6 @@ class PropertyAdmin(admin.ModelAdmin):
         else:
             return format_html('<span style="color: green;">{} files</span>', count)
     media_count.short_description = 'Media Files'
-    media_count.admin_order_field = 'media__count'
     
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -466,29 +465,85 @@ class AmenityAdmin(admin.ModelAdmin):
 
 @admin.register(ManagementRequest)
 class ManagementRequestAdmin(admin.ModelAdmin):
+    """Enhanced admin interface for property management requests"""
     list_display = [
-        'landlord_name', 'landlord_contact', 'property', 'rent_amount', 'status', 'created_at'
+        'request_id', 'landlord_info', 'property_info', 'rent_amount', 
+        'status_badge', 'created_at', 'actions_column'
     ]
-    list_filter = ['status', 'created_at']
-    search_fields = ['landlord_name', 'landlord_contact', 'property__title']
-    list_editable = ['status']
-    readonly_fields = ['created_at']
+    list_filter = ['status', 'created_at', 'property__county']
+    search_fields = ['landlord_name', 'landlord_contact', 'property__title', 'property__county__name']
+    readonly_fields = ['created_at', 'request_id']
+    ordering = ['-created_at']
+    list_per_page = 25
     
     fieldsets = (
+        ('Request Information', {
+            'fields': ('request_id', 'status', 'created_at')
+        }),
         ('Landlord Information', {
             'fields': ('landlord_name', 'landlord_contact')
         }),
         ('Property Details', {
             'fields': ('property', 'rent_amount', 'service_terms')
         }),
-        ('Status', {
-            'fields': ('status',)
-        }),
-        ('Timestamps', {
-            'fields': ('created_at',),
-            'classes': ('collapse',)
-        }),
     )
+    
+    actions = ['approve_requests', 'mark_pending']
+    
+    def request_id(self, obj):
+        """Display request ID"""
+        return f"MR-{obj.id:04d}"
+    request_id.short_description = 'Request ID'
+    
+    def landlord_info(self, obj):
+        """Display landlord information with contact"""
+        return format_html(
+            '<strong>{}</strong><br><small class="text-muted">📞 {}</small>',
+            obj.landlord_name,
+            obj.landlord_contact
+        )
+    landlord_info.short_description = 'Landlord'
+    
+    def property_info(self, obj):
+        """Display property information"""
+        return format_html(
+            '<strong>{}</strong><br><small class="text-muted">📍 {}{}</small>',
+            obj.property.title,
+            obj.property.county.name,
+            f', {obj.property.town}' if obj.property.town else ''
+        )
+    property_info.short_description = 'Property'
+    
+    def status_badge(self, obj):
+        """Display status as colored badge"""
+        if obj.status == 'approved':
+            return format_html(
+                '<span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-weight: 600;">✓ APPROVED</span>'
+            )
+        return format_html(
+            '<span style="background: #f59e0b; color: white; padding: 4px 12px; border-radius: 12px; font-weight: 600;">⏳ PENDING</span>'
+        )
+    status_badge.short_description = 'Status'
+    
+    def actions_column(self, obj):
+        """Display action buttons"""
+        return format_html(
+            '<a href="{}" class="btn btn-sm btn-outline-primary">View Property</a>',
+            f'/admin/listings/property/{obj.property.id}/change/'
+        )
+    actions_column.short_description = 'Actions'
+    
+    def approve_requests(self, request, queryset):
+        """Approve selected requests"""
+        updated = queryset.update(status='approved')
+        self.message_user(request, f'{updated} management request(s) approved.')
+    approve_requests.short_description = "✓ Approve selected requests"
+    
+    def mark_pending(self, request, queryset):
+        """Mark selected requests as pending"""
+        updated = queryset.update(status='pending')
+        self.message_user(request, f'{updated} management request(s) marked as pending.')
+    mark_pending.short_description = "⏳ Mark as pending"
 
 
 @admin.register(PropertyViewing)
@@ -1158,4 +1213,60 @@ class TenantServiceAdmin(admin.ModelAdmin):
         updated = queryset.update(is_featured=False)
         self.message_user(request, f'{updated} service(s) unmarked as featured.')
     unmark_as_featured.short_description = "Remove Featured Status"
+
+
+@admin.register(TeamMember)
+class TeamMemberAdmin(admin.ModelAdmin):
+    """Admin interface for team members"""
+    list_display = [
+        'photo_preview', 'name', 'title', 'order', 'is_active', 'created_at'
+    ]
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['name', 'title', 'bio']
+    list_editable = ['order', 'is_active']
+    readonly_fields = ['created_at', 'updated_at']
+    ordering = ['order', 'name']
+    list_per_page = 20
+    
+    fieldsets = (
+        ('Team Member Information', {
+            'fields': ('name', 'title', 'bio')
+        }),
+        ('Photo', {
+            'fields': ('photo',),
+            'description': 'Upload a square photo (120x120px recommended for best display)'
+        }),
+        ('Display Settings', {
+            'fields': ('order', 'is_active'),
+            'description': 'Order: 0 = first, 1 = second, etc.'
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def photo_preview(self, obj):
+        """Show a preview of the team member photo"""
+        if obj.photo:
+            return format_html(
+                '<img src="{}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 2px solid #C9A227;" />',
+                obj.photo.url
+            )
+        return "No photo"
+    photo_preview.short_description = 'Photo'
+    
+    actions = ['activate_members', 'deactivate_members']
+    
+    def activate_members(self, request, queryset):
+        """Activate selected team members"""
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f'✓ {updated} team member(s) activated.')
+    activate_members.short_description = "✓ Activate Selected Members"
+    
+    def deactivate_members(self, request, queryset):
+        """Deactivate selected team members"""
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f'✗ {updated} team member(s) deactivated.')
+    deactivate_members.short_description = "✗ Deactivate Selected Members"
 

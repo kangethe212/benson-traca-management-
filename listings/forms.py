@@ -34,9 +34,20 @@ class PropertyForm(forms.ModelForm):
             elif field_name == 'is_verified':
                 field.widget.attrs.update({'class': 'form-check-input'})
         
-        # Make county field required
+        # Configure county dropdown
         self.fields['county'].required = True
         self.fields['county'].queryset = County.objects.filter(is_active=True)
+        self.fields['county'].widget.attrs.update({
+            'class': 'form-select',
+            'placeholder': 'Select County'
+        })
+        
+        # Configure town field
+        self.fields['town'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Enter town or area (e.g., Westlands, Karen, etc.)'
+        })
+        self.fields['town'].help_text = "Enter the specific town or area within the county"
         
         # Add help text
         self.fields['price'].help_text = "Price in Kenyan Shillings (KSh)"
@@ -81,9 +92,24 @@ class ManagementRequestForm(forms.ModelForm):
         choices=Property.PROPERTY_TYPES,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
-    county = forms.ModelChoiceField(
-        queryset=County.objects.filter(is_active=True),
-        widget=forms.Select(attrs={'class': 'form-control'})
+    county = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Type county name (e.g., Nairobi, Mombasa, Kisumu, etc.)',
+            'autocomplete': 'off'
+        }),
+        help_text="Enter your county name"
+    )
+    town = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter town or area (e.g., Westlands, Karen, Nyali, etc.)'
+        }),
+        help_text="Specific town or area within the county"
     )
     property_images = forms.FileField(
         required=False,
@@ -99,7 +125,8 @@ class ManagementRequestForm(forms.ModelForm):
     class Meta:
         model = ManagementRequest
         fields = [
-            'landlord_name', 'landlord_contact', 'rent_amount', 'service_terms'
+            'landlord_name', 'landlord_contact', 'rent_amount', 'service_terms',
+            'property_type', 'county', 'town', 'property_images', 'property_videos'
         ]
         widgets = {
             'landlord_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your full name'}),
@@ -207,11 +234,14 @@ class PropertySearchForm(forms.Form):
         })
     )
     
-    county = forms.ModelChoiceField(
-        queryset=County.objects.filter(is_active=True),
+    county = forms.CharField(
+        max_length=100,
         required=False,
-        empty_label="All Counties",
-        widget=forms.Select(attrs={'class': 'form-select'})
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Type county name (e.g., Nairobi, Mombasa, Kisumu, etc.)',
+            'autocomplete': 'off'
+        })
     )
     
     property_type = forms.ChoiceField(
