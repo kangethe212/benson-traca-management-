@@ -165,6 +165,13 @@
                 </p>
                 {% endif %}
                 
+                {% if property.parking_slots %}
+                <p class="mb-2">
+                    <i class="fas fa-car text-secondary me-2"></i>
+                    {{ property.parking_slots }} Parking Space{{ property.parking_slots|pluralize }}
+                </p>
+                {% endif %}
+                
                 <hr>
                 
                 <div class="info-box">

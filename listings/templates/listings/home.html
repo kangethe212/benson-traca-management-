@@ -981,6 +981,7 @@
                         <div class="text-muted">
                             {% if property.bedrooms %}<i class="fas fa-bed me-1"></i>{{ property.bedrooms }} bed{% endif %}
                             {% if property.bathrooms %}<i class="fas fa-bath me-2 ms-2"></i>{{ property.bathrooms }} bath{% endif %}
+                            {% if property.parking_slots %}<i class="fas fa-car me-2 ms-2"></i>{{ property.parking_slots }} car{% endif %}
                         </div>
                     </div>
                     <a href="{% url 'listings:property_detail' property.pk %}" class="btn w-100" style="background: #FF1493; color: white; border: none; padding: 12px; font-weight: 600;">
