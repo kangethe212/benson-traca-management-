@@ -190,10 +190,10 @@ def property_detail(request, pk):
     else:
         form = InquiryForm()
     
-    # Get related properties (same county, different property)
+    # Get related properties (same county, same property type, exclude current property)
     related_properties = Property.objects.filter(
         county=property_obj.county,
-        property_type__in=['sale', 'rent']
+        property_type=property_obj.property_type
     ).exclude(pk=pk).select_related('county').prefetch_related('media')[:4]
     
     # Get property images for gallery
