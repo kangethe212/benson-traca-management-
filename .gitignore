@@ -245,3 +245,8 @@ node_modules/
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-testdb.sqlite3 
 db.sqlite3 
+
+# Local DB and backups
+db.sqlite3
+removed_sensitive_backup_*
+
