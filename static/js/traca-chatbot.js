@@ -759,7 +759,7 @@ class TracaChatbot {
                 company: "Traca Management Services Ltd:\n\n🏢 ESTABLISHED: 2004 (Over 20 years of experience)\n📍 HEADQUARTERS: Nairobi, Kenya\n🌍 COVERAGE: All 47 counties in Kenya\n👥 TEAM: Professional agents and property managers\n🏆 REPUTATION: Trusted by thousands of clients\n\nOur mission: To provide exceptional property management and real estate services across Kenya.\n\nWe specialize in:\n• Residential and commercial property management\n• Property sales and rentals\n• Investment property consulting\n• Market analysis and valuations\n• Legal compliance and documentation\n\nWhy choose us:\n✅ 20+ years of experience\n✅ Licensed and insured\n✅ 24/7 customer support\n✅ Transparent pricing\n✅ Professional team",
                 
                 // Fallback
-                fallback: "I'm not sure I understood that. Could you please rephrase your question? I'm here to help with information about:\n\n🏠 Property sales and rentals\n🏢 Property management services\n💰 Rent collection and tenant management\n🔧 Maintenance and repairs\n📊 Marketing and advertising\n📋 Property inspections\n💼 Landlord advisory services\n📞 Contact information\n\nFeel free to ask me anything else! What would you like to know more about?"
+                fallback: "I'm not sure I understood that. Could you please rephrase your question? I'm here to help with information about:\n\n🏠 Property sales and rentals\n🏢 Property management services\n💰 Rent collection and tenant management\n🔧 Maintenance and repairs\n📊 Marketing and advertising\n📋 Property inspections\n💼 Company advisory services\n📞 Contact information\n\nFeel free to ask me anything else! What would you like to know more about?"
             },
             sw: {
                 // Core Services

@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Services - TRACA Management{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #003366 0%, #1a4d73 100%);
+    color: white;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('{% static "images/hero-bg.jpg" %}') center/cover;
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.services-section {
+    padding: 80px 0;
+    background: #f8f9fa;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.service-card {
+    background: white;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.service-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+}
+
+.service-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.service-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.service-features {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+}
+
+.service-features li {
+    padding: 0.5rem 0;
+    color: #555;
+}
+
+.service-features li::before {
+    content: '✓';
+    color: #FF1493;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.cta-section {
+    background: linear-gradient(135deg, #003366 0%, #1a4d73 100%);
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.cta-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.btn-cta {
+    background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 30px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255,20,147,0.3);
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .cta-title {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="hero-title">Our Services</h1>
+                    <p class="hero-subtitle">Comprehensive Real Estate Solutions for Kenya's Property Market</p>
+                    <p class="lead">With over 20 years of experience, TRACA Management provides exceptional property services tailored to meet your specific needs.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">What We Offer</h2>
+            <p class="section-subtitle">Professional services designed to meet all your real estate needs</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Property Sales -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-card">
+                    <div class="card-body p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <h3 class="service-title">Property Sales</h3>
+                        <p class="service-description">Expert guidance for buying and selling properties across Kenya's major counties.</p>
+                        <ul class="service-features">
+                            <li>Market analysis and pricing</li>
+                            <li>Property valuation services</li>
+                            <li>Legal documentation support</li>
+                            <li>Negotiation assistance</li>
+                        </ul>
+                        <a href="{% url 'listings:properties_list' %}" class="btn btn-primary w-100">
+                            Browse Properties <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Property Rentals -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-card">
+                    <div class="card-body p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h3 class="service-title">Property Rentals</h3>
+                        <p class="service-description">Comprehensive rental services for tenants and landlords in prime locations.</p>
+                        <ul class="service-features">
+                            <li>Tenant screening services</li>
+                            <li>Rental agreement preparation</li>
+                            <li>Property viewing coordination</li>
+                            <li>Rent collection management</li>
+                        </ul>
+                        <a href="{% url 'listings:properties_list' %}" class="btn btn-primary w-100">
+                            Find Rentals <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Property Management -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-card">
+                    <div class="card-body p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <h3 class="service-title">Property Management</h3>
+                        <p class="service-description">Full-service property management for residential and commercial properties.</p>
+                        <ul class="service-features">
+                            <li>24/7 maintenance support</li>
+                            <li>Rent collection and accounting</li>
+                            <li>Tenant relationship management</li>
+                            <li>Property inspections</li>
+                        </ul>
+                        <a href="{% url 'admin:index' %}" class="btn btn-primary w-100">
+                            Manage Properties <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Investment Advisory -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-card">
+                    <div class="card-body p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="service-title">Investment Advisory</h3>
+                        <p class="service-description">Expert advice on real estate investment opportunities across Kenya.</p>
+                        <ul class="service-features">
+                            <li>Investment portfolio analysis</li>
+                            <li>ROI optimization strategies</li>
+                            <li>Market trend analysis</li>
+                            <li>Risk assessment services</li>
+                        </ul>
+                        <a href="{% url 'listings:contact' %}" class="btn btn-primary w-100">
+                            Get Consultation <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Legal Services -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-card">
+                    <div class="card-body p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3 class="service-title">Legal Services</h3>
+                        <p class="service-description">Comprehensive legal support for all real estate transactions.</p>
+                        <ul class="service-features">
+                            <li>Title deed verification</li>
+                            <li>Contract review and drafting</li>
+                            <li>Dispute resolution</li>
+                            <li>Compliance management</li>
+                        </ul>
+                        <a href="{% url 'listings:contact' %}" class="btn btn-primary w-100">
+                            Legal Support <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Valuation Services -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-card">
+                    <div class="card-body p-4">
+                        <div class="service-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <h3 class="service-title">Property Valuation</h3>
+                        <p class="service-description">Professional property valuation services for accurate market pricing.</p>
+                        <ul class="service-features">
+                            <li>Market value assessment</li>
+                            <li>Insurance valuations</li>
+                            <li>Tax assessment support</li>
+                            <li>Investment valuation</li>
+                        </ul>
+                        <a href="{% url 'listings:contact' %}" class="btn btn-primary w-100">
+                            Get Valuation <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="cta-title">Ready to Get Started?</h2>
+                <p class="cta-subtitle">Let us help you find the perfect property or manage your real estate portfolio</p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{% url 'listings:contact' %}" class="btn btn-cta btn-lg">
+                        <i class="fas fa-phone me-2"></i>Contact Us
+                    </a>
+                    <a href="{% url 'listings:properties_list' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Browse Properties
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

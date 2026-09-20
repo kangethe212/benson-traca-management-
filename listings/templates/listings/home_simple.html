@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - TRACA Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #003366 0%, #1a4d73 100%);
+        color: white;
+        padding: 80px 0 60px;
+        margin-bottom: 60px;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .featured-section {
+        padding: 60px 0;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #003366;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .property-card {
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .property-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .property-card .card-body {
+        padding: 2rem;
+    }
+
+    .property-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #003366;
+        margin-bottom: 1rem;
+    }
+
+    .property-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #FF1493;
+        margin-bottom: 0.5rem;
+    }
+
+    .property-location {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .property-details {
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(255, 20, 147, 0.3);
+    }
+
+    .quick-links-section {
+        background: #f8f9fa;
+        padding: 60px 0;
+    }
+
+    .quick-link-card {
+        background: white;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .quick-link-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .quick-link-icon {
+        font-size: 3rem;
+        color: #003366;
+        margin-bottom: 1rem;
+    }
+
+    .quick-link-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .btn-outline-custom {
+        border: 2px solid #003366;
+        color: #003366;
+        padding: 10px 25px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-custom:hover {
+        background: #003366;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .admin-section {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+
+    .admin-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .admin-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .btn-admin {
+        background: white;
+        color: #28a745;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-admin:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .stats-badge {
+        background: #FF1493;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1 class="hero-title">TRACA Management</h1>
+                <p class="hero-subtitle">Your Trusted Partner in Kenyan Real Estate</p>
+                <p class="lead mb-4">Professional property management, sales, and rental services across Kenya's major
+                    counties. Discover exceptional properties and comprehensive management solutions.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'listings:properties_list' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Browse Properties
+                    </a>
+                    <a href="{% url 'listings:contact' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-phone me-2"></i>Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Properties Section -->
+<section class="featured-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Featured Properties</h2>
+            <p class="section-subtitle">Handpicked premium properties for sale and rent</p>
+        </div>
+
+        {% if featured_properties %}
+        <div class="row g-4">
+            {% for property in featured_properties %}
+            <div class="col-lg-6">
+                <div class="card property-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="property-title">{{ property.title }}</h5>
+                            {% if property.is_verified %}
+                            <span class="stats-badge">Verified</span>
+                            {% endif %}
+                        </div>
+                        <div class="property-price">KSh {{ property.price }}</div>
+
+                        <div class="property-location">
+                            <i class="fas fa-map-marker-alt me-2"></i>{{ property.county.name }}
+                        </div>
+
+                        <div class="property-details">
+                            {% if property.bedrooms %}<i class="fas fa-bed me-2"></i>{{ property.bedrooms }} Bedrooms{%
+                            endif %}
+                            {% if property.bathrooms %}<span class="ms-3"><i class="fas fa-bath me-2"></i>{{
+                                property.bathrooms }} Bathrooms</span>{% endif %}
+                            {% if property.parking_slots %}<span class="ms-3"><i class="fas fa-car me-2"></i>{{
+                                property.parking_slots }} Parking</span>{% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if property.property_type == 'sale' %}
+                            <span class="badge bg-success">
+                                {{ property.get_property_type_display }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-info">
+                                {{ property.get_property_type_display }}
+                            </span>
+                            {% endif %}
+                            <a href="{% url 'listings:properties_list' %}" class="btn btn-primary-custom btn-sm">
+                                View Details <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="alert alert-info border-0 shadow-sm">
+                <h4 class="mb-3"><i class="fas fa-home me-2"></i>Properties Coming Soon</h4>
+                <p class="mb-0">We're preparing amazing properties for you. Check back soon!</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="text-center mt-5">
+            <a href="{% url 'listings:properties_list' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-th me-2"></i>View All Properties
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Links Section -->
+<section class="quick-links-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Quick Links</h2>
+            <p class="section-subtitle">Everything you need at your fingertips</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h5 class="quick-link-title">Properties</h5>
+                    <p class="text-muted mb-3">Browse our extensive property portfolio</p>
+                    <a href="{% url 'listings:properties_list' %}" class="btn btn-outline-custom">
+                        Explore <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h5 class="quick-link-title">Services</h5>
+                    <p class="text-muted mb-3">Comprehensive real estate solutions</p>
+                    <a href="{% url 'listings:services' %}" class="btn btn-outline-custom">
+                        Learn More <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h5 class="quick-link-title">About Us</h5>
+                    <p class="text-muted mb-3">20+ years of excellence in real estate</p>
+                    <a href="{% url 'listings:about' %}" class="btn btn-outline-custom">
+                        Our Story <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="quick-link-card">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h5 class="quick-link-title">Contact</h5>
+                    <p class="text-muted mb-3">Get in touch with our expert team</p>
+                    <a href="{% url 'listings:contact' %}" class="btn btn-outline-custom">
+                        Contact Us <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Admin Section -->
+{% if user.is_staff %}
+<section class="admin-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="admin-title">Admin Access</h2>
+                <p class="admin-subtitle">Manage your properties, users, and business operations</p>
+                <a href="{% url 'admin:index' %}" class="btn btn-admin btn-lg">
+                    <i class="fas fa-cog me-2"></i>Go to Admin Panel
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

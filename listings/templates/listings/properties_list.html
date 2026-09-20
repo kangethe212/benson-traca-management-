@@ -6,6 +6,13 @@
 
 {% block extra_css %}
 <style>
+:root {
+    --properties-hero-title: clamp(2.2rem, 5vw, 4.8rem);
+    --properties-page-title: clamp(1.8rem, 3vw, 2.8rem);
+    --properties-card-title: clamp(1.05rem, 2vw, 1.45rem);
+    --properties-subtitle: clamp(1rem, 2vw, 1.4rem);
+}
+
 /* Animated Background for Properties Page */
 .hero-background {
     position: relative;
@@ -58,16 +65,19 @@
 }
 
 .hero-title {
-    font-size: 3.5rem;
-    font-weight: 700;
+    font-size: var(--properties-hero-title);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
     margin-bottom: 1rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .hero-subtitle {
-    font-size: 1.3rem;
+    font-size: var(--properties-subtitle);
+    line-height: 1.5;
     margin-bottom: 2rem;
-    opacity: 0.9;
+    opacity: 0.95;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
@@ -168,6 +178,68 @@
     font-weight: 500;
 }
 
+.listing-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.04);
+}
+
+.view-toggle {
+    display: inline-flex;
+    background: #f3f6fb;
+    border-radius: 999px;
+    padding: 0.25rem;
+    gap: 0.25rem;
+}
+
+.view-toggle .toggle-btn {
+    border: none;
+    background: transparent;
+    color: #44536d;
+    font-weight: 600;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+}
+
+.view-toggle .toggle-btn.active {
+    background: linear-gradient(135deg, #003366 0%, #1a4d73 100%);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(0,51,102,0.2);
+}
+
+.save-property-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    color: #495057;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.save-property-btn:hover,
+.save-property-btn.saved {
+    background: rgba(255,20,147,0.95);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
 .county-suggestions {
     position: absolute;
     top: 100%;
@@ -259,12 +331,10 @@
     }
     
     .hero-title {
-        font-size: 2.5rem;
         margin-bottom: 0.75rem;
     }
     
     .hero-subtitle {
-        font-size: 1.1rem;
         margin-bottom: 1.5rem;
     }
     
@@ -282,7 +352,8 @@
     }
     
     .property-card .card-title {
-        font-size: 1.1rem;
+        font-size: var(--properties-card-title);
+        line-height: 1.3;
         margin-bottom: 0.5rem;
     }
     
@@ -308,14 +379,6 @@
 }
 
 @media (max-width: 480px) {
-    .hero-title {
-        font-size: 2rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1rem;
-    }
-    
     .hero-content .btn {
         padding: 0.75rem 1.25rem;
         font-size: 0.95rem;
@@ -350,14 +413,6 @@
 }
 
 @media (max-width: 360px) {
-    .hero-title {
-        font-size: 1.75rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 0.95rem;
-    }
-    
     .property-card .card-img-top {
         height: 160px;
     }
@@ -570,8 +625,16 @@
 
         <!-- Property Listings -->
         <div class="col-lg-8">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="listing-toolbar">
                 <h4 class="mb-0">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_results }} results</h4>
+                <div class="view-toggle" aria-label="View toggle">
+                    <button type="button" class="toggle-btn active" data-view="list">
+                        <i class="fas fa-list me-1"></i>List View
+                    </button>
+                    <button type="button" class="toggle-btn" data-view="map">
+                        <i class="fas fa-map me-1"></i>Map View
+                    </button>
+                </div>
                 <div class="dropdown sort-dropdown">
                     <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="fas fa-sort me-2"></i>Sort by
@@ -592,11 +655,10 @@
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card card-brand h-100 shadow-sm property-card">
                             <div class="position-relative">
-                                {% if property.main_image %}
-                                    <img src="{{ property.main_image.file.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 220px; object-fit: cover;">
-                                {% else %}
-                                    <img src="{% static 'images/default_property.jpg' %}" class="card-img-top" alt="No Image" style="height: 220px; object-fit: cover;">
-                                {% endif %}
+                                <button class="save-property-btn" type="button" aria-label="Save property" title="Save property">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <img src="{{ property.main_image_url }}" class="card-img-top" alt="{{ property.title }}" style="height: 220px; object-fit: cover;" onerror="this.onerror=null; this.src='/static/images/default_property.jpg';">
                                 <div class="position-absolute top-0 start-0 m-2">
                                     <span class="badge bg-{% if property.property_type == 'sale' %}success{% else %}primary{% endif %}">
                                         {{ property.get_property_type_display }}
@@ -664,7 +726,7 @@
                                     <div class="d-flex gap-2">
                                         <button class="btn btn-outline-secondary flex-fill" 
                                                 data-property-id="{{ property.pk }}"
-                                                onclick="addToComparison({{ property.pk }}, '{{ property.title|escapejs }}', '{{ property.price }}', '{% if property.main_image %}{{ property.main_image.file.url }}{% else %}{% static 'images/default_property.jpg' %}{% endif %}', '{{ property.county.name }}')"
+                                                onclick="addToComparison({{ property.pk }}, '{{ property.title|escapejs }}', '{{ property.price }}', '{% if property.main_image and property.main_image.file %}{{ property.main_image.file.url }}{% else %}{% static 'images/default_property.jpg' %}{% endif %}', '{{ property.county.name }}')"
                                                 title="Add to comparison">
                                             <i class="fas fa-balance-scale"></i>
                                         </button>
@@ -880,6 +942,25 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedCard.classList.add('selected');
         }
     }
+
+    document.querySelectorAll('.save-property-btn').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const icon = this.querySelector('i');
+            const isSaved = this.classList.toggle('saved');
+            icon.classList.toggle('fas', isSaved);
+            icon.classList.toggle('far', !isSaved);
+            icon.classList.add('fa-heart');
+            this.setAttribute('title', isSaved ? 'Saved property' : 'Save property');
+        });
+    });
+
+    document.querySelectorAll('.toggle-btn').forEach(function (button) {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('.toggle-btn').forEach(function (item) {
+                item.classList.toggle('active', item === button);
+            });
+        });
+    });
 });
     
     // Smooth scrolling for hero button

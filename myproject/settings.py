@@ -59,8 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',  # Humanize template tags
     'rest_framework',  # Django REST Framework
     'django_filters',  # For API filtering
-    'listings',  # New listings app
-    'properties',  # Keep old app for reference
+    'listings',  # Active property marketplace app
 ]
 
 MIDDLEWARE = [
@@ -177,13 +176,13 @@ if platform.system() == 'Windows':
         def _save(self, name, content):
             """Override _save to handle Windows permissions gracefully"""
             import uuid
-            
-            # Generate unique filename to avoid conflicts
-            if hasattr(content, 'name'):
-                name, ext = os.path.splitext(content.name)
-                name = f"{name}_{uuid.uuid4().hex[:8]}{ext}"
-            
-            # Call parent _save method
+
+            # Always use basename so full source paths cannot escape MEDIA_ROOT
+            name = os.path.basename(name)
+            if hasattr(content, 'name') and content.name:
+                base, ext = os.path.splitext(os.path.basename(content.name))
+                name = f"{base}_{uuid.uuid4().hex[:8]}{ext}"
+
             return super()._save(name, content)
         
         def get_valid_name(self, name):
@@ -201,8 +200,8 @@ if platform.system() == 'Windows':
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication Settings
-LOGIN_URL = '/tenant/login/'
-LOGIN_REDIRECT_URL = '/tenant/dashboard/'
+LOGIN_URL = '/admin/login/'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # Django REST Framework Configuration
@@ -395,7 +394,7 @@ JAZZMIN_SETTINGS = {
     # UI Tweaks #
     #############
     # Relative paths to custom CSS/JS scripts (must be present in static files)
-    "custom_css": None,
+    "custom_css": "css/admin-custom.css",
     "custom_js": None,
     # Whether to link font from fonts.googleapis.com (use custom_css to supply font otherwise)
     "use_google_fonts_cdn": True,
@@ -423,15 +422,15 @@ JAZZMIN_UI_TWEAKS = {
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-primary",
-    "accent": "accent-primary",
-    "navbar": "navbar-primary navbar-dark",
-    "no_navbar_border": False,
-    "navbar_fixed": False,
+    "brand_colour": "navbar-light",
+    "accent": "accent-purple",
+    "navbar": "navbar-light navbar-purple",
+    "no_navbar_border": True,
+    "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": False,
-    "sidebar_fixed": False,
-    "sidebar": "sidebar-dark-primary",
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-purple",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": False,

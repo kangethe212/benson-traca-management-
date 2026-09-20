@@ -7,43 +7,97 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.cache import cache
 
-from .models import Property, County, Agent, Amenity, Testimonial, Inquiry, ManagementRequest, PropertyMedia, PropertyViewing, TeamMember
-from .forms import PropertyForm, InquiryForm, ContactForm, PropertySearchForm, ManagementRequestForm, PropertyViewingForm
-from .notifications import NotificationService
+from .models import Property, County, Agent, Amenity, Testimonial, Inquiry, PropertyMedia, PropertyViewing, TeamMember
+from .forms import PropertyForm, InquiryForm, ContactForm, PropertySearchForm, PropertyViewingForm
+from .notifications_enhanced import NotificationService
 from datetime import date, timedelta
+import json
+import time
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def _dbg(hypothesis_id, location, message, data=None):
+    """Lightweight debug helper: logs only when DEBUG=True and uses Django logging.
+
+    This avoids writing absolute-path files and prevents leaking data in production.
+    """
+    if not getattr(settings, 'DEBUG', False):
+        return
+
+    try:
+        payload = {
+            'sessionId': 'local',
+            'timestamp': int(time.time() * 1000),
+            'hypothesisId': hypothesis_id,
+            'location': location,
+            'message': message,
+            'data': data or {},
+            'runId': 'run-localhost',
+        }
+        logger.debug(json.dumps(payload))
+    except Exception:
+        # never raise from debug helper
+        pass
 
 
 def home(request):
-    """Homepage with featured properties and testimonials"""
-    # Get featured properties (sale and rent) - show up to 12
-    featured_properties = Property.objects.filter(
-        property_type__in=['sale', 'rent']
-    ).select_related('county').prefetch_related('media')[:12]
-    
-    # Get featured testimonials
-    featured_testimonials = Testimonial.objects.filter(
-        is_featured=True, 
-        is_approved=True
-    ).select_related('property')[:3]
+    """Simple homepage with sample data"""
+    # #region agent log
+    _dbg('A', 'listings/views.py:home', 'home entered', {'path': request.path, 'method': request.method})
+    # #endregion
+    try:
+        # Get featured properties with simple query
+        featured_properties = Property.objects.filter(
+            property_type__in=['sale', 'rent'],
+            is_verified=True
+        ).select_related('county').prefetch_related('media')[:14]
+    except Exception as e:
+        print(f"Error getting properties: {e}")
+        featured_properties = []
+        # #region agent log
+        _dbg('A', 'listings/views.py:home', 'home featured query failed', {'error': str(e)})
+        # #endregion
     
     context = {
         'featured_properties': featured_properties,
-        'featured_testimonials': featured_testimonials,
         'year': timezone.now().year,
     }
-    return render(request, 'listings/home.html', context)
+    # #region agent log
+    _dbg('B', 'listings/views.py:home', 'home rendering', {
+        'template': 'listings/home_simple_clean.html',
+        'featured_count': len(list(featured_properties)) if featured_properties is not None else 0,
+    })
+    # #endregion
+    return render(request, 'listings/home_simple_clean.html', context)
 
 
 def properties_list(request):
     """Enhanced property listings page with advanced filters and professional features"""
     # Initialize search form
     search_form = PropertySearchForm(request.GET)
+    # #region agent log
+    _dbg('B', 'listings/views.py:properties_list', 'properties_list entered', {
+        'query': dict(request.GET),
+        'form_valid': search_form.is_valid(),
+    })
+    # #endregion
     
     # Start with base queryset - only sale and rent properties
     properties = Property.objects.filter(
-        property_type__in=['sale', 'rent']
+        property_type__in=['sale', 'rent'],
+        is_verified=True
     ).select_related('county').prefetch_related('media')
+    # #region agent log
+    _dbg('B', 'listings/views.py:properties_list', 'verified filter applied', {
+        'verified_count': properties.count(),
+        'all_count': Property.objects.filter(property_type__in=['sale', 'rent']).count(),
+    })
+    # #endregion
     
     # Check for county filter from URL parameter (from home page search)
     county_name = request.GET.get('county')
@@ -59,6 +113,7 @@ def properties_list(request):
             properties = properties.filter(
                 Q(title__icontains=keyword) | 
                 Q(description__icontains=keyword) |
+                Q(town__icontains=keyword) |
                 Q(county__name__icontains=keyword) |
                 Q(county__main_towns__icontains=keyword)
             )
@@ -103,242 +158,233 @@ def properties_list(request):
         pet_friendly = search_form.cleaned_data.get('pet_friendly')
         if pet_friendly:
             properties = properties.filter(pet_friendly=True)
+        
+        near_school = search_form.cleaned_data.get('near_school')
+        if near_school:
+            properties = properties.filter(near_school=True)
     
-    # Advanced sorting options
-    sort_by = request.GET.get('sort', 'newest')
+    # Sort results
+    sort_by = request.GET.get('sort', '-created_at')
     if sort_by == 'price_low':
         properties = properties.order_by('price')
     elif sort_by == 'price_high':
         properties = properties.order_by('-price')
-    elif sort_by == 'verified':
-        properties = properties.order_by('-is_verified', '-created_at')
     elif sort_by == 'bedrooms':
-        properties = properties.order_by('-bedrooms', '-created_at')
-    else:  # newest (default)
-        properties = properties.order_by('-is_verified', '-created_at')
-    
-    # Get total count before pagination
-    total_results = properties.count()
+        properties = properties.order_by('-bedrooms')
+    elif sort_by == 'area':
+        properties = properties.order_by('-area')
+    else:
+        properties = properties.order_by('-created_at')
     
     # Pagination
     paginator = Paginator(properties, 12)  # 12 properties per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    # Get filter options for form
-    counties = County.objects.filter(is_active=True).order_by('name')
-    property_types = Property.PROPERTY_TYPES
-    
-    # Get property statistics for display
-    stats = {
-        'total_properties': total_results,
-        'sale_properties': properties.filter(property_type='sale').count(),
-        'rent_properties': properties.filter(property_type='rent').count(),
-        'verified_properties': properties.filter(is_verified=True).count(),
-    }
+    page = request.GET.get('page')
+    properties_page = paginator.get_page(page)
     
     context = {
-        'page_obj': page_obj,
+        'properties': properties_page,
         'search_form': search_form,
-        'counties': counties,
-        'property_types': property_types,
-        'total_results': total_results,
-        'stats': stats,
-        'current_sort': sort_by,
+        'is_paginated': paginator.num_pages > 1,
+        'page_obj': properties_page,
         'year': timezone.now().year,
     }
+    
     return render(request, 'listings/properties_list.html', context)
 
 
 def property_detail(request, pk):
-    """Enhanced property detail view with professional features"""
-    property_obj = get_object_or_404(
-        Property.objects.select_related('county').prefetch_related('media'),
-        pk=pk
-    )
-    
-    # Handle inquiry form submission
+    """Enhanced property detail page with performance optimizations"""
+    # #region agent log
+    _dbg('D', 'listings/views.py:property_detail', 'property_detail entered', {
+        'pk': pk,
+        'method': request.method,
+        'path': request.path,
+        'has_post': bool(request.POST),
+        'post_keys': list(request.POST.keys())[:12] if request.method == 'POST' else [],
+    })
+    # #endregion
     if request.method == 'POST':
-        form = InquiryForm(request.POST)
-        if form.is_valid():
-            inquiry = form.save(commit=False)
-            inquiry.property = property_obj
-            inquiry.save()
-            
-            # Send email notification to admins
-            try:
-                mail_admins(
-                    subject=f"New Inquiry for {property_obj.title}",
-                    message=f"""
-                    New inquiry received:
-                    
-                    Property: {property_obj.title}
-                    From: {inquiry.name} ({inquiry.email})
-                    Phone: {inquiry.phone}
-                    Type: {inquiry.get_inquiry_type_display()}
-                    
-                    Message:
-                    {inquiry.message}
-                    """,
-                    fail_silently=True
-                )
-            except Exception:
-                pass  # Don't fail if email sending fails
-            
-            messages.success(request, 'Thank you for your inquiry! We will contact you soon.')
-            return redirect('listings:property_detail', pk=pk)
-    else:
-        form = InquiryForm()
+        return property_inquiry(request, pk)
+    # Cache property lookup for 15 minutes
+    cache_key = f'property_detail_{pk}'
+    property = cache.get(cache_key)
     
-    # Get related properties (same county, same property type, exclude current property)
-    related_properties = Property.objects.filter(
-        county=property_obj.county,
-        property_type=property_obj.property_type
-    ).exclude(pk=pk).select_related('county').prefetch_related('media')[:4]
+    if property is None:
+        property = get_object_or_404(
+            Property.objects.select_related('county').prefetch_related(
+                'media', 'amenities', 'inquiries'
+            ),
+            pk=pk, property_type__in=['sale', 'rent']
+        )
+        cache.set(cache_key, property, 900)  # 15 minutes
     
-    # Get property images for gallery
-    property_images = property_obj.media.filter(media_type='image').order_by('order', 'created_at')
-    main_image = property_images.first() if property_images.exists() else None
+    # Increment view count (with optimization)
+    increment_view_count(property)
     
-    # Calculate property features
+    # Get similar properties (cache for 30 minutes)
+    similar_cache_key = f'similar_properties_{pk}'
+    similar_properties = cache.get(similar_cache_key)
+    
+    if similar_properties is None:
+        similar_properties = Property.objects.filter(
+            property_type__in=['sale', 'rent'],
+            county=property.county,
+            is_verified=True
+        ).exclude(pk=pk).select_related('county').prefetch_related('media')[:6]
+        
+        cache.set(similar_cache_key, similar_properties, 1800)  # 30 minutes
+    
+    property_images = property.media.filter(
+        media_type='image'
+    ).exclude(file='').order_by('-is_primary', 'order', 'id')
+
     property_features = []
-    if property_obj.bedrooms:
-        property_features.append(f"{property_obj.bedrooms} Bedroom{'s' if property_obj.bedrooms > 1 else ''}")
-    if property_obj.bathrooms:
-        property_features.append(f"{property_obj.bathrooms} Bathroom{'s' if property_obj.bathrooms > 1 else ''}")
-    if property_obj.parking_slots:
-        property_features.append(f"{property_obj.parking_slots} Parking Space{'s' if property_obj.parking_slots > 1 else ''}")
-    if property_obj.area:
-        property_features.append(f"{property_obj.area} sq ft")
-    
-    # Get similar properties in same price range
-    from decimal import Decimal
-    price_range = Decimal(str(property_obj.price)) * Decimal('0.2') if property_obj.price else Decimal('0')
-    min_price = property_obj.price - price_range
-    max_price = property_obj.price + price_range
-    
-    similar_properties = Property.objects.filter(
-        property_type=property_obj.property_type,
-        price__gte=min_price,
-        price__lte=max_price
-    ).exclude(pk=pk).select_related('county').prefetch_related('media')[:3]
-    
+    if property.is_furnished:
+        property_features.append('Furnished')
+    if property.pet_friendly:
+        property_features.append('Pet Friendly')
+    if property.near_school:
+        property_features.append('Near School')
+
     context = {
-        'property': property_obj,
-        'form': form,
-        'related_properties': related_properties,
-        'similar_properties': similar_properties,
+        'property': property,
         'property_images': property_images,
-        'main_image': main_image,
         'property_features': property_features,
+        'similar_properties': similar_properties,
+        'related_properties': similar_properties,
+        'inquiry_form': InquiryForm(),
+        'form': InquiryForm(),
         'year': timezone.now().year,
     }
+    
     return render(request, 'listings/property_detail.html', context)
 
 
-def management_request(request):
-    """Property management request form (GET → form, POST → save ManagementRequest)"""
-    if request.method == 'POST':
-        form = ManagementRequestForm(request.POST, request.FILES)
-        print(f"Form is valid: {form.is_valid()}")
-        if not form.is_valid():
-            print(f"Form errors: {form.errors}")
-        if form.is_valid():
-            try:
-                # Get or create county from the county name
-                county_name = form.cleaned_data['county']
-                print(f"Creating county: {county_name}")
-                county_obj, created = County.objects.get_or_create(
-                    name=county_name,
-                    defaults={
-                        'slug': county_name.lower().replace(' ', '-'),
-                        'is_active': True
-                    }
-                )
-                print(f"County created: {created}, County: {county_obj}")
-                
-                # Create a property first
-                print("Creating property...")
-                property_obj = Property.objects.create(
-                    title=f"Property for Management - {form.cleaned_data['landlord_name']}",
-                    property_type=form.cleaned_data['property_type'],
-                    county=county_obj,
-                    town=form.cleaned_data.get('town', ''),
-                    description=form.cleaned_data['service_terms'],
-                    price=form.cleaned_data['rent_amount']
-                )
-                print(f"Property created: {property_obj.id}")
-                
-                # Create management request
-                print("Creating management request...")
-                mgmt_request = form.save(commit=False)
-                mgmt_request.property = property_obj
-                mgmt_request.save()
-                print(f"ManagementRequest created: {mgmt_request.id}")
-                
-                # Handle uploaded images
-                images = request.FILES.getlist('property_images')
-                print(f"Processing {len(images)} images...")
-                for i, image in enumerate(images):
-                    PropertyMedia.objects.create(
-                        property=property_obj,
-                        media_type='image',
-                        file=image,
-                        order=i,
-                        is_primary=(i == 0)  # First image is primary
-                    )
-                
-                # Handle uploaded videos
-                videos = request.FILES.getlist('property_videos')
-                print(f"Processing {len(videos)} videos...")
-                for i, video in enumerate(videos):
-                    PropertyMedia.objects.create(
-                        property=property_obj,
-                        media_type='video',
-                        file=video,
-                        order=i + len(images)
-                    )
-                
-                # Send email notification to admins
-                try:
-                    mail_admins(
-                        subject=f"New Property Management Request from {form.cleaned_data['landlord_name']}",
-                        message=f"""
-                        New property management request received:
-                        
-                        Landlord: {form.cleaned_data['landlord_name']}
-                        Contact: {form.cleaned_data['landlord_contact']}
-                        Property Type: {form.cleaned_data['property_type']}
-                        County: {form.cleaned_data['county']}
-                        Rent Amount: KSh {form.cleaned_data['rent_amount']:,.0f}
-                        
-                        Service Terms:
-                        {form.cleaned_data['service_terms']}
-                        """,
-                        fail_silently=True
-                    )
-                except Exception as e:
-                    print(f"Email error: {e}")
-                
-                messages.success(
-                    request, 
-                    'Your property management request has been submitted successfully! We will contact you within 24 hours.'
-                )
-                print("Redirecting to home...")
-                return redirect('listings:home')
-            except Exception as e:
-                print(f"Error in management request processing: {e}")
-                import traceback
-                traceback.print_exc()
-                messages.error(request, 'There was an error processing your request. Please try again.')
+def increment_view_count(property):
+    """Optimized view count increment"""
+    # Use cache to avoid frequent database writes
+    cache_key = f'property_views_{property.id}'
+    views = cache.get(cache_key, 0)
+    
+    if views >= 10:  # Write to database every 10 views
+        property.view_count = property.view_count + views
+        property.save(update_fields=['view_count'])
+        cache.set(cache_key, 0, 3600)  # Reset counter
     else:
-        form = ManagementRequestForm()
+        cache.set(cache_key, views + 1, 3600)  # Increment counter
+
+
+@require_http_methods(["GET"])
+def property_search_api(request):
+    """Public search suggestions used by the website search field."""
+    query = (request.GET.get('q') or '').strip()
+    county = (request.GET.get('county') or '').strip()
+    property_type = (request.GET.get('type') or '').strip()
+    # #region agent log
+    _dbg('H1', 'listings/views.py:property_search_api', 'search api entered', {
+        'query': query,
+        'county': county,
+        'property_type': property_type,
+        'has_published': hasattr(Property, 'published'),
+    })
+    # #endregion
+    if len(query) < 2 and not county and not property_type:
+        return JsonResponse({'suggestions': [], 'properties': []})
+
+    properties = Property.objects.filter(
+        property_type__in=['sale', 'rent'],
+        is_verified=True,
+    ).select_related('county').prefetch_related('media')
+    if query:
+        properties = properties.filter(
+            Q(title__icontains=query)
+            | Q(description__icontains=query)
+            | Q(town__icontains=query)
+            | Q(county__name__icontains=query)
+        )
+    if county:
+        properties = properties.filter(
+            Q(county__name__icontains=county) | Q(county__slug__icontains=county)
+        )
+    if property_type:
+        properties = properties.filter(property_type=property_type)
+
+    suggestions = []
+    for prop in properties[:10]:
+        suggestions.append({
+            'id': prop.id,
+            'title': prop.title,
+            'county': prop.county.name,
+            'price': float(prop.price) if prop.price is not None else None,
+            'bedrooms': prop.bedrooms,
+            'bathrooms': prop.bathrooms,
+            'area': float(prop.area) if prop.area is not None else None,
+            'image_url': prop.main_image_url,
+            'url': prop.get_absolute_url(),
+            'type': 'property',
+        })
+    # #region agent log
+    _dbg('H1', 'listings/views.py:property_search_api', 'search api success', {
+        'count': len(suggestions),
+        'sample_url': suggestions[0]['url'] if suggestions else None,
+    })
+    # #endregion
+    return JsonResponse({'suggestions': suggestions, 'properties': suggestions})
+
+
+@require_http_methods(["POST"])
+def property_inquiry(request, pk):
+    """Handle property inquiry with enhanced validation and notifications"""
+    # #region agent log
+    _dbg('D', 'listings/views.py:property_inquiry', 'property_inquiry entered', {
+        'pk': pk,
+        'post_keys': list(request.POST.keys())[:12],
+    })
+    # #endregion
+    property = get_object_or_404(Property, pk=pk)
+    
+    form = InquiryForm(request.POST)
+    if form.is_valid():
+        inquiry = form.save(commit=False)
+        inquiry.property = property
+        inquiry.save()
+        
+        # Send notifications asynchronously
+        try:
+            NotificationService.send_property_inquiry_notification(inquiry)
+            messages.success(
+                request,
+                'Thank you. We have received your enquiry and a colleague will be in touch shortly.'
+            )
+        except Exception as e:
+            messages.warning(
+                request,
+                'We have received your enquiry. If you do not hear from us soon, please call or WhatsApp us.'
+            )
+        
+        # #region agent log
+        _dbg('D', 'listings/views.py:property_inquiry', 'inquiry saved', {'pk': pk, 'inquiry_id': inquiry.id})
+        # #endregion
+        return redirect('listings:property_detail', pk=pk)
+    else:
+        messages.error(request, 'Please check the highlighted fields and try again.')
+    
+    # Get similar properties
+    similar_properties = Property.objects.filter(
+        property_type__in=['sale', 'rent'],
+        county=property.county,
+        is_verified=True
+    ).exclude(pk=pk)[:6]
     
     context = {
+        'property': property,
+        'similar_properties': similar_properties,
+        'inquiry_form': form,
         'form': form,
         'year': timezone.now().year,
     }
-    return render(request, 'listings/management_request.html', context)
+    
+    return render(request, 'listings/property_detail.html', context)
 
 
 def contact_view(request):
@@ -374,7 +420,10 @@ def contact_view(request):
             except Exception:
                 pass
             
-            messages.success(request, 'Thank you for contacting us! We will get back to you soon.')
+            messages.success(
+                request,
+                'Thank you for writing to us. We typically respond within one business day.'
+            )
             return redirect('listings:contact')
     else:
         form = ContactForm()
@@ -414,29 +463,6 @@ def about_view(request):
     return render(request, 'listings/about.html', context)
 
 
-@staff_member_required
-def management_requests_list(request):
-    """Admin view of landlord management requests"""
-    requests = ManagementRequest.objects.select_related('property__county').order_by('-created_at')
-    
-    # Filter by status if provided
-    status_filter = request.GET.get('status')
-    if status_filter:
-        requests = requests.filter(status=status_filter)
-    
-    # Pagination
-    paginator = Paginator(requests, 20)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'page_obj': page_obj,
-        'status_filter': status_filter,
-        'year': timezone.now().year,
-    }
-    return render(request, 'listings/management_requests_list.html', context)
-
-
 def agent_detail(request, pk):
     """Agent detail page"""
     agent = get_object_or_404(
@@ -457,49 +483,6 @@ def agent_detail(request, pk):
         'year': timezone.now().year,
     }
     return render(request, 'listings/agent_detail.html', context)
-
-
-@require_http_methods(["GET"])
-def property_search_api(request):
-    """AJAX property search endpoint"""
-    query = request.GET.get('q', '')
-    county = request.GET.get('county', '')
-    property_type = request.GET.get('type', '')
-    
-    properties = Property.objects.filter(published=True, status='available')
-    
-    if query:
-        properties = properties.filter(
-            Q(title__icontains=query) | 
-            Q(description__icontains=query) | 
-            Q(location__icontains=query)
-        )
-    
-    if county:
-        properties = properties.filter(county__slug=county)
-    
-    if property_type:
-        properties = properties.filter(property_type=property_type)
-    
-    # Limit results and serialize
-    properties = properties.select_related('county', 'agent__user').prefetch_related('media')[:10]
-    
-    results = []
-    for prop in properties:
-        main_image = prop.main_image
-        results.append({
-            'id': prop.id,
-            'title': prop.title,
-            'county': prop.county.name,
-            'price': float(prop.price),
-            'bedrooms': prop.bedrooms,
-            'bathrooms': prop.bathrooms,
-            'area': float(prop.area),
-            'image_url': main_image.file.url if main_image else None,
-            'url': prop.get_absolute_url() if hasattr(prop, 'get_absolute_url') else f'/property/{prop.id}/'
-        })
-    
-    return JsonResponse({'properties': results})
 
 
 def property_compare(request):
@@ -722,3 +705,50 @@ Please prepare the property for viewing and contact the customer if needed.
             NotificationService.send_sms(settings.WHATSAPP_PHONE_NUMBER, sms_message)
         except Exception as e:
             print(f"Error sending SMS: {e}")
+
+
+def services_view(request):
+    """Services page showing all TRACA Management services"""
+    context = {
+        'year': timezone.now().year,
+    }
+    return render(request, 'listings/services_enhanced.html', context)
+
+
+def about_view(request):
+    """About page with company information"""
+    context = {
+        'year': timezone.now().year,
+    }
+    return render(request, 'listings/about_enhanced.html', context)
+
+
+def contact_view(request):
+    """Contact page with contact form"""
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Persist as an inquiry in the company inbox pipeline.
+            inquiry = Inquiry.objects.create(
+                name=form.cleaned_data['name'],
+                email=form.cleaned_data['email'],
+                phone=form.cleaned_data.get('phone', ''),
+                inquiry_type='general',
+                message=f"Subject: {form.cleaned_data['subject']}\n\n{form.cleaned_data['message']}"
+            )
+
+            try:
+                NotificationService.send_contact_notification(form)
+            except Exception as e:
+                print(f"Error sending contact notification: {e}")
+
+            messages.success(request, 'Your message has been sent successfully! We will contact you soon.')
+            return redirect('listings:contact')
+    else:
+        form = ContactForm()
+    
+    context = {
+        'form': form,
+        'year': timezone.now().year,
+    }
+    return render(request, 'listings/contact.html', context)

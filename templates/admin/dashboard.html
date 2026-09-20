@@ -1,0 +1,271 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/admin-custom.css' %}">
+<style>
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, var(--brand-magenta), var(--brand-bright-pink));
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(255, 0, 255, 0.2);
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(255, 0, 255, 0.3);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .dashboard-sections {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+        color: var(--brand-magenta);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .activity-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+    
+    .activity-item:hover {
+        background-color: rgba(255, 0, 255, 0.05);
+        padding-left: 0.5rem;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-title {
+        font-weight: 600;
+        color: var(--brand-dark-grey);
+        margin-bottom: 0.25rem;
+    }
+    
+    .activity-meta {
+        font-size: 0.875rem;
+        color: #666;
+    }
+    
+    .revenue-highlight {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+    }
+    
+    .revenue-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .revenue-period {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-sections {
+            grid-template-columns: 1fr;
+        }
+        
+        .dashboard-stats {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <!-- Revenue Highlight -->
+    <div class="revenue-highlight">
+        <div class="revenue-amount">KES {{ monthly_revenue|default:0|floatformat:0 }}</div>
+        <div class="revenue-period">Revenue for {{ current_month }} {{ current_year }}</div>
+    </div>
+    
+    <!-- Dashboard Statistics -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_properties }}</div>
+            <div class="stat-label">Total Properties</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.active_properties }}</div>
+            <div class="stat-label">Available Properties</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_tenants }}</div>
+            <div class="stat-label">Total Tenants</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.active_tenants }}</div>
+            <div class="stat-label">Active Tenants</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_inquiries|default:0 }}</div>
+            <div class="stat-label">Client Inquiries</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.pending_requests|default:0 }}</div>
+            <div class="stat-label">Pending Requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.active_leases }}</div>
+            <div class="stat-label">Active Leases</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.pending_maintenance }}</div>
+            <div class="stat-label">Pending Maintenance</div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Sections -->
+    <div class="dashboard-sections">
+        <!-- Recent Properties -->
+        <div class="dashboard-section">
+            <h3 class="section-title">Recent Properties</h3>
+            {% for property in recent_properties %}
+                <div class="activity-item">
+                    <div class="activity-title">{{ property.title }}</div>
+                    <div class="activity-meta">
+                        {{ property.property_type.title }} - {{ property.status.title }} - 
+                        Added {{ property.created_at|timesince }} ago
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted">No properties found.</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Recent Tenants -->
+        <div class="dashboard-section">
+            <h3 class="section-title">Recent Tenants</h3>
+            {% for tenant in recent_tenants %}
+                <div class="activity-item">
+                    <div class="activity-title">{{ tenant.first_name }} {{ tenant.last_name }}</div>
+                    <div class="activity-meta">
+                        {{ tenant.email }} - {{ tenant.status.title }} - 
+                        Joined {{ tenant.created_at|timesince }} ago
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted">No tenants found.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Pending Maintenance -->
+    {% if recent_maintenance %}
+        <div class="dashboard-section">
+            <h3 class="section-title">Pending Maintenance Requests</h3>
+            {% for request in recent_maintenance %}
+                <div class="activity-item">
+                    <div class="activity-title">{{ request.title }}</div>
+                    <div class="activity-meta">
+                        {{ request.property.title }} - {{ request.priority.title }} Priority - 
+                        {{ request.created_at|timesince }} ago
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Quick Actions -->
+    <div class="dashboard-section">
+        <h3 class="section-title">Quick Actions</h3>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'admin:listings_property_add' %}" class="btn btn-primary btn-block">
+                    <i class="fas fa-plus"></i> Add Property
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'admin:listings_tenant_add' %}" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i> Add Tenant
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{% url 'admin:listings_lease_add' %}" class="btn btn-primary btn-block">
+                    <i class="fas fa-file-contract"></i> Create Lease
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+    // Add some interactivity to the dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate stat cards on load
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+        
+        // Add click handlers for quick actions
+        const quickActionButtons = document.querySelectorAll('.dashboard-section .btn');
+        quickActionButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Add a subtle animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    });
+</script>
+{% endblock %}

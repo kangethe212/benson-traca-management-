@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
-from .models import Property, PropertyMedia, Inquiry, County, Amenity, ManagementRequest, PropertyViewing
+from .models import Property, PropertyMedia, Inquiry, County, Amenity, PropertyViewing
 
 
 class PropertyForm(forms.ModelForm):
@@ -86,109 +86,6 @@ class PropertyForm(forms.ModelForm):
         return area
 
 
-class ManagementRequestForm(forms.ModelForm):
-    """Form for landlords to submit property management requests"""
-    property_type = forms.ChoiceField(
-        choices=Property.PROPERTY_TYPES,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-    county = forms.CharField(
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Type county name (e.g., Nairobi, Mombasa, Kisumu, etc.)',
-            'autocomplete': 'off'
-        }),
-        help_text="Enter your county name"
-    )
-    town = forms.CharField(
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter town or area (e.g., Westlands, Karen, Nyali, etc.)'
-        }),
-        help_text="Specific town or area within the county"
-    )
-    property_images = forms.FileField(
-        required=False,
-        help_text="Upload property images (JPG, PNG, max 5MB each)",
-        widget=forms.ClearableFileInput(attrs={'accept': 'image/*', 'class': 'form-control'})
-    )
-    property_videos = forms.FileField(
-        required=False,
-        help_text="Upload property videos (MP4, AVI, max 50MB each)",
-        widget=forms.ClearableFileInput(attrs={'accept': 'video/*', 'class': 'form-control'})
-    )
-    
-    class Meta:
-        model = ManagementRequest
-        fields = [
-            'landlord_name', 'landlord_contact', 'rent_amount', 'service_terms',
-            'property_type', 'county', 'town', 'property_images', 'property_videos'
-        ]
-        widgets = {
-            'landlord_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your full name'}),
-            'landlord_contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+254 700 000 000'}),
-            'rent_amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Monthly rent amount in KSh'}),
-            'service_terms': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Describe your property and management requirements...'}),
-        }
-
-    def clean_landlord_contact(self):
-        """Basic phone validation"""
-        contact = self.cleaned_data.get('landlord_contact')
-        if contact:
-            # Remove spaces and special characters for validation
-            clean_contact = ''.join(filter(str.isdigit, contact))
-            if len(clean_contact) < 9:
-                raise ValidationError("Please enter a valid phone number.")
-        return contact
-
-    def clean_rent_amount(self):
-        """Validate rent amount is positive"""
-        rent_amount = self.cleaned_data.get('rent_amount')
-        if rent_amount and rent_amount <= 0:
-            raise ValidationError("Rent amount must be greater than zero.")
-        return rent_amount
-
-    def clean_property_images(self):
-        """Validate uploaded property images"""
-        images = self.files.getlist('property_images')
-        if not images:
-            return images
-        
-        for image in images:
-            # Check file size (5MB limit)
-            if image.size > 5 * 1024 * 1024:
-                raise ValidationError(f"Image {image.name} is too large. Maximum size is 5MB.")
-            
-            # Check file type
-            allowed_types = ['image/jpeg', 'image/png', 'image/jpg']
-            if image.content_type not in allowed_types:
-                raise ValidationError(f"Image {image.name} is not a valid image format. Use JPG or PNG.")
-        
-        return images
-
-    def clean_property_videos(self):
-        """Validate uploaded property videos"""
-        videos = self.files.getlist('property_videos')
-        if not videos:
-            return videos
-        
-        for video in videos:
-            # Check file size (50MB limit)
-            if video.size > 50 * 1024 * 1024:
-                raise ValidationError(f"Video {video.name} is too large. Maximum size is 50MB.")
-            
-            # Check file type
-            allowed_types = ['video/mp4', 'video/avi', 'video/quicktime']
-            if video.content_type not in allowed_types:
-                raise ValidationError(f"Video {video.name} is not a valid video format. Use MP4, AVI, or MOV.")
-        
-        return videos
-
-
 class InquiryForm(forms.ModelForm):
     """Form for property inquiries"""
     
@@ -207,10 +104,10 @@ class InquiryForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({'class': 'form-control'})
         
         # Add placeholders
-        self.fields['name'].widget.attrs['placeholder'] = 'Your full name'
-        self.fields['email'].widget.attrs['placeholder'] = 'your.email@example.com'
-        self.fields['phone'].widget.attrs['placeholder'] = '+254 700 000 000'
-        self.fields['message'].widget.attrs['placeholder'] = 'Tell us about your inquiry...'
+        self.fields['name'].widget.attrs['placeholder'] = 'Your name'
+        self.fields['email'].widget.attrs['placeholder'] = 'name@example.com'
+        self.fields['phone'].widget.attrs['placeholder'] = '+254 7xx xxx xxx'
+        self.fields['message'].widget.attrs['placeholder'] = 'A few lines on what you need — viewing, price, or availability'
 
     def clean_phone(self):
         """Basic phone validation"""
@@ -230,7 +127,7 @@ class PropertySearchForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Search by title or description...'
+            'placeholder': 'Title, town, or county'
         })
     )
     
@@ -316,11 +213,11 @@ class PropertySearchForm(forms.Form):
 
 class ContactForm(forms.Form):
     """General contact form"""
-    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    phone = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    subject = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your name'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'name@example.com'}))
+    phone = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+254 7xx xxx xxx'}))
+    subject = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'What is this about?'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'How can we help you?'}))
 
     def clean_phone(self):
         """Basic phone validation"""

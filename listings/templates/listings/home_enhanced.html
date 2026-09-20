@@ -1,0 +1,1395 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Home - Traca Management Services Ltd{% endblock %}
+
+{% block meta_description %}Traca Management Services - Professional property management, sales, and rentals in Kenya. Find your perfect property from over 500+ premium listings across all 47 counties.{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Professional Real Estate Hero Section - Enhanced for Performance */
+.hero-section {
+    min-height: 100vh;
+    position: relative;
+    background: linear-gradient(135deg, rgba(0, 51, 102, 0.9) 0%, rgba(26, 77, 115, 0.9) 100%);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Optimized Background for Mobile Performance */
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: url('{% static 'images/traca-hero-bg.jpg' %}');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Fallback for older devices */
+@media (max-width: 768px) {
+    .hero-background {
+        background-attachment: scroll;
+        background-position: center top;
+    }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hero-main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.hero-text-content {
+    color: white;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, var(--brand-magenta) 0%, var(--brand-bright-pink) 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    box-shadow: 0 8px 30px rgba(255, 0, 255, 0.3);
+    animation: slideInLeft 1s ease-out;
+    transition: all 0.3s ease;
+}
+
+.hero-badge:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(255, 0, 255, 0.4);
+}
+
+.hero-main-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: slideInLeft 1s ease-out;
+    animation-delay: 0.3s;
+    animation-fill-mode: both;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.95);
+    animation: slideInLeft 1s ease-out;
+    animation-delay: 0.6s;
+    animation-fill-mode: both;
+    letter-spacing: 0.5px;
+}
+
+.hero-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.85);
+    animation: slideInLeft 1s ease-out;
+    animation-delay: 0.9s;
+    animation-fill-mode: both;
+    max-width: 600px;
+}
+
+/* Enhanced Statistics Section */
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 2rem;
+    animation: slideInLeft 1s ease-out;
+    animation-delay: 1.2s;
+    animation-fill-mode: both;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.4s ease;
+    min-width: 140px;
+}
+
+.stat-item:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.stat-number {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--brand-magenta) 0%, var(--brand-bright-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+}
+
+.hero-cta-buttons {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    animation: slideInLeft 1s ease-out;
+    animation-delay: 1.5s;
+    animation-fill-mode: both;
+}
+
+.hero-cta-primary {
+    background: linear-gradient(135deg, var(--brand-magenta) 0%, var(--brand-bright-pink) 100%);
+    color: white;
+    padding: 1.25rem 3rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.4s ease;
+    box-shadow: 0 15px 35px rgba(255, 0, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.hero-cta-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.hero-cta-primary:hover::before {
+    left: 100%;
+}
+
+.hero-cta-primary:hover {
+    background: linear-gradient(135deg, var(--brand-bright-pink) 0%, var(--brand-magenta) 100%);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 45px rgba(255, 0, 255, 0.5);
+    color: white;
+}
+
+.hero-cta-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 1.25rem 2.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(15px);
+    letter-spacing: 0.5px;
+}
+
+.hero-cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.95);
+    color: #003366;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 45px rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Enhanced Search Panel */
+.hero-search-panel {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 25px;
+    padding: 2.5rem;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: slideInRight 1s ease-out;
+    animation-delay: 0.6s;
+    animation-fill-mode: both;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-search-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--brand-magenta), var(--brand-bright-pink), var(--brand-magenta));
+    background-size: 200% 100%;
+    animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.search-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #003366;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.search-title::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--brand-magenta), var(--brand-bright-pink));
+    border-radius: 2px;
+}
+
+.search-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.search-input-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.search-input {
+    padding: 1rem 1.25rem;
+    border: 2px solid #e8e8e8;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: #fafafa;
+    color: #333;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--brand-magenta);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(255, 0, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.search-input::placeholder {
+    color: #999;
+    font-weight: 400;
+}
+
+.search-btn {
+    background: linear-gradient(135deg, var(--brand-magenta) 0%, var(--brand-bright-pink) 100%);
+    color: white;
+    padding: 1.25rem 2.5rem;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.search-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.search-btn:hover::before {
+    left: 100%;
+}
+
+.search-btn:hover {
+    background: linear-gradient(135deg, var(--brand-bright-pink) 0%, var(--brand-magenta) 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(255, 0, 255, 0.4);
+}
+
+/* Advanced Mobile Responsive Design */
+@media (max-width: 1200px) {
+    .hero-main-title {
+        font-size: 3rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
+    
+    .hero-stats {
+        gap: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .hero-main-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        min-height: auto;
+        padding: 2rem 0;
+    }
+    
+    .hero-main-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .hero-description {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-item {
+        padding: 1.5rem 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .hero-cta-buttons {
+        justify-content: center;
+    }
+    
+    .hero-cta-primary,
+    .hero-cta-secondary {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+    
+    .hero-search-panel {
+        margin: 0 1rem;
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: auto;
+        padding: 4rem 0;
+    }
+    
+    .hero-content {
+        padding: 0 1rem;
+    }
+    
+    .hero-main-title {
+        font-size: 2rem;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .hero-description {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-item {
+        padding: 1.25rem 0.75rem;
+        min-width: auto;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .hero-cta-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .hero-cta-primary,
+    .hero-cta-secondary {
+        width: 100%;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+    
+    .hero-search-panel {
+        margin: 0 0.5rem;
+        padding: 1.5rem;
+    }
+    
+    .search-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-input-group {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .search-input {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .search-btn {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+    
+    .hero-badge {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 3rem 0;
+    }
+    
+    .hero-main-title {
+        font-size: 1.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-description {
+        font-size: 0.9rem;
+    }
+    
+    .hero-stats {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .stat-item {
+        padding: 1rem 0.75rem;
+    }
+    
+    .stat-number {
+        font-size: 1.75rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .hero-search-panel {
+        margin: 0 0.25rem;
+        padding: 1.25rem;
+    }
+    
+    .search-title {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-cta-primary,
+    .hero-cta-secondary {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .search-btn {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Ultra Small Devices (Android 8 and older) */
+@media (max-width: 360px) {
+    .hero-main-title {
+        font-size: 1.5rem;
+    }
+    
+    .hero-badge {
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+    }
+    
+    .hero-search-panel {
+        padding: 1rem;
+    }
+    
+    .search-title {
+        font-size: 1.2rem;
+    }
+    
+    .search-input {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .hero-cta-primary,
+    .hero-cta-secondary {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Performance Optimizations */
+.hero-section,
+.hero-search-panel,
+.stat-item {
+    will-change: transform;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .hero-badge,
+    .hero-main-title,
+    .hero-subtitle,
+    .hero-description,
+    .hero-stats,
+    .hero-cta-buttons,
+    .hero-search-panel {
+        animation: none;
+    }
+    
+    .hero-badge:hover,
+    .stat-item:hover,
+    .hero-cta-primary:hover,
+    .hero-cta-secondary:hover,
+    .search-btn:hover {
+        transform: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .hero-section {
+        background: #000;
+    }
+    
+    .hero-text-content {
+        color: #fff;
+    }
+    
+    .hero-search-panel {
+        background: #fff;
+        border: 2px solid #000;
+    }
+}
+
+/* Animations */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Enhanced Property Cards Section */
+.featured-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #003366;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #003366 0%, var(--brand-magenta) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-subtitle {
+    font-size: 1.25rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.property-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.property-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.property-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.property-image {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+}
+
+.property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.property-card:hover .property-image img {
+    transform: scale(1.1);
+}
+
+.property-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: linear-gradient(135deg, var(--brand-magenta), var(--brand-bright-pink));
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.property-content {
+    padding: 2rem;
+}
+
+.property-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.property-location {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.property-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--brand-magenta);
+    margin-bottom: 1rem;
+}
+
+.property-features {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.property-features span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.property-action {
+    background: linear-gradient(135deg, var(--brand-magenta), var(--brand-bright-pink));
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.property-action:hover {
+    background: linear-gradient(135deg, var(--brand-bright-pink), var(--brand-magenta));
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* Trust Indicators Section */
+.trust-section {
+    padding: 4rem 0;
+    background: white;
+}
+
+.trust-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    text-align: center;
+}
+
+.trust-item {
+    padding: 2rem;
+    transition: transform 0.3s ease;
+}
+
+.trust-item:hover {
+    transform: translateY(-5px);
+}
+
+.trust-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--brand-magenta), var(--brand-bright-pink));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+}
+
+.trust-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 1rem;
+}
+
+.trust-description {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Mobile Responsive for Sections */
+@media (max-width: 768px) {
+    .featured-section,
+    .trust-section {
+        padding: 3rem 0;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1rem;
+    }
+    
+    .property-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .trust-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .property-content {
+        padding: 1.5rem;
+    }
+    
+    .property-title {
+        font-size: 1.1rem;
+    }
+    
+    .property-price {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .featured-section,
+    .trust-section {
+        padding: 2rem 0;
+    }
+    
+    .section-header {
+        margin-bottom: 2rem;
+    }
+    
+    .property-content {
+        padding: 1rem;
+    }
+    
+    .trust-item {
+        padding: 1.5rem;
+    }
+    
+    .trust-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+}
+
+/* Loading Animation */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Professional Real Estate Hero Section -->
+<div class="hero-section">
+    <!-- Optimized Background -->
+    <div class="hero-background"></div>
+    
+    <!-- Hero Content -->
+    <div class="hero-content">
+        <div class="hero-main-content">
+            <!-- Left Side: Professional Text Content -->
+            <div class="hero-text-content">
+                <div class="hero-badge">
+                    <i class="fas fa-award me-2"></i>
+                    <span>Trusted Since 2004</span>
+                </div>
+                
+                <h1 class="hero-main-title">
+                    Find Your Dream Property in Kenya
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Premium Real Estate Investment Opportunities
+                </p>
+                
+                <p class="hero-description">
+                    Discover exceptional properties across Kenya's 47 counties. From luxury villas in Karen to modern apartments in Westlands, we connect international investors and local buyers with Kenya's finest real estate opportunities.
+                </p>
+                
+                <!-- Enhanced Statistics -->
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="500">0</span>
+                        <span class="stat-label">Properties</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="350">0</span>
+                        <span class="stat-label">Happy Clients</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="20">0</span>
+                        <span class="stat-label">Years Experience</span>
+                    </div>
+                </div>
+                
+                <!-- Call-to-Action Buttons -->
+                <div class="hero-cta-buttons">
+                    <a href="{% url 'listings:properties_list' %}" class="hero-cta-primary">
+                        <i class="fas fa-search"></i>
+                        <span>Browse Properties</span>
+                    </a>
+                    <a href="{% url 'listings:contact' %}" class="hero-cta-secondary">
+                        <i class="fas fa-phone"></i>
+                        <span>Get Consultation</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Right Side: Advanced Search Panel -->
+            <div class="hero-search-panel">
+                <h3 class="search-title">Find Your Perfect Property</h3>
+                
+                <form class="search-form" action="{% url 'listings:properties_list' %}" method="GET">
+                    <div class="search-input-group">
+                        <select name="property_type" class="search-input">
+                            <option value="">Property Type</option>
+                            <option value="sale">For Sale</option>
+                            <option value="rent">For Rent</option>
+                        </select>
+                        <input type="text" name="county" class="search-input" placeholder="Type County Name" autocomplete="off">
+                    </div>
+                    
+                    <div class="search-input-group">
+                        <input type="number" name="min_price" placeholder="Min Price (KES)" class="search-input">
+                        <input type="number" name="max_price" placeholder="Max Price (KES)" class="search-input">
+                    </div>
+                    
+                    <div class="search-input-group">
+                        <select name="bedrooms" class="search-input">
+                            <option value="">Bedrooms</option>
+                            <option value="1">1+ Bedroom</option>
+                            <option value="2">2+ Bedrooms</option>
+                            <option value="3">3+ Bedrooms</option>
+                            <option value="4">4+ Bedrooms</option>
+                            <option value="5">5+ Bedrooms</option>
+                        </select>
+                        <select name="bathrooms" class="search-input">
+                            <option value="">Bathrooms</option>
+                            <option value="1">1+ Bathroom</option>
+                            <option value="2">2+ Bathrooms</option>
+                            <option value="3">3+ Bathrooms</option>
+                            <option value="4">4+ Bathrooms</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                        <span>Search Properties</span>
+                    </button>
+                </form>
+                
+                <!-- Quick Contact -->
+                <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1.25rem; font-weight: 500;">Need immediate assistance?</p>
+                    <button onclick="openWhatsApp()" style="background: linear-gradient(135deg, #25D366 0%, #20B858 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 25px; font-weight: 700; cursor: pointer; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp Us</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Featured Properties Section -->
+<div class="featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Properties</h2>
+            <p class="section-subtitle">Handpicked premium properties for sale and rent across Kenya</p>
+        </div>
+        
+        <div class="property-grid">
+            {% for property in featured_properties|slice:":6" %}
+            <div class="property-card">
+                <div class="property-image">
+                    {% if property.main_image %}
+                        <img src="{{ property.main_image.file.url }}" alt="{{ property.title }}" loading="lazy">
+                    {% else %}
+                        <img src="{% static 'images/default_property.jpg' %}" alt="No Image" loading="lazy">
+                    {% endif %}
+                    {% if property.is_verified %}
+                        <div class="property-badge">
+                            <i class="fas fa-check me-1"></i>Verified
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="property-content">
+                    <h3 class="property-title">{{ property.title }}</h3>
+                    <div class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ property.county.name }}
+                    </div>
+                    <div class="property-price">
+                        KSh {{ property.price|intcomma }}
+                        {% if property.property_type == 'rent' %}/month{% endif %}
+                    </div>
+                    <div class="property-features">
+                        {% if property.bedrooms %}<span><i class="fas fa-bed"></i> {{ property.bedrooms }}</span>{% endif %}
+                        {% if property.bathrooms %}<span><i class="fas fa-bath"></i> {{ property.bathrooms }}</span>{% endif %}
+                        {% if property.parking_slots %}<span><i class="fas fa-car"></i> {{ property.parking_slots }}</span>{% endif %}
+                    </div>
+                    <a href="{% url 'listings:property_detail' property.pk %}" class="property-action">
+                        <i class="fas fa-eye me-2"></i>View Details
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+                <!-- Loading Skeletons -->
+                {% for i in "123456" %}
+                <div class="property-card">
+                    <div class="property-image">
+                        <div class="loading-skeleton" style="height: 100%;"></div>
+                    </div>
+                    <div class="property-content">
+                        <div class="loading-skeleton" style="height: 24px; margin-bottom: 1rem; border-radius: 4px;"></div>
+                        <div class="loading-skeleton" style="height: 16px; margin-bottom: 1rem; border-radius: 4px;"></div>
+                        <div class="loading-skeleton" style="height: 20px; margin-bottom: 1rem; border-radius: 4px;"></div>
+                        <div class="loading-skeleton" style="height: 40px; border-radius: 25px;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        
+        <div class="text-center">
+            <a href="{% url 'listings:properties_list' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #003366, #1a4d73); color: white; border: none; padding: 1rem 3rem; font-weight: 600; border-radius: 25px; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-th me-2"></i>View All Properties
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Trust Indicators Section -->
+<div class="trust-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Why Choose TRACA</h2>
+            <p class="section-subtitle">Your trusted partner in Kenyan real estate</p>
+        </div>
+        
+        <div class="trust-grid">
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="trust-title">Verified Properties</h3>
+                <p class="trust-description">All properties are thoroughly verified and documented for your peace of mind</p>
+            </div>
+            
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="trust-title">Expert Support</h3>
+                <p class="trust-description">Dedicated team of real estate professionals to guide you every step</p>
+            </div>
+            
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3 class="trust-title">Nationwide Coverage</h3>
+                <p class="trust-description">Properties available across all 47 counties in Kenya</p>
+            </div>
+            
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3 class="trust-title">Trusted Service</h3>
+                <p class="trust-description">20+ years of excellence in Kenyan real estate market</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animated Counter
+document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.stat-number');
+    const speed = 200; // Animation speed
+    
+    const animateCounter = (counter) => {
+        const target = +counter.getAttribute('data-count');
+        const increment = target / speed;
+        
+        const updateCount = () => {
+            const count = +counter.innerText;
+            
+            if (count < target) {
+                counter.innerText = Math.ceil(count + increment);
+                setTimeout(updateCount, 10);
+            } else {
+                counter.innerText = target;
+            }
+        };
+        
+        updateCount();
+    };
+    
+    // Intersection Observer for performance
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    counters.forEach(counter => {
+        observer.observe(counter);
+    });
+    
+    // Enhanced Search Functionality
+    const countyInput = document.querySelector('input[name="county"]');
+    if (countyInput) {
+        // Simple autocomplete for counties
+        const kenyanCounties = [
+            'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Kisii', 'Thika',
+            'Kitale', 'Garissa', 'Kakamega', 'Nyeri', 'Meru', 'Embu', 'Machakos',
+            'Bungoma', 'Lodwar', 'Webuye', 'Kericho', 'Naivasha', 'Malindi'
+        ];
+        
+        let currentFocus = -1;
+        
+        countyInput.addEventListener('input', function() {
+            const value = this.value.toLowerCase();
+            const existingList = document.getElementById('county-suggestions');
+            if (existingList) {
+                existingList.remove();
+            }
+            
+            if (value.length < 2) return;
+            
+            const suggestions = kenyanCounties.filter(county => 
+                county.toLowerCase().includes(value)
+            );
+            
+            if (suggestions.length > 0) {
+                const suggestionList = document.createElement('div');
+                suggestionList.id = 'county-suggestions';
+                suggestionList.style.cssText = `
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    right: 0;
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-top: none;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    z-index: 1000;
+                    border-radius: 0 0 15px 15px;
+                `;
+                
+                suggestions.forEach(county => {
+                    const item = document.createElement('div');
+                    item.textContent = county;
+                    item.style.cssText = `
+                        padding: 12px 16px;
+                        cursor: pointer;
+                        border-bottom: 1px solid #f0f0f0;
+                        transition: background-color 0.2s;
+                    `;
+                    item.addEventListener('click', function() {
+                        countyInput.value = county;
+                        suggestionList.remove();
+                    });
+                    item.addEventListener('mouseenter', function() {
+                        this.style.backgroundColor = '#f8f9fa';
+                    });
+                    item.addEventListener('mouseleave', function() {
+                        this.style.backgroundColor = 'white';
+                    });
+                    suggestionList.appendChild(item);
+                });
+                
+                countyInput.parentElement.style.position = 'relative';
+                countyInput.parentElement.appendChild(suggestionList);
+            }
+        });
+        
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== countyInput) {
+                const existingList = document.getElementById('county-suggestions');
+                if (existingList) {
+                    existingList.remove();
+                }
+            }
+        });
+    }
+    
+    // Performance optimization: Lazy load images
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src || img.src;
+                    img.classList.remove('loading-skeleton');
+                    imageObserver.unobserve(img);
+                }
+            });
+        });
+        
+        document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+    
+    // Mobile menu enhancement
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+    
+    if (navbarToggler && navbarCollapse) {
+        navbarToggler.addEventListener('click', function() {
+            setTimeout(() => {
+                if (navbarCollapse.classList.contains('show')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }, 300);
+        });
+    }
+    
+    // Close mobile menu when clicking on links
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 992) {
+                const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+                    toggle: false
+                });
+                bsCollapse.hide();
+                document.body.style.overflow = '';
+            }
+        });
+    });
+});
+
+// WhatsApp integration
+function openWhatsApp() {
+    const phoneNumber = '254700000000'; // Replace with actual number
+    const message = encodeURIComponent('Hi! I\'m interested in your property services.');
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+}
+
+// Enhanced property search with filters
+function enhancePropertySearch() {
+    const searchForm = document.querySelector('.search-form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            // Add loading state
+            const submitBtn = this.querySelector('.search-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Searching...';
+            submitBtn.disabled = true;
+            
+            // Remove loading state after 2 seconds (in case of slow response)
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        });
+    }
+}
+
+// Initialize enhancements
+enhancePropertySearch();
+</script>
+{% endblock %}
