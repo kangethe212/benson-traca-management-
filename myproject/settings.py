@@ -27,26 +27,53 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# Read SECRET_KEY from environment to avoid committing secrets. Provide a
-# fallback value only for local development. Replace with a real secret in
-# production via an environment variable.
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-placeholder')
+# Security settings: secret comes from environment in real deployments.
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    '9p2qv7x4z1n8m5w6c3d7y0r2t4u6v8x1a2b5c7d9e0f1g2h3j4k5l6m7n8p9q0r'
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').strip().lower() in {'1', 'true', 'yes', 'on'}
+
+# Hosts must be explicitly trusted. Wildcards are disabled even for local dev.
+raw_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in raw_hosts.split(',') if host.strip()]
 
 # Homepage hero background image. Set it to a static or media URL such as
 # '/static/images/property2.jpg' or '/media/properties/your-house.jpg'
 HERO_BACKGROUND_IMAGE = os.getenv('HERO_BACKGROUND_IMAGE', '/static/images/property2.jpg')
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '10.60.9.26',
-    '192.168.56.1',
-    '0.0.0.0',
-    '*',  # Allow all hosts for development
+# Hardening for production deployments behind a reverse proxy/CDN.
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+# Trust the proxy/host headers used by Railway, Render, or a load balancer.
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        'CSRF_TRUSTED_ORIGINS',
+        'https://localhost,https://127.0.0.1,https://*.railway.app,https://*.render.com'
+    ).split(',')
+    if origin.strip()
 ]
 
 
