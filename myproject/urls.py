@@ -21,7 +21,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('admin/listings/', include('listings.admin_urls')),  # Custom admin views
     path('', include('listings.urls')),  # Active marketplace routes only
 ]
 

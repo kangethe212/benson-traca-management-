@@ -2,10 +2,27 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.db.models import Sum
+from . import admin_views
 from .models import (
-    County, Agent, Amenity, Property, PropertyMedia, Inquiry, Testimonial,
-    PropertyViewing, TeamMember
+    County, Agent, Amenity, Property, PropertyMedia, Inquiry, ManagementRequest,
+    Testimonial, PropertyViewing, TeamMember, HomepageHeroSettings
 )
+
+
+@admin.register(HomepageHeroSettings)
+class HomepageHeroSettingsAdmin(admin.ModelAdmin):
+    list_display = ['title', 'is_active', 'updated_at']
+    fieldsets = (
+        ('Hero Settings', {
+            'fields': ('title', 'hero_image', 'hero_image_url', 'is_active')
+        }),
+    )
+
+    def has_add_permission(self, request):
+        return not HomepageHeroSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(County)
@@ -133,26 +150,16 @@ class PropertyAdmin(admin.ModelAdmin):
         custom_urls = [
             path(
                 '<int:property_id>/bulk-upload/',
-                self.admin_site.admin_view(self.bulk_media_upload_view),
+                self.admin_site.admin_view(admin_views.bulk_media_upload),
                 name='listings_property_bulk_upload',
             ),
             path(
                 '<int:property_id>/media-manager/',
-                self.admin_site.admin_view(self.media_manager_view),
+                self.admin_site.admin_view(admin_views.property_media_manager),
                 name='listings_property_media_manager',
             ),
         ]
         return custom_urls + urls
-    
-    def bulk_media_upload_view(self, request, property_id):
-        """Redirect to custom bulk upload view"""
-        from django.shortcuts import redirect
-        return redirect(f'/admin/listings/property/{property_id}/bulk-upload/')
-    
-    def media_manager_view(self, request, property_id):
-        """Redirect to custom media manager view"""
-        from django.shortcuts import redirect
-        return redirect(f'/admin/listings/property/{property_id}/media-manager/')
     
     def mark_as_verified(self, request, queryset):
         """Mark selected properties as verified"""
@@ -252,6 +259,15 @@ class InquiryAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(ManagementRequest)
+class ManagementRequestAdmin(admin.ModelAdmin):
+    list_display = ['landlord_name', 'landlord_contact', 'property', 'rent_amount', 'status', 'created_at']
+    list_filter = ['status', 'created_at']
+    search_fields = ['landlord_name', 'landlord_contact', 'property__title']
+    readonly_fields = ['created_at']
+    ordering = ['-created_at']
 
 
 @admin.register(Testimonial)

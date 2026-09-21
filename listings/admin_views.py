@@ -10,6 +10,9 @@ import os
 import uuid
 
 from .models import Property, PropertyMedia
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @staff_member_required
@@ -24,28 +27,47 @@ def bulk_media_upload(request, property_id):
     if request.method == 'POST':
         files = request.FILES.getlist('media_files')
         media_type = request.POST.get('media_type', 'image')
-        
+
+        # Normalize incoming files: prefer explicit 'media_files', but also
+        # collect any uploaded file entries in case clients send alternative keys.
+        if not files:
+            files = []
+            for key in request.FILES:
+                files.extend(request.FILES.getlist(key))
+
+        # Log what we received (non-verbose)
+        logger.debug('Bulk upload POST: property_id=%s user=%s request_files_keys=%s files_count=%d',
+                     property_id, getattr(request.user, 'username', None), list(request.FILES.keys()), len(files))
+
         uploaded_count = 0
-        for file in files:
-            # Generate unique filename
-            file_extension = os.path.splitext(file.name)[1]
-            unique_filename = f"{uuid.uuid4()}{file_extension}"
-            
-            # Save file
-            file_path = default_storage.save(f'properties/{unique_filename}', ContentFile(file.read()))
-            
-            # Create PropertyMedia object
-            PropertyMedia.objects.create(
-                property=property_obj,
-                media_type=media_type,
-                file=file_path,
-                caption=f"Uploaded: {file.name}",
-                is_primary=False,
-                order=PropertyMedia.objects.filter(property=property_obj).count() + 1
-            )
-            uploaded_count += 1
+        for idx, file in enumerate(files, start=1):
+            try:
+                logger.debug('Processing file %d: name=%s size=%s', idx, getattr(file, 'name', None), getattr(file, 'size', None))
+                # Generate unique filename
+                file_extension = os.path.splitext(file.name)[1]
+                unique_filename = f"{uuid.uuid4()}{file_extension}"
+
+                # Save file
+                file_path = default_storage.save(f'properties/{unique_filename}', ContentFile(file.read()))
+
+                # Create PropertyMedia object
+                media_obj = PropertyMedia.objects.create(
+                    property=property_obj,
+                    media_type=media_type,
+                    file=file_path,
+                    caption=f"Uploaded: {file.name}",
+                    is_primary=False,
+                    order=PropertyMedia.objects.filter(property=property_obj).count() + 1
+                )
+                uploaded_count += 1
+                logger.info('Uploaded file for property %s: original_name=%s saved_path=%s media_id=%s', property_id, getattr(file, 'name', None), file_path, media_obj.id)
+            except Exception:
+                logger.exception('Failed to process uploaded file for property %s, file=%s', property_id, getattr(file, 'name', None))
+                # continue with next file
+                continue
         
         messages.success(request, f'Successfully uploaded {uploaded_count} media files to {property_obj.title}.')
+        logger.debug('Bulk upload finished: property_id=%s uploaded_count=%d redirect_target=%s', property_id, uploaded_count, 'admin:listings_property_change')
         return redirect('admin:listings_property_change', property_id)
     
     context = {

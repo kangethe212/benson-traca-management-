@@ -9,7 +9,10 @@ from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
 
-from .models import Property, County, Agent, Amenity, Testimonial, Inquiry, PropertyMedia, PropertyViewing, TeamMember
+from .models import (
+    Property, County, Agent, Amenity, Testimonial, Inquiry, PropertyMedia,
+    PropertyViewing, TeamMember, HomepageHeroSettings
+)
 from .forms import PropertyForm, InquiryForm, ContactForm, PropertySearchForm, PropertyViewingForm
 from .notifications_enhanced import NotificationService
 from datetime import date, timedelta
@@ -51,10 +54,10 @@ def home(request):
     _dbg('A', 'listings/views.py:home', 'home entered', {'path': request.path, 'method': request.method})
     # #endregion
     try:
-        # Get featured properties with simple query
+        # Show active listings regardless of verification state, while the template
+        # still highlights properties that are explicitly marked as verified.
         featured_properties = Property.objects.filter(
-            property_type__in=['sale', 'rent'],
-            is_verified=True
+            property_type__in=['sale', 'rent']
         ).select_related('county').prefetch_related('media')[:14]
     except Exception as e:
         print(f"Error getting properties: {e}")
@@ -63,9 +66,33 @@ def home(request):
         _dbg('A', 'listings/views.py:home', 'home featured query failed', {'error': str(e)})
         # #endregion
     
+    hero_property = featured_properties[0] if featured_properties else None
+    hero_settings = HomepageHeroSettings.get_or_create_singleton()
+    if hero_settings.is_active and (hero_settings.hero_image or hero_settings.hero_image_url):
+        hero_background_url = hero_settings.background_image
+    elif hero_property and getattr(hero_property, 'main_image_url', None):
+        hero_background_url = hero_property.main_image_url
+    else:
+        hero_background_url = getattr(settings, 'HERO_BACKGROUND_IMAGE', '/static/images/property2.jpg')
+
+    popular_locations = [
+        {'name': 'Nairobi', 'slug': 'nairobi', 'type': 'sale'},
+        {'name': 'Kitengela', 'slug': 'kitengela', 'type': 'sale'},
+        {'name': 'Kajiado', 'slug': 'kajiado', 'type': 'sale'},
+        {'name': 'Mombasa', 'slug': 'mombasa', 'type': 'sale'},
+        {'name': 'Nakuru', 'slug': 'nakuru', 'type': 'sale'},
+        {'name': 'Machakos', 'slug': 'machakos', 'type': 'sale'},
+        {'name': 'Athi River', 'slug': 'athi-river', 'type': 'sale'},
+        {'name': 'Naivasha', 'slug': 'naivasha', 'type': 'sale'},
+        {'name': 'Thika', 'slug': 'thika', 'type': 'sale'},
+        {'name': 'Kisumu', 'slug': 'kisumu', 'type': 'sale'},
+    ]
+
     context = {
         'featured_properties': featured_properties,
         'year': timezone.now().year,
+        'hero_background_url': hero_background_url,
+        'popular_locations': popular_locations,
     }
     # #region agent log
     _dbg('B', 'listings/views.py:home', 'home rendering', {
@@ -87,10 +114,10 @@ def properties_list(request):
     })
     # #endregion
     
-    # Start with base queryset - only sale and rent properties
+    # Start with base queryset - list active sale/rent properties, regardless of
+    # verification state. The verified badge is displayed separately when set.
     properties = Property.objects.filter(
-        property_type__in=['sale', 'rent'],
-        is_verified=True
+        property_type__in=['sale', 'rent']
     ).select_related('county').prefetch_related('media')
     # #region agent log
     _dbg('B', 'listings/views.py:properties_list', 'verified filter applied', {
@@ -205,18 +232,14 @@ def property_detail(request, pk):
     # #endregion
     if request.method == 'POST':
         return property_inquiry(request, pk)
-    # Cache property lookup for 15 minutes
-    cache_key = f'property_detail_{pk}'
-    property = cache.get(cache_key)
-    
-    if property is None:
-        property = get_object_or_404(
-            Property.objects.select_related('county').prefetch_related(
-                'media', 'amenities', 'inquiries'
-            ),
-            pk=pk, property_type__in=['sale', 'rent']
-        )
-        cache.set(cache_key, property, 900)  # 15 minutes
+    # Fetch the current property state directly from the database; caching the
+    # full instance here causes stale verification/badge data after updates.
+    property = get_object_or_404(
+        Property.objects.select_related('county').prefetch_related(
+            'media', 'amenities', 'inquiries'
+        ),
+        pk=pk, property_type__in=['sale', 'rent']
+    )
     
     # Increment view count (with optimization)
     increment_view_count(property)

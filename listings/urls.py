@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from django.shortcuts import redirect
-from . import views
+from . import views, views_enhanced
 
 app_name = 'listings'
 
@@ -30,7 +30,11 @@ urlpatterns = [
     path('contact/', views.contact_view, name='contact'),
     path('about/', views.about_view, name='about'),
     path('services/', views.services_view, name='services'),
-    
+    path('management-request/', views_enhanced.management_request, name='management_request'),
+    path('management-request/success/', views_enhanced.management_request_success, name='management_request_success'),
+    path('management-requests/', views_enhanced.management_requests_list, name='management_requests_list'),
+    path('list-property/', views_enhanced.management_request, name='list_property'),
+
     # API endpoints
     path('api/search/', views.property_search_api, name='property_search_api'),
 ]

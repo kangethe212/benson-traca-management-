@@ -1,0 +1,92 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:listings_property_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; <a href="{% url 'admin:listings_property_change' property.id %}">{{ property.title|truncatechars:30 }}</a>
+&rsaquo; {% trans 'Media Manager' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="module aligned">
+    <h1>{% trans 'Media Manager' %}</h1>
+    <h2>{{ property.title }}</h2>
+
+    <div class="submit-row" style="margin-bottom: 20px;">
+        <a href="{% url 'admin:listings_property_bulk_upload' property.id %}" class="button default">📁 Bulk Upload</a>
+        <a href="{% url 'admin:listings_property_change' property.id %}" class="button">← Back to Property</a>
+    </div>
+
+    <div class="module">
+        <h2>Current Media</h2>
+        {% if media_files %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Preview</th>
+                        <th>Caption</th>
+                        <th>Primary</th>
+                        <th>Order</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for media in media_files %}
+                    <tr>
+                        <td>{{ media.get_media_type_display }}</td>
+                        <td>
+                            {% if media.media_type == 'image' %}
+                                <img src="{{ media.file.url }}" style="max-width: 60px; max-height: 40px; object-fit: cover;">
+                            {% else %}
+                                📹 Video
+                            {% endif %}
+                        </td>
+                        <td>{{ media.caption }}</td>
+                        <td>{% if media.is_primary %}✓{% endif %}</td>
+                        <td>{{ media.order }}</td>
+                        <td>
+                            <a href="{% url 'admin:listings_propertymedia_change' media.id %}">Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No media files uploaded yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.submit-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

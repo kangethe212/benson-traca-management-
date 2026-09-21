@@ -153,6 +153,44 @@ class Property(models.Model):
         return bool(self.main_image and self.main_image.file and self.main_image.file.name)
 
 
+class HomepageHeroSettings(models.Model):
+    """Single settings card for the homepage hero image."""
+    title = models.CharField(max_length=120, default='Homepage Hero')
+    hero_image = models.ImageField(upload_to='homepage/', blank=True, null=True, help_text='Upload the hero background image for the home page.')
+    hero_image_url = models.URLField(blank=True, default='/static/images/property2.jpg', help_text='Or set a direct image URL for the homepage hero.')
+    is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Homepage Hero Settings'
+        verbose_name_plural = 'Homepage Hero Settings'
+
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def get_or_create_singleton(cls):
+        obj, _ = cls.objects.get_or_create(
+            pk=1,
+            defaults={
+                'title': 'Homepage Hero',
+                'hero_image_url': '/static/images/property2.jpg',
+            }
+        )
+        if not obj.hero_image_url:
+            obj.hero_image_url = '/static/images/property2.jpg'
+            obj.save(update_fields=['hero_image_url'])
+        return obj
+
+    @property
+    def background_image(self):
+        if self.hero_image and self.hero_image.name:
+            return self.hero_image.url
+        if self.hero_image_url:
+            return self.hero_image_url
+        return '/static/images/property2.jpg'
+
+
 class PropertyMedia(models.Model):
     """Property images, videos, and virtual tours"""
     MEDIA_TYPES = [
@@ -231,6 +269,30 @@ class Inquiry(models.Model):
     def __str__(self):
         property_name = self.property.title if self.property else "General"
         return f"{self.name} - {property_name}"
+
+
+class ManagementRequest(models.Model):
+    """Property management requests submitted by landlords."""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+    ]
+
+    landlord_name = models.CharField(max_length=100)
+    landlord_contact = models.CharField(max_length=20)
+    rent_amount = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0)])
+    service_terms = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    property = models.ForeignKey(Property, on_delete=models.SET_NULL, null=True, blank=True, related_name='management_requests')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Management Request'
+        verbose_name_plural = 'Management Requests'
+
+    def __str__(self):
+        return f"{self.landlord_name} - {self.property.title}"
 
 
 class Testimonial(models.Model):

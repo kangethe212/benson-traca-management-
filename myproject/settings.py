@@ -36,6 +36,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-placeholder')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Homepage hero background image. Set it to a static or media URL such as
+# '/static/images/property2.jpg' or '/media/properties/your-house.jpg'
+HERO_BACKGROUND_IMAGE = os.getenv('HERO_BACKGROUND_IMAGE', '/static/images/property2.jpg')
+
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',

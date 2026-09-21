@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .models import County, Property, ManagementRequest
+from .models import County, Property, ManagementRequest, HomepageHeroSettings
 
 
 class PropertyViewsTestCase(TestCase):
@@ -35,10 +35,12 @@ class PropertyViewsTestCase(TestCase):
         self.client = Client()
 
     def test_home_view(self):
-        """Test that home view returns 200"""
+        """Test that home view returns 200 and includes popular Kenyan market destinations."""
         response = self.client.get(reverse('listings:home'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Traca Management Services')
+        self.assertIn('popular_locations', response.context)
+        self.assertTrue(any(location['name'] == 'Kitengela' for location in response.context['popular_locations']))
 
     def test_properties_list_view(self):
         """Test that properties list view returns 200 and contains property"""
@@ -172,3 +174,9 @@ class PropertyModelTestCase(TestCase):
         self.assertEqual(request_obj.landlord_name, "Jane Doe")
         self.assertEqual(request_obj.property, property_obj)
         self.assertEqual(request_obj.status, "pending")  # Default status
+
+    def test_homepage_hero_settings_singleton(self):
+        """Test that homepage hero settings are available as a dedicated single record."""
+        settings_obj = HomepageHeroSettings.get_or_create_singleton()
+        self.assertEqual(settings_obj.pk, 1)
+        self.assertTrue(settings_obj.hero_image_url.startswith('/static/'))

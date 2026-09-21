@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
-from .models import Property, PropertyMedia, Inquiry, County, Amenity, PropertyViewing
+from .models import Property, PropertyMedia, Inquiry, County, Amenity, PropertyViewing, ManagementRequest
 
 
 class PropertyForm(forms.ModelForm):
@@ -227,6 +227,36 @@ class ContactForm(forms.Form):
             if len(clean_phone) < 9:
                 raise ValidationError("Please enter a valid phone number.")
         return phone
+
+
+class ManagementRequestForm(forms.ModelForm):
+    """Form for landlords to submit management requests."""
+
+    class Meta:
+        model = ManagementRequest
+        fields = [
+            'landlord_name', 'landlord_contact', 'rent_amount', 'service_terms'
+        ]
+        widgets = {
+            'landlord_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your full name'}),
+            'landlord_contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+254700000000'}),
+            'rent_amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '50000'}),
+            'service_terms': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Tell us about the property and the services you need'}),
+        }
+
+    def clean_landlord_contact(self):
+        contact = self.cleaned_data.get('landlord_contact')
+        if contact:
+            digits = ''.join(filter(str.isdigit, contact))
+            if len(digits) < 9:
+                raise ValidationError('Please enter a valid phone number.')
+        return contact
+
+    def clean_rent_amount(self):
+        rent_amount = self.cleaned_data.get('rent_amount')
+        if rent_amount is not None and rent_amount <= 0:
+            raise ValidationError('Rent amount must be greater than zero.')
+        return rent_amount
 
 
 class PropertyViewingForm(forms.ModelForm):
