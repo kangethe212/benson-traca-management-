@@ -17,7 +17,14 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-wgz7pj+ta2hjjk+raicfd
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Configure allowed hosts from environment (comma-separated), default to Railway domain
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '.railway.app').split(',') if h.strip()]
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.getenv(
+        'ALLOWED_HOSTS',
+        'traca-management-services-ltd.onrender.com,localhost,127.0.0.1'
+    ).split(',')
+    if h.strip()
+]
 
 # Application definition
 INSTALLED_APPS = [
